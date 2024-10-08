@@ -11,7 +11,7 @@ Set Implicit Arguments.
 
 (* Disk value and address types  *)
 
-Notation "'valubytes_real'" := (HexString.to_nat "0x1000"). (* 4KB *)
+Notation "'valubytes_real'" := 4096. (* 4KB *)
 Notation "'valulen_real'" := (valubytes_real * 8)%nat.
 
 Module Type VALULEN.

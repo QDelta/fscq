@@ -41,6 +41,8 @@ HSLIB_FUSE := hscgen/Fuse.hs hslib/libopfuse.a
 HSLIB_PRE  := hslib/Word.hs hslib/Evict.hs hslib/Profile.hs
 HSLIB_POST := hslib/Disk.hs hslib/Interpreter.hs
 
+COQ_WARNING := -w -omega-is-deprecated,-implicit-core-hint-db,-deprecated-hint-without-locality,-deprecated-grab-existentials,-undeclared-scope
+
 .PHONY: coq proof clean
 
 all: fscq mkfs
@@ -94,7 +96,7 @@ coqbuild/Makefile.coq: Makefile $(VS_BUILD)
 	@mkdir -p codegen
 	@mkdir -p coqbuild
 	@ln -sf ../coqbuild codegen
-	( cd coqbuild && coq_makefile -R . Fscq $(VS) -o Makefile.coq )
+	( cd coqbuild && coq_makefile -R . Fscq -arg "$(COQ_WARNING)" $(VS) -o Makefile.coq )
 
 %/main.go: %.json coq2go.py
 	@mkdir -p $(@D)

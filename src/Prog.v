@@ -195,7 +195,7 @@ Notation "'let^' ( a ) <- p1 ; p2" :=
   (Bind p1
     (pair_args_helper (fun a (_:unit) => p2))
   )
-  (at level 60, right associativity, a ident,
+  (at level 60, right associativity, a name,
    format "'[v' let^ ( a )  <-  p1 ; '/' p2 ']'").
 
 Notation "'let^' ( a , .. , b ) <- p1 ; p2" :=

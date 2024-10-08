@@ -29,7 +29,7 @@ Fixpoint wordToNat sz (w : word sz) : nat :=
   end.
 Arguments wordToNat : simpl nomatch.
 
-Fixpoint wordToNat' sz (w : word sz) : nat :=
+Definition wordToNat' sz (w : word sz) : nat :=
   match w with
     | WO => O
     | WS false w' => 2 * wordToNat w'
@@ -2065,7 +2065,7 @@ Ltac word_contra1 := match goal with
 Open Scope word_scope.
 
 (** * Signed Logic **)
-Fixpoint wordToZ sz (w : word sz) : Z :=
+Definition wordToZ sz (w : word sz) : Z :=
   if wmsb w true then 
     (** Negative **)
     match wordToN (wneg w) with
