@@ -1,0 +1,20 @@
+{
+    "name": "fscq",
+
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "coqtop.startOn": "interaction",
+                "coq.coqProjectRoot": "src",
+                "coqtop.args": ["-w", "-omega-is-deprecated,-implicit-core-hint-db,-deprecated-hint-without-locality,-deprecated-grab-existentials,-undeclared-scope"]
+            },
+            "extensions": [
+                "coq-community.vscoq1"
+            ]
+        }
+    }
+}

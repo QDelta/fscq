@@ -21,7 +21,6 @@ MODULES    := Lock Nomega Word WordAuto WordZ Bytes Rounding \
 
 VS         := $(MODULES:%=%.v)
 VS_BUILD   := $(patsubst %.v,coqbuild/%.v,$(VS))
-VS_VIO	   := $(patsubst %.v,coqbuild/%.vio,$(VS))
 VS_HS      := codegen/AsyncFS.hs
 VS_ML      := codegen/AsyncFS.ml
 VS_JSON    := codegen/AsyncFS.json
@@ -33,7 +32,8 @@ ifeq (,$(shell $(GHC) --version 2>/dev/null | grep 'version 8\.' 2>/dev/null))
 endif
 
 J	   ?= 1
-GHCARGS    := -j$(J) -O2 -threaded -rtsopts -optl-no-pie
+GHC_PACKAGES := bytestring unix integer-gmp ghc-prim containers directory filepath process
+GHCARGS    := -j$(J) -O2 -threaded -rtsopts -optl-no-pie $(foreach p,$(GHC_PACKAGES),-package $(p))
 		# -ticky -ticky-dyn-thunk -ticky-allocd
 		# -prof -fprof-auto
 		# -eventlog
@@ -43,7 +43,7 @@ HSLIB_POST := hslib/Disk.hs hslib/Interpreter.hs
 
 COQ_WARNING := -w -omega-is-deprecated,-implicit-core-hint-db,-deprecated-hint-without-locality,-deprecated-grab-existentials,-undeclared-scope
 
-.PHONY: coq proof clean
+.PHONY: vio proof clean
 
 all: fscq mkfs
 
@@ -65,27 +65,27 @@ hscgen/%.hs: hslib/%.hsc
 	$(GHC) $(GHCARGS) -F -pgmF ./fiximports.py -Wall $(HSLIB_POST) -ihslib -icodegen
 	$(GHC) $(GHCARGS) -F -pgmF ./fiximports.py -Wall $< -ihslib -icodegen -ihscgen -optl -lfuse -lopfuse -Lhslib -o $@
 
-$(VS_HS): $(VS_VIO) coqbuild/ExtractHaskell.v
+$(VS_HS): vio coqbuild/ExtractHaskell.v
 	( cd coqbuild && coqc -q -R . Fscq ExtractHaskell.v )
 
-$(VS_ML): $(VS_VIO) coqbuild/ExtractOcaml.v
+$(VS_ML): vio coqbuild/ExtractOcaml.v
 	( cd coqbuild && coqc -q -R . Fscq ExtractOcaml.v )
 	mv codegen/Word.ml codegen/.WordCoq.ml
 	mv codegen/Word.mli codegen/.WordCoq.mli
 
-$(VS_JSON): $(VS_VIO) coqbuild/ExtractJSON.v
+$(VS_JSON): vio coqbuild/ExtractJSON.v
 	( cd coqbuild && coqc -q -R . Fscq ExtractJSON.v )
 
-$(VS_VIO): coqbuild/Makefile.coq
+vio: coqbuild/Makefile.coq
 	( cd coqbuild && $(MAKE) -j $(J) -f Makefile.coq vio )
 
-checkproofs: coqbuild/Makefile.coq
+checkproofs: vio
 	( cd coqbuild && $(MAKE) -f Makefile.coq checkproofs J=$(J) )
 
 proof: coqbuild/Makefile.coq
 	( cd coqbuild && $(MAKE) -f Makefile.coq )
 
-parproof: $(VS_VIO)
+parproof: vio
 	( cd coqbuild && $(MAKE) -f Makefile.coq vio2vo J=$(J) )
 
 coqbuild/%.v: %.v
