@@ -42,8 +42,9 @@ HSLIB_PRE  := hslib/Word.hs hslib/Evict.hs hslib/Profile.hs
 HSLIB_POST := hslib/Disk.hs hslib/Interpreter.hs
 
 COQ_WARNING := -w -omega-is-deprecated,-implicit-core-hint-db,-deprecated-hint-without-locality,-deprecated-grab-existentials,-undeclared-scope
+COQEXEC     := coqtop -R . Fscq $(COQ_WARNING) -batch -load-vernac-source
 
-.PHONY: vio proof clean
+.PHONY: vos vok proof clean
 
 all: fscq mkfs
 
@@ -65,28 +66,25 @@ hscgen/%.hs: hslib/%.hsc
 	$(GHC) $(GHCARGS) -F -pgmF ./fiximports.py -Wall $(HSLIB_POST) -ihslib -icodegen
 	$(GHC) $(GHCARGS) -F -pgmF ./fiximports.py -Wall $< -ihslib -icodegen -ihscgen -optl -lfuse -lopfuse -Lhslib -o $@
 
-$(VS_HS): vio coqbuild/ExtractHaskell.v
-	( cd coqbuild && coqc -q -R . Fscq ExtractHaskell.v )
+$(VS_HS): vos coqbuild/ExtractHaskell.v
+	( cd coqbuild && $(COQEXEC) ExtractHaskell.v )
 
-$(VS_ML): vio coqbuild/ExtractOcaml.v
-	( cd coqbuild && coqc -q -R . Fscq ExtractOcaml.v )
+$(VS_ML): vos coqbuild/ExtractOcaml.v
+	( cd coqbuild && $(COQEXEC) ExtractOcaml.v )
 	mv codegen/Word.ml codegen/.WordCoq.ml
 	mv codegen/Word.mli codegen/.WordCoq.mli
 
-$(VS_JSON): vio coqbuild/ExtractJSON.v
-	( cd coqbuild && coqc -q -R . Fscq ExtractJSON.v )
+$(VS_JSON): vos coqbuild/ExtractJSON.v
+	( cd coqbuild && $(COQEXEC) ExtractJSON.v )
 
-vio: coqbuild/Makefile.coq
-	( cd coqbuild && $(MAKE) -j $(J) -f Makefile.coq vio )
+vos: coqbuild/Makefile.coq
+	( cd coqbuild && $(MAKE) -j $(J) -f Makefile.coq vos )
 
-checkproofs: vio
-	( cd coqbuild && $(MAKE) -f Makefile.coq checkproofs J=$(J) )
+vok: coqbuild/Makefile.coq
+	( cd coqbuild && $(MAKE) -j $(J) -f Makefile.coq vok )
 
 proof: coqbuild/Makefile.coq
-	( cd coqbuild && $(MAKE) -f Makefile.coq )
-
-parproof: vio
-	( cd coqbuild && $(MAKE) -f Makefile.coq vio2vo J=$(J) )
+	( cd coqbuild && $(MAKE) -j $(J) -f Makefile.coq )
 
 coqbuild/%.v: %.v
 	@mkdir -p coqbuild
