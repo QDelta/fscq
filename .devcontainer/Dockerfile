@@ -22,4 +22,8 @@ ENV PATH="/home/coq/.cabal/bin:/home/coq/.ghcup/bin:$PATH"
 RUN cabal update && \
     cabal install --lib rdtsc digest
 
+RUN opam update -y -u && \
+    opam install -y -v ocaml-lsp-server ocamlformat && \
+    opam clean -a -c -s --logs
+
 CMD ["/bin/bash"]
