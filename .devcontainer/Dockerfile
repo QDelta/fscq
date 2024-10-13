@@ -1,4 +1,4 @@
-FROM coqorg/coq:8.13
+FROM coqorg/coq:8.16
 
 SHELL ["/bin/bash", "-c"]
 
