@@ -1,5 +1,5 @@
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import List.
 Require Import Prog ProgMonad.
 Require Import Pred PredCrash.
@@ -434,11 +434,11 @@ Ltac wordcmp_one :=
   match goal with
   | [ H: (natToWord ?sz ?n < ?x)%word |- _ ] =>
     assert (goodSize sz (wordToNat x)) by (apply wordToNat_good);
-    assert (wordToNat (natToWord sz n) < wordToNat x) by (apply wlt_lt'; unfold goodSize in *; auto; omega);
+    assert (wordToNat (natToWord sz n) < wordToNat x) by (apply wlt_lt'; unfold goodSize in *; auto; lia);
     clear H
   | [ H: context[wordToNat (natToWord _ _)] |- _ ] =>
     rewrite wordToNat_natToWord_idempotent' in H;
-    [| solve [ omega ||
+    [| solve [ lia ||
                ( eapply Nat.le_lt_trans; [| apply wordToNat_good ]; eauto ) ] ]
   | [ H: (?a < natToWord _ ?b)%word |- wordToNat ?a < ?b ] =>
     apply wlt_lt in H; unfold goodSize in *; erewrite wordToNat_natToWord_bound in H;
@@ -891,7 +891,7 @@ Ltac poststep t :=
   | _ => t
   end in
   intuition tac;
-  try omega;
+  try lia;
   try congruence;
   try tac.
 
@@ -931,7 +931,7 @@ Ltac step_with t :=
   apply_xform cancel;
   try cancel_with t; try autorewrite_fast;
   intuition t;
-  try omega;
+  try lia;
   try congruence;
   try t.
 *)

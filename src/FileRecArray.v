@@ -1,4 +1,4 @@
-Require Import Eqdep_dec Arith Omega List ListUtils Rounding Psatz.
+Require Import Eqdep_dec Arith Lia List ListUtils Rounding Psatz.
 Require Import Word WordAuto AsyncDisk Pred PredCrash GenSepN Array SepAuto.
 Require Import Rec Prog BasicProg Hoare RecArrayUtils Log.
 Require Import ProofIrrelevance.
@@ -283,7 +283,7 @@ Module FileRecArray (FRA : FileRASig).
     unfold items_valid, RALen in *; intuition; simpl.
     repeat rewrite app_length; simpl.
     rewrite block0_repeat, length_updN, repeat_length.
-    rewrite Nat.mul_add_distr_r, Nat.mul_1_l; omega.
+    rewrite Nat.mul_add_distr_r, Nat.mul_1_l; lia.
     apply Forall_append; auto.
     apply Forall_updN; auto.
     rewrite block0_repeat.
@@ -658,7 +658,7 @@ Module FileRecArray (FRA : FileRASig).
     destruct (lt_dec i (length l)).
     apply Forall_selN; auto.
     eapply items_wellformed; eauto.
-    rewrite selN_oob by omega.
+    rewrite selN_oob by lia.
     apply item0_wellformed.
   Qed.
 

@@ -2,7 +2,7 @@ Require Import Prog ProgMonad.
 Require Import Pred.
 Require Import PredCrash.
 Require Import Hoare.
-Require Import Omega.
+Require Import Lia.
 Require Import SepAuto.
 Require Import Word.
 Require Import Nomega.
@@ -13,6 +13,7 @@ Require Import AsyncDisk.
 Require Import Hashmap.
 Require Import ListUtils.
 Require Import ProofIrrelevance.
+Import PeanoNat.
 
 Set Implicit Arguments.
 
@@ -277,7 +278,7 @@ Theorem for_args_wf: forall L,
   well_founded (fun a b => wlt a.(@For_args_n L) b.(@For_args_n L)).
 Proof.
   intros.
-  apply well_founded_lt_compat with (f:=fun a => wordToNat (a.(For_args_n))).
+  apply Wf_nat.well_founded_lt_compat with (f:=fun a => wordToNat (a.(For_args_n))).
   intros.
   apply wlt_lt; auto.
 Qed.
@@ -407,7 +408,7 @@ Proof.
       apply eq_le; auto.
       rewrite wplus_comm.
       apply lt_wlt.
-      omega.
+      lia.
 
       intros.
       eapply pimpl_ok2.
@@ -434,8 +435,8 @@ Proof.
       unfold wplusN, wordBinN.
       simpl (wordToNat $1).
       rewrite wordToNat_natToWord_idempotent'.
-      omega.
-      eapply Nat.le_lt_trans; [| apply (wordToNat_bound (i ^+ x)) ]; omega.
+      lia.
+      eapply Nat.le_lt_trans; [| apply (wordToNat_bound (i ^+ x)) ]; lia.
 
       rewrite wminus_Alt.
       rewrite wminus_Alt2.
@@ -444,14 +445,14 @@ Proof.
 
       simpl (wordToNat $1).
       repeat rewrite wordToNat_natToWord_idempotent'.
-      omega.
+      lia.
       rewrite H2; apply wordToNat_bound.
 
-      eapply Nat.le_lt_trans; [| apply (wordToNat_bound x) ]; omega.
-      eapply Nat.le_lt_trans; [| apply (wordToNat_bound (i ^+ x)) ]; omega.
+      eapply Nat.le_lt_trans; [| apply (wordToNat_bound x) ]; lia.
+      eapply Nat.le_lt_trans; [| apply (wordToNat_bound (i ^+ x)) ]; lia.
 
       unfold not; intros; apply H6.
-      assert (wordToNat x < 1); [| omega ].
+      assert (wordToNat x < 1); [| lia ].
       apply wlt_lt in H9; simpl in H9; auto.
     + cancel.
 Qed.
@@ -489,7 +490,7 @@ Proof.
   eapply pimpl_ok2.
   apply for_ok'.
   fold (wzero addrlen); ring_simplify (wzero addrlen ^+ n).
-  simpl (wordToNat (wzero addrlen)); replace (0 + wordToNat n) with (wordToNat n) by omega.
+  simpl (wordToNat (wzero addrlen)); replace (0 + wordToNat n) with (wordToNat n) by lia.
   ring_simplify (n ^+ wzero addrlen).
   cancel.
   cancel.
@@ -593,7 +594,7 @@ Proof.
       unfold pimpl, lift; intros.
 
       eapply pimpl_ok2; monad_simpl.
-      apply H1. omega. omega.
+      apply H1. lia. lia.
       intros.
       eapply pimpl_ok2.
       eapply IHn.
@@ -607,7 +608,7 @@ Proof.
       intros.
       cancel.
 
-      replace (n + S i) with (S (n + i)) by omega.
+      replace (n + S i) with (S (n + i)) by lia.
       eauto.
     + cancel.
 Qed.
@@ -649,7 +650,7 @@ Proof.
   cancel.
   eapply pimpl_ok2.
   eauto.
-  replace (n + 0) with n by omega; auto.
+  replace (n + 0) with n by lia; auto.
 Qed.
 
 Hint Extern 1 ({{_}} Bind (ForN_ _ _ _ _ _ _) _) => apply forN_ok : prog.

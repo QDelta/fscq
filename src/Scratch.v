@@ -11,7 +11,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import FunctionalExtensionality.
-Require Import Omega.
+Require Import Lia.
 Require Import Word.
 Require Import WordAuto.
 Require Import Rec.
@@ -37,14 +37,14 @@ Module addr_as_OT <: UsualOrderedType.
     unfold lt; intros.
     apply wlt_lt in H; apply wlt_lt in H0.
     apply lt_wlt.
-    omega.
+    lia.
   Qed.
 
   Lemma lt_not_eq : forall x y : t, lt x y -> ~ eq x y.
   Proof.
     unfold lt, eq; intros.
     apply wlt_lt in H.
-    intro He; subst; omega.
+    intro He; subst; lia.
   Qed.
 
   Definition compare x y : Compare lt eq x y.
@@ -323,7 +323,7 @@ Module LOG (Map:FMapInterface.WSfun addr_as_OT).
       repeat (rewrite selN_oob); unfold replay;
         try match goal with [H: _ |- length (replay' _ _) <= a]
             => rewrite <- replay'_length end;
-        auto; omega].
+        auto; lia].
     unfold replay, replay'.
     induction (Map.elements ms); [reflexivity|].
     rewrite <- IHl0; clear IHl0; simpl.
@@ -409,7 +409,7 @@ Module LOG (Map:FMapInterface.WSfun addr_as_OT).
       unfold upd.
       rewrite selN_updN_ne by (
         generalize (wordToNat_bound a); intro Hb;
-        unfold addr_as_OT.WIDTH in *; omega).
+        unfold addr_as_OT.WIDTH in *; lia).
       rewrite replay_sel_invalid by auto; trivial.
   Qed.
 

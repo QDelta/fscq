@@ -1,5 +1,6 @@
 Require Import Word.
 Require Import ZArith.
+Require Import Lia.
 
 Set Implicit Arguments.
 
@@ -64,7 +65,7 @@ Proof.
   reflexivity.
   replace (0%Z) with (Z.of_nat 0) by reflexivity.
   apply inj_le.
-  omega.
+  lia.
 Qed.
 
 Theorem wordToZ_ZToWordTrunc_idempotent : forall sz z,

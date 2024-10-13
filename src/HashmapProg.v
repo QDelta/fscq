@@ -15,7 +15,7 @@ Require Import Array.
 Require Import EqdepFacts.
 Require Import Arith.
 Require Import ListUtils.
-Require Import Omega.
+Require Import Lia.
 
 Set Implicit Arguments.
 
@@ -67,7 +67,7 @@ Proof.
     rewrite app_nil_r. eauto.
   - repeat eexists.
     rewrite firstn_O. cbn. solve_hash_list_rep.
-  Grab Existential Variables.
+  Unshelve.
   all: eauto.
   all: try ( exact tt || exact 0 || exact False ).
 Qed.

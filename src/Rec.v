@@ -1,4 +1,4 @@
-Require Import Arith List String Omega Bool.
+Require Import Arith List String Lia Bool.
 Require Import Word.
 Require Import Eqdep_dec.
 Require Import Array.
@@ -85,7 +85,7 @@ Module Rec.
     unfold well_formed in *.
     inversion H.
     split.
-    rewrite firstn_length_l; omega.
+    rewrite firstn_length_l; lia.
     rewrite Forall_forall; intros.
     apply in_firstn_in in H2.
     rewrite Forall_forall in H1.
@@ -102,7 +102,7 @@ Module Rec.
     unfold well_formed in *.
     inversion H0.
     split.
-    rewrite firstn_length_l; omega.
+    rewrite firstn_length_l; lia.
     rewrite Forall_forall in *; intros.
     eapply H2.
     eapply in_firstn_in; eauto.
@@ -116,7 +116,7 @@ Module Rec.
     unfold well_formed in *.
     inversion H.
     split.
-    rewrite skipn_length; omega.
+    rewrite skipn_length; lia.
     rewrite Forall_forall; intros.
     apply in_skipn_in in H2.
     rewrite Forall_forall in H1.
@@ -133,7 +133,7 @@ Module Rec.
     inversion H.
     split.
     simpl in *.
-    omega.
+    lia.
     rewrite Forall_forall in *; intros.
     apply H1.
     constructor; assumption.
@@ -429,10 +429,10 @@ Module Rec.
     Datatypes.length l > n -> @to_word (ArrayF (WordF sz) n) (app l l2) = @to_word (ArrayF (WordF sz) n) l.
   Proof.
     simpl.
-    induction l; simpl; induction n; intros; auto; try omega.
+    induction l; simpl; induction n; intros; auto; try lia.
     f_equal.
     apply IHl.
-    omega.
+    lia.
   Qed.
 
   Theorem to_word_append_zeroes: forall sz l n m,
@@ -468,18 +468,18 @@ Module Rec.
     rewrite Nat.add_sub_assoc.
     rewrite <- plus_assoc.
     rewrite plus_comm.
-    rewrite <- Nat.add_sub_assoc by omega.
+    rewrite <- Nat.add_sub_assoc by lia.
     rewrite Nat.sub_diag; rewrite <- plus_n_O.
     rewrite Nat.add_sub_assoc.
     rewrite plus_comm.
-    rewrite <- Nat.add_sub_assoc by omega.
+    rewrite <- Nat.add_sub_assoc by lia.
     rewrite Nat.sub_diag; rewrite <- plus_n_O.
     reflexivity.
-    replace (lenft) with (1 * lenft) at 1 by omega.
-    apply Nat.mul_le_mono_r; omega.
-    replace (lenft) with (1 * lenft) at 3 by omega.
+    replace (lenft) with (1 * lenft) at 1 by lia.
+    apply Nat.mul_le_mono_r; lia.
+    replace (lenft) with (1 * lenft) at 3 by lia.
     rewrite <- Nat.mul_sub_distr_r.
-    apply Nat.mul_le_mono_r; omega.
+    apply Nat.mul_le_mono_r; lia.
   Qed.
 
   Definition word_selN {ft : type} {l : nat} (idx : nat) (w : word (len (ArrayF ft l))) : word (len ft).
@@ -494,24 +494,24 @@ Module Rec.
   Theorem word_selN_equiv : forall ft l idx w def, idx < l ->
     of_word (@word_selN ft l idx w) = selN (of_word w) idx def.
   Proof.
-    induction l; intros; try omega.
+    induction l; intros; try lia.
     unfold of_word in *; fold (@of_word ft) in *.
     destruct idx; simpl.
     - f_equal. clear IHl.
       unfold word_selN, middle.
 
-      destruct (lt_dec 0 (S l)); [|omega].
+      destruct (lt_dec 0 (S l)); [|lia].
       generalize (word_selN_helper (len ft) l0).
       replace (S l * len ft - len ft - 0 * len ft) with (l * len ft) by lia.
       simpl; intros.
       erewrite <- eq_rect_eq.
       reflexivity.
 
-    - rewrite <- IHl by omega; clear IHl.
+    - rewrite <- IHl by lia; clear IHl.
       f_equal.
       unfold word_selN.
-      destruct (lt_dec (S idx) (S l)); try omega.
-      destruct (lt_dec idx l); try omega.
+      destruct (lt_dec (S idx) (S l)); try lia.
+      destruct (lt_dec idx l); try lia.
 
       unfold middle.
 
@@ -533,7 +533,7 @@ Module Rec.
       generalize (len ft); clear ft.
       intros.
 
-      assert (n + n0 = n + (n1 + n2)) as e0' by omega.
+      assert (n + n0 = n + (n1 + n2)) as e0' by lia.
       replace ((eq_rect (n + n0) (fun n => word n) w (n + n1 + n2) e0))
         with (match plus_assoc _ _ _ in _ = N return word N with
               | refl_equal => (eq_rect (n+n0) (fun n => word n) w (n+(n1+n2)) e0')
@@ -558,11 +558,11 @@ Module Rec.
   Proof.
     intros.
 
-    rewrite Nat.add_sub_assoc. rewrite plus_comm. rewrite <- Nat.add_sub_assoc by omega.
-    rewrite Nat.sub_diag. omega.
+    rewrite Nat.add_sub_assoc. rewrite plus_comm. rewrite <- Nat.add_sub_assoc by lia.
+    rewrite Nat.sub_diag. lia.
 
-    rewrite <- Nat.mul_sub_distr_r. replace (lenft) with (1 * lenft) at 1 by omega.
-    apply Nat.mul_le_mono_r; omega.
+    rewrite <- Nat.mul_sub_distr_r. replace (lenft) with (1 * lenft) at 1 by lia.
+    apply Nat.mul_le_mono_r; lia.
   Qed.
 
   Lemma word_updN_helper2 : forall idx l lenft, idx < l ->
@@ -570,10 +570,10 @@ Module Rec.
   Proof.
     intros.
 
-    rewrite Nat.add_sub_assoc. rewrite plus_comm. rewrite <- Nat.add_sub_assoc by omega.
-    rewrite Nat.sub_diag. omega.
+    rewrite Nat.add_sub_assoc. rewrite plus_comm. rewrite <- Nat.add_sub_assoc by lia.
+    rewrite Nat.sub_diag. lia.
 
-    apply Nat.mul_le_mono_r; omega.
+    apply Nat.mul_le_mono_r; lia.
   Qed.
 
   Definition word_updN {ft : type} {l : nat} (idx : nat) (w : word (len (ArrayF ft l)))
@@ -598,7 +598,7 @@ Module Rec.
   Proof.
     unfold word_updN; simpl; intros.
     destruct (lt_dec idx l); auto.
-    exfalso; omega.
+    exfalso; lia.
   Qed.
 
   Theorem word_updN_equiv : forall ft l idx w v, idx < l ->
@@ -606,7 +606,7 @@ Module Rec.
   Proof.
     simpl; intros.
     unfold word_updN.
-    destruct (lt_dec idx l); try omega; clear H.
+    destruct (lt_dec idx l); try lia; clear H.
 
     unfold eq_rec_r, eq_rec.
     rewrite eq_rect_word_offset.
@@ -617,7 +617,7 @@ Module Rec.
 
     generalize dependent l.
     induction idx; simpl; intros.
-    - destruct l; try omega.
+    - destruct l; try lia.
       unfold of_word; fold (@of_word ft).
       unfold to_word; fold (@to_word ft).
       replace ((fix word2arrayf (n : nat) (w0 : word (n * len ft)) {struct n} : 
@@ -647,7 +647,7 @@ Module Rec.
       rewrite to_of_id.
       reflexivity.
 
-    - destruct l; try omega.
+    - destruct l; try lia.
       unfold of_word; fold (@of_word ft). fold Init.Nat.mul. fold len.
       unfold to_word; fold (@to_word ft). fold Init.Nat.mul. fold len.
       fold recdata. fold data.
@@ -658,7 +658,7 @@ Module Rec.
       simpl.
 
       rewrite to_of_id.
-      assert (idx < l) as Hidx by omega.
+      assert (idx < l) as Hidx by lia.
       specialize (IHidx l (split2 (len ft) (l * len ft) w) Hidx).
       clear l0.
 
@@ -667,7 +667,7 @@ Module Rec.
         with (len ft + (l * len ft - len ft - idx * len ft)) by
         ( rewrite Nat.sub_add_distr;
           rewrite minus_plus;
-          rewrite <- word_updN_helper1 by omega;
+          rewrite <- word_updN_helper1 by lia;
           lia ).
       intros.
       rewrite eq_rect_combine.
@@ -754,10 +754,11 @@ Module Rec.
       f_equal; clear.
       apply UIP_dec; exact eq_nat_dec.
       apply UIP_dec; exact eq_nat_dec.
-      Grab Existential Variables.
-      rewrite plus_assoc; reflexivity.
+      Unshelve.
       lia.
       lia.
+      (* If use lia will trigger https://github.com/coq/coq/issues/4085 *)
+      { rewrite Nat.add_assoc. reflexivity. }
   Qed.
 
   Definition word_mask (l n : nat) (idx : nat) : word (l * n).
@@ -788,7 +789,7 @@ Module Rec.
   Proof. intros. lia. Qed.
 
   Fact word_shift_helper2 : forall n l, l > 0 -> n + (l - 1) * n = l * n.
-  Proof. intros. destruct l; simpl; try rewrite <- minus_n_O; omega. Qed.
+  Proof. intros. destruct l; simpl; try rewrite <- minus_n_O; lia. Qed.
 
   Fact word_shift_helper3 : forall a b c, a * c + (c + b * c) = (a + 1 + b) * c.
   Proof. intros. lia. Qed.
@@ -801,7 +802,7 @@ Module Rec.
       (eq_rect _ word (wrshift w (idx * n)) _ (eq_sym (word_shift_helper1 n idx off))).
   Proof.
     intros idx off n.
-    assert (idx + 1 + off = S (idx + off)) as H by omega.
+    assert (idx + 1 + off = S (idx + off)) as H by lia.
     generalize_proof.
     rewrite H.
     intros.
@@ -849,7 +850,7 @@ Module Rec.
    Qed.
 
   Fact split1_eq_rect_combine_partial_helper : forall a b c d (H : a + c = a + b + d), c = b + d.
-  Proof. intros. omega. Qed.
+  Proof. intros. lia. Qed.
 
   Theorem split1_eq_rect_combine_partial : forall a b c d H (wa : word a) (wc : word c),
     split1 (a + b) d
@@ -857,7 +858,7 @@ Module Rec.
         combine wa (split1 b d (eq_rect _ word wc _ (split1_eq_rect_combine_partial_helper a b c d H))).
   Proof.
     intros a b c d H.
-    assert (c = b + d) by omega; subst c.
+    assert (c = b + d) by lia; subst c.
     intros.
     erewrite <- split1_combine; f_equal.
     eq_rect_simpl.
@@ -868,7 +869,7 @@ Module Rec.
   Qed.
 
   Fact combine_eq_rect_combine_helper : forall a b c d, a + b = c -> a + (b + d) = c + d.
-  Proof. intros. omega. Qed.
+  Proof. intros. lia. Qed.
 
   Fact combine_eq_rect_combine : forall a b c d H (wa : word a) (wb : word b) (wa' : word d),
     combine (eq_rect (a + b) word (combine wa wb) c H) wa' =
@@ -887,7 +888,7 @@ Module Rec.
     eq_rect c word wc b (plus_reg_l c b a H).
   Proof.
     intros a b c H.
-    assert (c = b) by omega; subst.
+    assert (c = b) by lia; subst.
     intros.
     eq_rect_simpl.
     apply split2_combine.
@@ -915,7 +916,7 @@ Module Rec.
                      rewrite split1_combine  ||
                      rewrite split2_combine).
     reflexivity.
-    Grab Existential Variables.
+    Unshelve.
     all : lia.
   Qed.
 
@@ -925,11 +926,11 @@ Module Rec.
     intros.
     generalize dependent w.
     remember (l - idx - 1) as off.
-    assert (l = (idx + 1+ off)) by omega.
+    assert (l = (idx + 1+ off)) by lia.
     subst l.
     intros w.
     unfold word_selN.
-    destruct lt_dec; try omega.
+    destruct lt_dec; try lia.
     erewrite word_selN_shift_eq_middle.
     generalize dependent (word_selN_helper (len ft) l).
     replace ((idx + 1 + off) * len ft - len ft - idx * len ft) with (off * len ft) by lia.
@@ -959,7 +960,7 @@ Module Rec.
     unfold word_updN_shift.
     intros idx off n.
     generalize dependent (word_shift_helper1 n idx off).
-    replace (idx + 1 + off) with (S (idx + off)) by omega.
+    replace (idx + 1 + off) with (S (idx + off)) by lia.
     intros.
     eq_rect_simpl.
     f_equal.
@@ -977,7 +978,7 @@ Module Rec.
     repeat f_equal.
     generalize_proof.
     intros HH; rewrite HH; auto.
-    Grab Existential Variables.
+    Unshelve.
     simpl; rewrite <- minus_n_O.
     reflexivity.
   Qed.
@@ -989,7 +990,7 @@ Module Rec.
   Proof.
     intros off n idx.
     generalize dependent (word_shift_helper3 idx off n).
-    replace (idx + 1 + off) with (S (idx + off)) by omega.
+    replace (idx + 1 + off) with (S (idx + off)) by lia.
     intros H.
     unfold word_mask.
     rewrite wnot_wlshift.
@@ -1004,7 +1005,7 @@ Module Rec.
     eq_rect_simpl.
     rewrite wnot_combine, split1_combine.
     apply wnot_zero.
-    Grab Existential Variables.
+    Unshelve.
     all : lia.
   Qed.
 
@@ -1017,7 +1018,7 @@ Module Rec.
   Proof.
     intros.
     erewrite eq_rect_combine_dist3 with (w := w).
-    erewrite wnot_word_mask_l_gt_0 by omega.
+    erewrite wnot_word_mask_l_gt_0 by lia.
     unfold wand.
     unfold eq_rec.
     erewrite <- eq_rect_bitwp'; f_equal.
@@ -1062,12 +1063,12 @@ Module Rec.
       erewrite wzero_dist, wzero_rev, <- combine_wzero.
       eq_rect_simpl.
       symmetry; apply split1_combine.
-    Grab Existential Variables.
+    Unshelve.
     all : lia.
   Qed.
 
   Fact word_updN_abs_helper : forall idx off, idx < idx + 1 + off.
-  Proof. intros. omega. Qed.
+  Proof. intros. lia. Qed.
 
   Theorem word_updN_abs : forall idx off ft w v,
     let H := word_shift_helper3 idx off (len ft) in
@@ -1080,7 +1081,7 @@ Module Rec.
   Proof.
     unfold word_updN; simpl.
     intros.
-    destruct lt_dec; try omega.
+    destruct lt_dec; try lia.
     repeat eexists.
     eq_rect_simpl; apply eq_rect_both.
     rewrite eq_rect_word_offset; eq_rect_simpl.
@@ -1094,7 +1095,7 @@ Module Rec.
       rewrite eq_rect_split2.
       eq_rect_simpl.
       repeat (try reflexivity; f_equal; eq_rect_simpl; try apply eq_rect_both).
-    Grab Existential Variables.
+    Unshelve.
     all : simpl; lia.
   Qed.
 
@@ -1103,7 +1104,7 @@ Module Rec.
   Proof.
     intros l idx ft w v H.
     remember (l - idx - 1) as off.
-    assert (l = idx + 1 + off) by omega.
+    assert (l = idx + 1 + off) by lia.
     subst l.
     erewrite word_updN_shift_abs by auto.
     erewrite word_updN_abs.
@@ -1268,8 +1269,8 @@ Module Rec.
     rewrite split2_combine.
     f_equal.
 
-    Grab Existential Variables.
-    all: omega.
+    Unshelve.
+    all: lia.
   Qed.
 
   Theorem combine_app : forall (t:type) (n m:nat)
@@ -1324,8 +1325,8 @@ Module Rec.
     f_equal.
     apply proof_irrelevance.
 
-    Grab Existential Variables.
-    all: try omega.
+    Unshelve.
+    all: try lia.
     simpl.
     nia.
   Qed.
@@ -1357,9 +1358,9 @@ Module Rec.
     repeat f_equal.
     apply proof_irrelevance.
 
-    Grab Existential Variables.
-    omega.
-    simpl; nia.
+    Unshelve.
+    simpl; lia.
+    lia.
   Qed.
 
 End Rec.

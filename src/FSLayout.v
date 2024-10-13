@@ -9,7 +9,7 @@ Require Import Hoare.
 Require Import SepAuto.
 Require Import Cache.
 Require Import AsyncDisk.
-Require Import Omega.
+Require Import Lia.
 
 Import ListNotations.
 Set Implicit Arguments.

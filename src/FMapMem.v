@@ -1,6 +1,6 @@
 Require Import List.
 Require Import FMapFacts.
-Require Import Omega.
+Require Import Lia.
 Require Import ListUtils.
 Require Import OrderedTypeEx.
 Require Import MapUtils.
@@ -117,7 +117,7 @@ Module MapMem (OT : UsualOrderedType) (M : S with Module E := OT).
         rewrite find_add_eq; eauto.
         rewrite find_add_ne by auto.
         destruct H1; repeat deex.
-        apply equal_f with (x0 := x) in H0; rewrite H0.
+        apply equal_f with (x := x) in H0; rewrite H0.
         unfold mem_union. rewrite H2; auto.
       - unfold mem_disjoint in *. intuition. repeat deex.
         apply H.

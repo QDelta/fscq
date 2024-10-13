@@ -3,7 +3,7 @@ Require Import Word.
 Require Import Ascii.
 Require Import String.
 Require Import Dir.
-Require Import Omega.
+Require Import Lia.
 Require Import Prog.
 Require Import BasicProg.
 Require Import Pred PredCrash.
@@ -151,12 +151,12 @@ Theorem string_pad_unpad : forall nbytes s,
   length s <= nbytes -> nozero s -> string_unpad (string_pad nbytes s) = s.
 Proof.
   induction nbytes; simpl; intros.
-  destruct s; simpl in *; try congruence; omega.
+  destruct s; simpl in *; try congruence; lia.
   destruct s; simpl in *; try congruence.
   inversion H0.
   destruct (ascii_dec a zero); try congruence.
   rewrite IHnbytes; eauto.
-  omega.
+  lia.
 Qed.
 
 Inductive zerostring : string -> Prop :=
@@ -268,7 +268,7 @@ Proof.
   repeat constructor.
   apply WFScons.
   apply IHs.
-  omega.
+  lia.
   inversion H0; auto.
   inversion H0; auto.
 Qed.
@@ -303,7 +303,7 @@ Lemma string_unpad_length : forall s,
   length (string_unpad s) <= length s.
 Proof.
   induction s; simpl; firstorder.
-  destruct (ascii_dec a zero); simpl; omega.
+  destruct (ascii_dec a zero); simpl; lia.
 Qed.
 
 Lemma name2padstring_unpad_length : forall nbytes s,

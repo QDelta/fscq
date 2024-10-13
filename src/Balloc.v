@@ -5,7 +5,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
-Require Import Omega.
+Require Import Lia.
 Require Import Array.
 Require Import List ListUtils.
 Require Import Bool.
@@ -69,7 +69,7 @@ Module BmpWordSig (Sig : AllocSig) (WBSig : WordBMapSig) <: RASig.
   Proof.
     unfold items_per_val. simpl.
     pose proof WBSig.word_size_nonzero.
-    rewrite Rounding.mul_div; try omega.
+    rewrite Rounding.mul_div; try lia.
     apply Nat.mod_divide; auto.
     apply WBSig.word_size_ok.
   Qed.
@@ -139,13 +139,13 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
         let H' := fresh "H" in
         destruct H as [y [? H'] ];
         exists (S y);
-        split; [ omega |
+        split; [ lia |
           intros d; rewrite <- (H' d)];
           clear H'
       end.
       reflexivity.
     + exists 0.
-      split; auto; omega.
+      split; auto; lia.
   Defined.
 *)
 
@@ -453,10 +453,10 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
   Proof.
     intros.
     apply Rounding.div_lt_mul_lt.
-    omega.
-    rewrite Nat.div_add_l by omega.
-    rewrite Nat.div_small by omega.
-    omega.
+    lia.
+    rewrite Nat.div_add_l by lia.
+    rewrite Nat.div_small by lia.
+    lia.
   Qed.
 
   Theorem selN_to_bits : forall sz n l d,
@@ -475,8 +475,8 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     rewrite selN_oob with (n := _ / _).
     rewrite bits_rep_bit.
     rewrite repeat_selN'; auto.
-    apply Nat.div_le_lower_bound; solve [auto | omega].
-    rewrite to_bits_length, mult_comm. omega.
+    apply Nat.div_le_lower_bound; solve [auto | lia].
+    rewrite to_bits_length, mult_comm. lia.
   Qed.
 
   Lemma avail_nonzero_is_avail : forall bmap i ii b d d',
@@ -551,7 +551,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     rewrite Hx in *.
     rewrite bits_cons.
     simpl in *.
-    erewrite selN_inb by (rewrite bits_length; omega). eauto.
+    erewrite selN_inb by (rewrite bits_length; lia). eauto.
     Unshelve.
     all : eauto; solve [exact nil | exact None].
   Qed.
@@ -591,7 +591,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     compute [natToWord].
     erewrite wtl_eq_rect_mul.
     destruct n0; [reflexivity | apply IHn].
-    omega.
+    lia.
   Qed.
 
   Lemma freelist_bmap_equiv_init_ok : forall xp,
@@ -604,7 +604,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
       eapply in_seq in H.
       rewrite to_bits_length.
       rewrite repeat_length.
-      rewrite bits_len_rewrite. omega.
+      rewrite bits_len_rewrite. lia.
     - rewrite selN_to_bits by auto.
       rewrite repeat_selN; auto.
       rewrite avail_item0.
@@ -615,13 +615,13 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
       rewrite mult_comm, bits_len_rewrite.
       intuition idtac.
     - apply in_seq; intuition.
-      destruct (lt_dec a (BMPLen xp * valulen)); try omega.
+      destruct (lt_dec a (BMPLen xp * valulen)); try lia.
       rewrite selN_oob in *.
       cbv in *; congruence.
       rewrite to_bits_length.
       rewrite repeat_length.
       rewrite bits_len_rewrite.
-      omega.
+      lia.
   Qed.
 
   Lemma bits_to_freelist_bound: forall l start,
@@ -631,7 +631,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     split; generalize dependent start;
       induction l; cbn; intuition.
     all: repeat match goal with
-    | _ => omega
+    | _ => lia
     | [H: context [if ?x then _ else _] |- _ ] => destruct x; subst
     | [H: In _ (_ :: _) |- _] => destruct H; subst
     | [H: In _ _ |- _] => apply IHl in H
@@ -648,7 +648,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     end; auto.
     constructor; auto.
     intro.
-    apply bits_to_freelist_bound in H. omega.
+    apply bits_to_freelist_bound in H. lia.
   Qed.
 
   Lemma bits_to_freelist_no_zero : forall l start,
@@ -657,7 +657,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
   Proof.
     induction l; cbn; intuition.
     repeat match goal with
-    | _ => omega
+    | _ => lia
     | [H: context [if ?x then _ else _] |- _ ] => destruct x; subst
     | [H: In _ (_ :: _) |- _] => destruct H; subst
     | [H: In _ _ |- _] => apply IHl in H
@@ -673,19 +673,19 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     cbv in *; congruence.
     destruct i;
     repeat match goal with
-    | _ => omega
+    | _ => lia
     | _ => solve [auto]
     | [H: context [_ + S _] |- _] => rewrite <- plus_Snm_nSm in H
     | [H: context [if ?x then _ else _] |- _ ] => destruct x; subst
     | [H: In _ (_ :: _) |- _] => destruct H; subst
     | [H: In _ _ |- _] => apply IHl in H
     end.
-    apply bits_to_freelist_bound in H0. omega.
+    apply bits_to_freelist_bound in H0. lia.
     shatter_word a. destruct x; cbv in *; congruence.
     shatter_word a. destruct x; cbv in *; congruence.
     destruct i;
     repeat match goal with
-    | _ => omega
+    | _ => lia
     | _ => solve [auto | cbv in *; congruence]
     | _ => rewrite <- plus_Snm_nSm
     | [|- context [if ?x then _ else _] ] => destruct x; subst
@@ -693,7 +693,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     | [|- In _ _ ] => apply IHl
     end.
     autorewrite with core. intuition.
-    right. rewrite IHl; auto. omega.
+    right. rewrite IHl; auto. lia.
   Qed.
 
   Lemma itemlist_to_freelist'_bound: forall sz (bs : list (word sz)) start,
@@ -702,17 +702,17 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
   Proof.
     induction bs; rewrite ?to_bits_length in *; cbn; intuition.
     apply in_app_or in H. destruct H.
-    apply bits_to_freelist_bound in H. omega.
-    apply IHbs in H. omega.
+    apply bits_to_freelist_bound in H. lia.
+    apply IHbs in H. lia.
     apply in_app_or in H. destruct H.
     apply bits_to_freelist_bound in H.
-    rewrite bits_length in *. enough (length bs * sz >= 0). omega.
-    apply Nat.mul_nonneg_nonneg; omega.
-    apply IHbs in H. omega.
+    rewrite bits_length in *. enough (length bs * sz >= 0). lia.
+    apply Nat.mul_nonneg_nonneg; lia.
+    apply IHbs in H. lia.
     apply in_app_or in H. destruct H.
-    destruct x; try omega.
+    destruct x; try lia.
     apply bits_to_freelist_no_zero in H. intuition.
-    apply IHbs in H. omega.
+    apply IHbs in H. lia.
   Qed.
 
   Lemma itemlist_to_freelist'_spec: forall sz (bs : list (word sz)) start,
@@ -724,22 +724,22 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     destruct (in_dec addr_eq_dec (start + i) (word_to_freelist a start)) as [H' | H'].
     apply bits_to_freelist_bound in H' as ?.
     apply bits_to_freelist_spec in H'; auto.
-    rewrite selN_app1; auto; omega.
+    rewrite selN_app1; auto; lia.
     apply in_app_or in H0 as Ha. destruct Ha as [Ha | Ha]; intuition.
     apply itemlist_to_freelist'_bound in Ha as ?.
-    replace (start + i) with ((start + sz) + (i - sz)) in H by omega.
+    replace (start + i) with ((start + sz) + (i - sz)) in H by lia.
     apply IHbs in H.
     rewrite selN_app2; rewrite bits_length.
     rewrite <- H in *.
-    replace (start + sz + (i - sz)) with (start + i) in * by omega; auto.
-    omega.
+    replace (start + sz + (i - sz)) with (start + i) in * by lia; auto.
+    lia.
     destruct (lt_dec i (length (bits a))).
-    rewrite selN_app1 in * by omega.
+    rewrite selN_app1 in * by lia.
     rewrite <- bits_to_freelist_spec in *; eauto.
     eapply in_app_iff. right.
-    rewrite selN_app2 in * by omega.
+    rewrite selN_app2 in * by lia.
     rewrite bits_length in *.
-    replace (start + i) with ((start + sz) + (i - sz)) in * by omega.
+    replace (start + i) with ((start + sz) + (i - sz)) in * by lia.
     rewrite IHbs; eauto.
   Qed.
 (* TODO move this *)
@@ -766,10 +766,10 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     apply nodup_app; intuition eauto using bits_to_freelist_nodup.
     apply itemlist_to_freelist'_bound in H0.
     apply bits_to_freelist_bound in H.
-    rewrite bits_length in *. omega.
+    rewrite bits_length in *. lia.
     apply itemlist_to_freelist'_bound in H.
     apply bits_to_freelist_bound in H0.
-    rewrite bits_length in *. omega.
+    rewrite bits_length in *. lia.
   Qed.
 
   Lemma itemlist_to_freelist'_no_zero : forall sz (bs : list (word sz)) start,
@@ -786,8 +786,8 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     forall x, In x freelist -> x < length (to_bits bs).
   Proof.
     cbn; unfold itemlist_to_freelist; intros.
-    replace x with (0 + x) in H by omega.
-    eapply itemlist_to_freelist'_bound in H. omega.
+    replace x with (0 + x) in H by lia.
+    eapply itemlist_to_freelist'_bound in H. lia.
   Qed.
 
   Lemma itemlist_to_freelist_spec: forall sz (bs : list (word sz)),
@@ -795,7 +795,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     forall i, i <> 0 -> In i freelist <-> selN (to_bits bs) i inuse = avail.
   Proof.
     cbn; unfold itemlist_to_freelist; intros.
-    replace i with (0 + i) in * by omega.
+    replace i with (0 + i) in * by lia.
     auto using itemlist_to_freelist'_spec.
   Qed.
 
@@ -834,7 +834,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
       apply itemlist_to_freelist_no_zero.
       repeat rewrite count_occ_remove_ne by auto.
       destruct (zerop (count_occ addr_eq_dec freelist x)) as [Ha | Ha];
-      destruct (zerop (count_occ addr_eq_dec (itemlist_to_freelist bs) x)) as [Hb | Hb]; try omega.
+      destruct (zerop (count_occ addr_eq_dec (itemlist_to_freelist bs) x)) as [Hb | Hb]; try lia.
       all: rewrite <- count_occ_not_In, <- Hc in *.
       apply itemlist_to_freelist_spec in Hb.
       rewrite <- H2 in *. congruence.
@@ -846,7 +846,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
       intuition.
     - rewrite remove_not_In by auto.
       destruct (zerop (count_occ addr_eq_dec freelist x)) as [Ha | Ha];
-      destruct (zerop (count_occ addr_eq_dec (itemlist_to_freelist bs) x)) as [Hb | Hb]; try omega.
+      destruct (zerop (count_occ addr_eq_dec (itemlist_to_freelist bs) x)) as [Hb | Hb]; try lia.
       all: rewrite <- count_occ_not_In, <- Hc in *.
       apply itemlist_to_freelist_spec in Hb.
       rewrite <- H2 in *. congruence.
@@ -1331,7 +1331,7 @@ Module BmapAllocCache (Sig : AllocSig).
 
   Ltac apply_cache_rep := match goal with
     | Hm: MSCache _ = _, H: cache_rep _ _ |- _ =>
-      rewrite ?Hm in *; specialize (H _ eq_refl) as ?; intuition
+      rewrite ?Hm in *; pose proof (H _ eq_refl) as ?; intuition
     end.
 
   Theorem init_ok : forall V FP lxp xp ms,
@@ -1790,7 +1790,7 @@ Module BALLOC.
 
     destruct l.
     denote (_ < _) as Hy; simpl in Hy; inversion Hy.
-    rewrite listpred_isolate with (i := 0) in Hx, Hs by (rewrite skipn_length; omega).
+    rewrite listpred_isolate with (i := 0) in Hx, Hs by (rewrite skipn_length; lia).
     rewrite skipn_selN, Nat.add_0_r in Hx, Hs.
 
     (*** extract the exis from |->? *)
@@ -2202,7 +2202,7 @@ Module BALLOCC.
 
     destruct l.
     denote (_ < _) as Hy; simpl in Hy; inversion Hy.
-    rewrite listpred_isolate with (i := 0) in Hx, Hs by (rewrite skipn_length; omega).
+    rewrite listpred_isolate with (i := 0) in Hx, Hs by (rewrite skipn_length; lia).
     rewrite skipn_selN, Nat.add_0_r in Hx, Hs.
 
     (*** extract the exis from |->? *)

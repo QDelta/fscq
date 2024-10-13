@@ -21,7 +21,7 @@ Require Import DiskSet.
 Require Import SyncedMem.
 Require Import GenSepAuto.
 Require Import BFileCrash.
-Require Import Omega.
+Require Import Lia.
 Require Import DirTreeDef.
 Require Import DirTreeRep.
 Require Import DirTreePred.
@@ -217,7 +217,7 @@ Module DTCrash.
     pred_apply.
     cancel; auto.
     intros; eapply BFILE.freepred_file_crash; eauto.
-  Grab Existential Variables.
+  Unshelve.
     all: exact (LOG.mk_memstate0 (Cache.BUFCACHE.cache0 1)).
   Qed.
 

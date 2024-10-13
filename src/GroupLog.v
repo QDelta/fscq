@@ -12,7 +12,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import BasicProg.
 Require Import FunctionalExtensionality.
-Require Import Omega.
+Require Import Lia.
 Require Import Word.
 Require Import Rec.
 Require Import Array.
@@ -166,7 +166,7 @@ Module GLog.
   Proof.
     unfold effective; intros.
     rewrite length_popn.
-    omega.
+    lia.
   Qed.
 
   Lemma effective_length_le : forall ds n,
@@ -174,7 +174,7 @@ Module GLog.
   Proof.
     unfold effective; intros.
     rewrite length_popn.
-    omega.
+    lia.
   Qed.
 
 
@@ -487,7 +487,7 @@ Module GLog.
     eapply Forall_selN with (i := i) in H0; intuition.
     eapply log_valid_length_eq; eauto.
     erewrite replay_seq_nthd_length; eauto.
-    rewrite selN_oob by omega.
+    rewrite selN_oob by lia.
     unfold log_valid, KNoDup; intuition; inversion H.
   Qed.
 
@@ -585,7 +585,7 @@ Module GLog.
     destruct (lt_dec i (length ts)).
     eapply Forall_selN with (i := i) (def := nil) in H1; intuition.
     eapply le_not_gt; eauto.
-    rewrite selN_oob in H; simpl in H; omega.
+    rewrite selN_oob in H; simpl in H; lia.
   Qed.
 
 
@@ -626,7 +626,7 @@ Module GLog.
     rewrite H.
     erewrite replay_seq_replay_mem; eauto.
     erewrite nthd_oob; eauto.
-    omega.
+    lia.
   Qed.
 
   Lemma dset_match_grouped : forall ts vmap ds xp,
@@ -668,7 +668,7 @@ Module GLog.
     cancel.
     apply MLog.recover_before_either.
     intuition simpl; auto.
-    rewrite cuttail_length; omega.
+    rewrite cuttail_length; lia.
   Qed.
 
   Lemma recover_before_any_fst : forall xp ds ts hm len,
@@ -684,7 +684,7 @@ Module GLog.
     rewrite MLog.recover_before_either.
     cancel.
     intuition simpl; auto.
-    omega.
+    lia.
   Qed.
 
   Lemma synced_recover_any : forall xp ds nr ms ts hm,
@@ -786,7 +786,7 @@ Module GLog.
     effective (pushd d ds) (S n) = pushd d (effective ds n).
   Proof.
     unfold effective; simpl; intros.
-    rewrite popn_pushd_comm by omega; auto.
+    rewrite popn_pushd_comm by lia; auto.
   Qed.
 
   Theorem read_ok: forall xp ms a,
@@ -847,7 +847,7 @@ Module GLog.
     step.
     step.
     or_r; cancel.
-    rewrite nthd_pushd' by omega; eauto.
+    rewrite nthd_pushd' by lia; eauto.
 
     unfold vmap_match in *; simpl.
     denote! (Map.Equal _ _) as Heq.
@@ -902,7 +902,7 @@ Module GLog.
       xform_normr. safecancel.
       eassign (mk_mstate vmap0 (MSTxns ms_1) vmap0); simpl.
       rewrite selR_inb by eauto; cancel.
-      all: simpl; auto; omega.
+      all: simpl; auto; lia.
 
     - safestep.
       rewrite nthd_oob, latest_effective, nthd_0.
@@ -960,7 +960,7 @@ Module GLog.
     apply dset_match_nil.
 
     denote (length _ > _) as Hf; contradict Hf.
-    setoid_rewrite <- Map.cardinal_1; omega.
+    setoid_rewrite <- Map.cardinal_1; lia.
     apply dset_match_nil.
 
     xcrash.
@@ -988,17 +988,17 @@ Module GLog.
     assert (length (snd ds) > 0).
     denote dset_match as Hx.
     apply dset_match_length in Hx; simpl in Hx.
-    rewrite cuttail_length in Hx; omega.
+    rewrite cuttail_length in Hx; lia.
     intuition.
     rewrite <- nthd_0, nthd_effective, Nat.add_0_r.
-    apply nelist_subset_nthd_latest; omega.
+    apply nelist_subset_nthd_latest; lia.
 
     unfold effective; simpl; rewrite popn_0.
     replace (S (length t)) with (length (c :: t)) by auto.
     erewrite dset_match_nthd_effective_fst; eauto.
     erewrite <- latest_effective; eauto.
     eapply dset_match_grouped; eauto; simpl.
-    rewrite cuttail_length; omega.
+    rewrite cuttail_length; lia.
 
     safestep.
     repeat match goal with
@@ -1553,7 +1553,7 @@ Module GLog.
     rewrite <- dsupd_vecs_latest.
     rewrite synced_recover_any; eauto.
     eassign (MSTxns a); substl (MSTxns a); simpl.
-    unfold effective; rewrite popn_oob by omega.
+    unfold effective; rewrite popn_oob by lia.
     apply dset_match_nil.
 
     cancel.
@@ -1692,10 +1692,10 @@ Module GLog.
       erewrite dset_match_nthd_S in *; eauto.
       setoid_rewrite Hnthd; auto.
       denote dset_match as Hx.
-      apply dset_match_length in Hx; simpl in Hx; omega.
+      apply dset_match_length in Hx; simpl in Hx; lia.
       denote dset_match as Hx. 
       apply dset_match_length in Hx; simpl in Hx; simpl.
-      rewrite cuttail_length in *. omega.
+      rewrite cuttail_length in *. lia.
 
     - norm. cancel.
       or_r; cancel.
@@ -1753,7 +1753,7 @@ Module GLog.
     apply dset_match_nil.
     pred_apply.
     cancel.
-    omega.
+    lia.
   Qed.
 
   Lemma crash_xform_rollback : forall xp d ms hm,

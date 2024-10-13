@@ -3,7 +3,7 @@ Require Import Hashmap.
 Require Import Prog ProgMonad.
 Require Import Log.
 Require Import Word.
-Require Import Omega.
+Require Import Lia.
 Require Import BasicProg.
 Require Import Bool.
 Require Import Pred PredCrash.
@@ -102,7 +102,7 @@ Hint Resolve valubytes_ge_O.
     try apply Nat.le_add_le_sub_l;
     try rewrite <- Nat.mul_succ_l;
     try apply mult_le_compat_r;
-    omega.
+    lia.
     
 Ltac solve_dsupd_iter:=
     rewrite skipn_oob; [| solve_ineq_dwrite_middle];
@@ -120,12 +120,12 @@ Ltac solve_tsupd_iter:=
      repeat rewrite Nat.add_assoc;
      rewrite skipn_skipn;
      replace (block_off * valubytes + valubytes + length bnl * valubytes)
-      with  (block_off * valubytes + length bnl * valubytes + valubytes) by omega;
+      with  (block_off * valubytes + length bnl * valubytes + valubytes) by lia;
       cancel;
       rewrite sep_star_comm;
       unfold get_sublist;
       replace (valubytes + length bnl * valubytes)
-        with(length bnl * valubytes + valubytes) by omega;
+        with(length bnl * valubytes + valubytes) by lia;
       rewrite arrayN_merge_bs_split_firstn; cancel.
    
   Lemma div_mod': forall x y,
@@ -171,7 +171,7 @@ Ltac solve_tsupd_iter:=
       length_rewrite_l; repeat rewrite mod_eq'; auto;
       rewrite Nat.mul_add_distr_r; 
       rewrite <- Nat.add_assoc; rewrite div_mod'; auto;
-      destruct (length data mod valubytes); omega | eapply bytefile_length_eq; eauto ].
+      destruct (length data mod valubytes); lia | eapply bytefile_length_eq; eauto ].
       
         Ltac solve_cancel_dwrite_middle2:=
     pred_apply; repeat rewrite Nat.mul_add_distr_r;
@@ -336,7 +336,7 @@ Ltac solve_tsupd_iter:=
   valubytes <= a - c * valubytes.
   Proof.
     intros.
-    rewrite valubytes_is in *; omega.
+    rewrite valubytes_is in *; lia.
   Qed.
   
     Lemma map_app_firstn_skipn: forall {A B} (data: list (A * B)) m,
@@ -353,7 +353,7 @@ Ltac solve_tsupd_iter:=
       rewrite firstn_firstn.
       rewrite Nat.min_l.
       reflexivity.
-      omega.
+      lia.
   Qed.
   
           
@@ -368,8 +368,8 @@ Ltac solve_tsupd_iter:=
       intros; unfold rep in *; split_hypothesis.
       apply list2nmem_arrayN_bound in H1.
       destruct H1.
-      apply length_zero_iff_nil in H1; omega.
-      rewrite H5 in H6; rewrite H6 in H0; omega.
+      apply length_zero_iff_nil in H1; lia.
+      rewrite H5 in H6; rewrite H6 in H0; lia.
   Qed.
   
   Lemma arrayN_app_merge: forall Fd a head_data old_data tail_data,
@@ -393,7 +393,7 @@ Lemma list2nmem_arrayN_bound_app_middle: forall Fd a head_data old_data tail_dat
 Proof.
   intros.
   apply list2nmem_arrayN_bound in H0 as Hx; destruct Hx.
-  apply length_zero_iff_nil in H1; repeat rewrite app_length in H1; omega.
+  apply length_zero_iff_nil in H1; repeat rewrite app_length in H1; lia.
   repeat rewrite app_length in H1; auto.
 Qed.
 
@@ -464,9 +464,9 @@ Proof.
   match goal with | [H: DFData ?f = _ |- context[DFData ?f] ] => rewrite H end; auto.
   eapply inlen_bfile with (j:= length head_data); eauto.
   solve_rep.
-  omega.
+  lia.
   instantiate (1:= old_data).
-  omega.
+  lia.
   pred_apply; repeat rewrite arrayN_app; cancel.
 
   unfold unified_bytefile_valid; simpl.
@@ -489,11 +489,11 @@ Proof.
   eapply bytefile_unified_byte_len; eauto.
   eapply inlen_bfile with (j:= length head_data); eauto.
   solve_rep.
-  omega.
+  lia.
   instantiate (1:= old_data).
-  omega.
+  lia.
   pred_apply; repeat rewrite arrayN_app; cancel.
-  omega.
+  lia.
 Qed.
 
 
@@ -568,7 +568,7 @@ Proof.
      2: rewrite <- plus_n_O; pred_apply; cancel.
      length_rewrite_l.
      match goal with | [H: 0 < length (skipn _ _) |- _] => 
-        rewrite skipn_length in H end; omega.
+        rewrite skipn_length in H end; lia.
    
 
      erewrite dsupd_iter_dsupd_tail; [ | solve_eq_dwrite_middle ]. 
@@ -665,7 +665,7 @@ Proof.
      2: rewrite <- plus_n_O; pred_apply; cancel.
      length_rewrite_l.
      match goal with | [H: 0 < length (skipn _ _) |- _] => 
-        rewrite skipn_length in H end; omega.
+        rewrite skipn_length in H end; lia.
    
 
      erewrite dsupd_iter_dsupd_tail; [ | solve_eq_dwrite_middle ]. 
@@ -687,7 +687,7 @@ Proof.
     length_rewrite_l.
     rewrite Nat.add_sub_assoc; [| apply mod_upper_bound_le'; auto ].
     rewrite Nat.add_sub_swap; [| apply Nat.mod_le; auto ].
-    rewrite mod_minus; auto; omega.
+    rewrite mod_minus; auto; lia.
     
    eapply inlen_bfile_S; eauto.
    pred_apply; cancel.
@@ -779,7 +779,7 @@ tsupd_iter ts pathname block_off
   rewrite Nat.add_sub_assoc.
   rewrite Nat.add_sub_swap.
   rewrite  sub_mod_eq_round; auto.
-  omega.
+  lia.
   apply Nat.mod_le; auto.
   apply mod_upper_bound_le'; auto.
   rewrite <- roundup_div_S_eq; auto.
@@ -869,15 +869,15 @@ Proof.
   eapply inlen_bfile with (j:= 0); eauto.
   apply valubytes_ge_O.
   2: rewrite <- plus_n_O; pred_apply; cancel.
-  omega.
+  lia.
   
   rewrite roundup_lt_one; auto.
   rewrite Nat.div_same; auto; simpl.
   destruct (skipn block_off (DFData f)) eqn:D.
   apply skipn_eq_nil in D.
   destruct D.
-  omega.
-  apply length_zero_iff_nil in H6; omega.
+  lia.
+  apply length_zero_iff_nil in H6; lia.
 
   simpl.
   rewrite firstn_oob.
@@ -892,7 +892,7 @@ Proof.
   apply Nat.lt_le_incl; apply Nat.div_small_iff; auto.
   apply Nat.div_small_iff; auto.
   apply Nat.div_small_iff in H2; auto.
-  omega.
+  lia.
 Qed.
       
             Lemma tsupd_eq_dwrite_middle:  forall ts Fd pathname inum Ftree old_data tail_data data f fy block_off,
@@ -934,14 +934,14 @@ Proof.
   eapply inlen_bfile with (j:= 0); eauto.
   apply valubytes_ge_O.
   2: rewrite <- plus_n_O; pred_apply; cancel.
-  omega.
+  lia.
 
   rewrite roundup_lt_one; auto.
   rewrite Nat.div_same; auto.
   rewrite H2; simpl; rewrite <- plus_n_O.
   destruct (skipn block_off (DFData f)) eqn:D.
   apply skipn_eq_nil in D.
-  destruct D; try apply length_zero_iff_nil in H6; omega.
+  destruct D; try apply length_zero_iff_nil in H6; lia.
 
   simpl.
   rewrite firstn_oob.
@@ -955,7 +955,7 @@ Proof.
   apply Nat.lt_le_incl; apply Nat.div_small_iff; auto.
   apply Nat.div_small_iff; auto.
   apply Nat.div_small_iff in H2; auto.
-  omega.
+  lia.
 Qed.
       
 Lemma skipn_not_nil': forall Fd f fy (data: list byte) 
@@ -975,12 +975,12 @@ Proof.
   intros.
   assert (A: block_off < length (DFData f)).
   eapply inlen_bfile with (j:= length head_data); [eauto|eauto| |pred_apply; cancel].
-  omega.
+  lia.
   unfold not; intros D.
   apply skipn_eq_nil in D.
-  destruct D; try omega.
+  destruct D; try lia.
   apply length_zero_iff_nil in H4.
-  omega.
+  lia.
 Qed.
   
   
@@ -1046,8 +1046,8 @@ Lemma dsupd_dsupd_iter_eq_dwrite_first: forall Fd
     length_rewrite_l.
 
     rewrite H5 in *.
-    rewrite Nat.mod_small; auto; try omega.
-    destruct (length head_data + length data) eqn:D; try omega.
+    rewrite Nat.mod_small; auto; try lia.
+    destruct (length head_data + length data) eqn:D; try lia.
     rewrite Nat.div_same.
     erewrite firstn_1_selN.
     rewrite skipn_selN; rewrite <- plus_n_O.
@@ -1055,7 +1055,7 @@ Lemma dsupd_dsupd_iter_eq_dwrite_first: forall Fd
     simpl; rewrite firstn_oob with (n:= valubytes); eauto.
     length_rewrite_l.
     destruct (valu2list (fst (DFData f) ⟦ block_off ⟧)) eqn:D0.
-    simpl; omega.
+    simpl; lia.
     rewrite Nat.add_assoc.
     rewrite D.
     length_rewrite_l.
@@ -1064,8 +1064,8 @@ Lemma dsupd_dsupd_iter_eq_dwrite_first: forall Fd
     rewrite D0; auto.
     rewrite valu2list_len in A.
     simpl in A.
-    rewrite <- le_plus_minus; omega.
-    symmetry; apply Nat.div_small_iff; auto; omega.
+    rewrite <- le_plus_minus; lia.
+    symmetry; apply Nat.div_small_iff; auto; lia.
     
     eapply skipn_not_nil'; eauto.
     auto.
@@ -1132,8 +1132,8 @@ Lemma tsupd_tsupd_iter_eq_dwrite_first: forall ts Fd pathname
     length_rewrite_l.
 
     rewrite H5 in *.
-    rewrite Nat.mod_small; auto; try omega.
-    destruct (length head_data + length data) eqn:D; try omega.
+    rewrite Nat.mod_small; auto; try lia.
+    destruct (length head_data + length data) eqn:D; try lia.
     rewrite Nat.div_same.
     erewrite firstn_1_selN.
     rewrite skipn_selN; rewrite <- plus_n_O.
@@ -1141,7 +1141,7 @@ Lemma tsupd_tsupd_iter_eq_dwrite_first: forall ts Fd pathname
     simpl; rewrite firstn_oob with (n:= valubytes); eauto.
     length_rewrite_l.
     destruct (valu2list (fst (DFData f) ⟦ block_off ⟧)) eqn:D0.
-    simpl; omega.
+    simpl; lia.
     rewrite Nat.add_assoc.
     rewrite D.
     length_rewrite_l.
@@ -1150,8 +1150,8 @@ Lemma tsupd_tsupd_iter_eq_dwrite_first: forall ts Fd pathname
     rewrite D0; auto.
     rewrite valu2list_len in A.
     simpl in A.
-    rewrite <- le_plus_minus; omega.
-    symmetry; apply Nat.div_small_iff; auto; omega.
+    rewrite <- le_plus_minus; lia.
+    symmetry; apply Nat.div_small_iff; auto; lia.
     
     eapply skipn_not_nil'; eauto.
     auto.
@@ -1245,7 +1245,7 @@ Proof.
   rewrite crash_xform_lift_empty).
   safecancel.
   instantiate (1:= 0).
-  omega.
+  lia.
   simpl.
   instantiate(1:= nil); eauto.
   all: simpl; eauto.
@@ -1258,9 +1258,9 @@ Proof.
   match goal with |[H: _ <= _ - _ |- _] => apply le_sub_le_add_l' in H end.
   rewrite roundup_lt_one; auto.
   rewrite Nat.div_same; auto.
-  omega.
+  lia.
   length_rewrite_l.
-  omega.
+  lia.
   
   match goal with |[H: _ <= _ - _ |- _] => apply le_sub_le_add_l' in H end.
     unfold tpad_length.
@@ -1277,13 +1277,13 @@ Proof.
     destruct (map vsmerge (get_sublist (DFData f) block_off 1)) eqn:D.
     apply map_eq_nil in D; unfold get_sublist in D; 
     apply firstn_eq_nil in D.
-    destruct D; [omega | ].
+    destruct D; [lia | ].
      apply skipn_eq_nil in H9.
      destruct H9.
      assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
+    lia.
     exfalso; eapply le_lt_false.
     apply H9. apply A.
     
@@ -1291,7 +1291,7 @@ Proof.
        assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
+    lia.
     unfold datatype in A; rewrite H9 in A; inversion A.
     simpl in D.
     unfold get_sublist in D; erewrite firstn_1_selN in D.
@@ -1309,8 +1309,8 @@ Proof.
     length_rewrite_l.
       unfold tpad_length.
     rewrite H9 in *.
-    rewrite Nat.mod_small; auto; try omega.
-    destruct (length head_data + length data) eqn:D; try omega.
+    rewrite Nat.mod_small; auto; try lia.
+    destruct (length head_data + length data) eqn:D; try lia.
     simpl; unfold get_sublist.
     erewrite firstn_1_selN.
     rewrite skipn_selN; rewrite <- plus_n_O.
@@ -1319,7 +1319,7 @@ Proof.
     simpl; rewrite firstn_oob with (n:= valubytes); eauto.
     length_rewrite_l.
     destruct (valu2list (fst (DFData f) ⟦ block_off ⟧)) eqn:D0.
-    simpl; omega.
+    simpl; lia.
     rewrite Nat.add_assoc.
     rewrite D.
     length_rewrite_l.
@@ -1327,11 +1327,11 @@ Proof.
     rewrite D0; auto.
     rewrite valu2list_len in A.
     simpl in A.
-    rewrite <- le_plus_minus; omega.
+    rewrite <- le_plus_minus; lia.
     length_rewrite_l.
     destruct (valu2list (fst (DFData f) ⟦ block_off ⟧)) eqn:D0.
     apply length_zero_iff_nil in D0; rewrite valu2list_len in D0; rewrite valubytes_is in D0.
-    simpl in *; omega.
+    simpl in *; lia.
     rewrite Nat.add_assoc.
     rewrite D.
     length_rewrite_l.
@@ -1339,22 +1339,22 @@ Proof.
     rewrite D0; auto.
     rewrite valu2list_len in A.
     simpl in A.
-    rewrite <- le_plus_minus; omega.
-    symmetry; apply Nat.div_small_iff; auto; omega.
+    rewrite <- le_plus_minus; lia.
+    symmetry; apply Nat.div_small_iff; auto; lia.
     unfold not; intros D1.
     apply skipn_eq_nil in D1.
     destruct D1.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     apply length_zero_iff_nil in H12.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     auto.
     length_rewrite_l.
     length_rewrite_l.
@@ -1375,13 +1375,13 @@ Proof.
     destruct (map vsmerge (get_sublist (DFData f) block_off 1)) eqn:D.
     apply map_eq_nil in D; unfold get_sublist in D; 
     apply firstn_eq_nil in D.
-    destruct D; [omega | ].
+    destruct D; [lia | ].
     apply skipn_eq_nil in H9.
     destruct H9.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
+    lia.
     exfalso; eapply le_lt_false.
     apply H9. apply A.
     
@@ -1389,7 +1389,7 @@ Proof.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
+    lia.
     unfold datatype in A; rewrite H9 in A; inversion A.
     simpl in D.
     unfold get_sublist in D; erewrite firstn_1_selN in D.
@@ -1407,8 +1407,8 @@ Proof.
     length_rewrite_l.
     unfold tpad_length.
     rewrite H9 in *.
-    rewrite Nat.mod_small; auto; try omega.
-    destruct (length head_data + length data) eqn:D; try omega.
+    rewrite Nat.mod_small; auto; try lia.
+    destruct (length head_data + length data) eqn:D; try lia.
     simpl; unfold get_sublist.
     erewrite firstn_1_selN.
     rewrite skipn_selN; rewrite <- plus_n_O.
@@ -1417,7 +1417,7 @@ Proof.
     simpl; rewrite firstn_oob with (n:= valubytes); eauto.
     length_rewrite_l.
     destruct (valu2list (fst (DFData f) ⟦ block_off ⟧)) eqn:D0.
-    simpl; omega.
+    simpl; lia.
     rewrite Nat.add_assoc.
     rewrite D.
     length_rewrite_l.
@@ -1425,11 +1425,11 @@ Proof.
     rewrite D0; auto.
     rewrite valu2list_len in A.
     simpl in A.
-    rewrite <- le_plus_minus; omega.
+    rewrite <- le_plus_minus; lia.
     length_rewrite_l.
     destruct (valu2list (fst (DFData f) ⟦ block_off ⟧)) eqn:D0.
     apply length_zero_iff_nil in D0; rewrite valu2list_len in D0; rewrite valubytes_is in D0.
-    simpl in *; omega.
+    simpl in *; lia.
     rewrite Nat.add_assoc.
     rewrite D.
     length_rewrite_l.
@@ -1437,22 +1437,22 @@ Proof.
     rewrite D0; auto.
     rewrite valu2list_len in A.
     simpl in A.
-    rewrite <- le_plus_minus; omega.
-    symmetry; apply Nat.div_small_iff; auto; omega.
+    rewrite <- le_plus_minus; lia.
+    symmetry; apply Nat.div_small_iff; auto; lia.
     unfold not; intros D1.
     apply skipn_eq_nil in D1.
     destruct D1.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     apply length_zero_iff_nil in H12.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     auto.
     length_rewrite_l.
     length_rewrite_l.
@@ -1556,7 +1556,7 @@ Proof.
   rewrite dsupd_iter_dsupd_head.
   rewrite combine_cons.
   repeat rewrite <- map_cons.
-  repeat rewrite firstn_length_l; try omega.
+  repeat rewrite firstn_length_l; try lia.
   rewrite cons_app with (a:= (selN (DFData f) block_off valuset0) ).
   replace ([(selN (DFData f) block_off valuset0)])
     with (firstn 1 (skipn block_off (DFData f))).
@@ -1569,9 +1569,9 @@ Proof.
                length head_data - valubytes) valubytes / valubytes)).
   rewrite roundup_div_minus_S.
   rewrite list_split_chunk_cons'.
-  repeat rewrite mm_dist'; try omega.
+  repeat rewrite mm_dist'; try lia.
   rewrite roundup_div_minus_S.
-  rewrite <- le_plus_minus; try omega.
+  rewrite <- le_plus_minus; try lia.
   replace (skipn valubytes (valu2list (fst  (selN (DFData f) block_off valuset0))))
       with (nil: list byte).
   rewrite app_nil_r.
@@ -1588,14 +1588,14 @@ Proof.
   destruct ((length head_data + length data)
                 mod valubytes) eqn:D.
   rewrite Nat.add_comm in D; rewrite D.
-  repeat rewrite roundup_eq_mod_O; try omega.
+  repeat rewrite roundup_eq_mod_O; try lia.
   rewrite app_assoc; rewrite list_split_chunk_app_l.
   replace (skipn valubytes (valu2list (fst (selN (DFData f) (block_off +
                       (length head_data + length data) /
                       valubytes ) valuset0))))
       with (nil: list byte). rewrite app_nil_r.
   replace (length head_data + length data)
-      with  (length data + length head_data) by omega; eauto.
+      with  (length data + length head_data) by lia; eauto.
   rewrite skipn_oob; auto.
   length_rewrite_l.
   length_rewrite_l.
@@ -1604,23 +1604,23 @@ Proof.
   
   rewrite <- D.
   replace (length head_data + length data)
-      with  (length data + length head_data) by omega; eauto.
-  apply Nat.div_str_pos; omega.
-  unfold not; intros; omega.
-  omega.
+      with  (length data + length head_data) by lia; eauto.
+  apply Nat.div_str_pos; lia.
+  unfold not; intros; lia.
+  lia.
   rewrite skipn_oob; auto.
   length_rewrite_l.
   auto.
-  omega.
+  lia.
   length_rewrite_l.
   auto.
-  omega.
+  lia.
   rewrite mm_dist'; auto.
-  omega.
+  lia.
   rewrite skipn_skipn'.
   erewrite dir2flatmem2_tsupd_updN with (f':=f'); eauto.
   simpl. 
-  rewrite skipn_updN_oob_eq; auto; omega.
+  rewrite skipn_updN_oob_eq; auto; lia.
   erewrite firstn_1_selN; eauto.
   rewrite skipn_selN; rewrite <- plus_n_O; eauto.
   
@@ -1630,14 +1630,14 @@ Proof.
   assert (A: block_off < length (DFData f)).
   eapply inlen_bfile with (j:= length head_data); eauto.
   2: pred_apply; cancel.
-  omega.
-  omega.
+  lia.
+  lia.
   apply length_zero_iff_nil in H8.
   assert (A: block_off < length (DFData f)).
   eapply inlen_bfile with (j:= length head_data); eauto.
   2: pred_apply; cancel.
-  omega.
-  omega.
+  lia.
+  lia.
   length_rewrite_l.
 Qed.
   
@@ -1738,14 +1738,14 @@ tsupd_iter ts pathname block_off
            (skipn block_off (DFData f))))).
 Proof.
   intros.
-  rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try omega.
+  rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try lia.
   length_rewrite_l.
-  replace (block_off + 1) with (S block_off) by omega.
+  replace (block_off + 1) with (S block_off) by lia.
   rewrite tsupd_iter_tsupd_head.
-    replace (S block_off) with (block_off + 1) by omega.
+    replace (S block_off) with (block_off + 1) by lia.
   unfold datatype; rewrite combine_cons.
   repeat rewrite <- map_cons.
-  repeat rewrite firstn_length_l; try omega.
+  repeat rewrite firstn_length_l; try lia.
   rewrite cons_app with (a:= (selN (DFData f) block_off valuset0) ).
   replace ([(selN (DFData f) block_off valuset0)])
     with (firstn 1 (skipn block_off (DFData f))).
@@ -1759,7 +1759,7 @@ Proof.
                length head_data - valubytes) valubytes / valubytes)).
   rewrite roundup_div_minus_S.
   rewrite list_split_chunk_cons'.
-  repeat rewrite mm_dist'; try omega.
+  repeat rewrite mm_dist'; try lia.
   rewrite roundup_div_minus_S.
   replace (skipn valubytes (valu2list (fst  (selN (DFData f) block_off valuset0))))
       with (nil: list byte).
@@ -1778,14 +1778,14 @@ Proof.
   destruct ((length head_data + length data)
                 mod valubytes) eqn:D.
   rewrite Nat.add_comm in D; rewrite D.
-  repeat rewrite roundup_eq_mod_O; try omega.
+  repeat rewrite roundup_eq_mod_O; try lia.
   rewrite app_assoc; rewrite list_split_chunk_app_l.
   replace (skipn valubytes (valu2list (fst (selN (DFData f) (block_off +
                       (length head_data + length data) /
                       valubytes ) valuset0))))
       with (nil: list byte). rewrite app_nil_r.
   replace (length head_data + length data)
-      with  (length data + length head_data) by omega; eauto.
+      with  (length data + length head_data) by lia; eauto.
   rewrite skipn_oob; auto.
   length_rewrite_l.
   length_rewrite_l.
@@ -1794,26 +1794,26 @@ Proof.
   
   rewrite <- D.
   replace (length head_data + length data)
-      with  (length data + length head_data) by omega; eauto.
+      with  (length data + length head_data) by lia; eauto.
   assert ((length data + length head_data) / valubytes > 0).
-  apply Nat.div_str_pos; omega.
-  omega.
-  unfold not; intros; omega.
-  omega.
+  apply Nat.div_str_pos; lia.
+  lia.
+  unfold not; intros; lia.
+  lia.
   rewrite skipn_oob; auto.
   length_rewrite_l.
   auto.
-  omega.
+  lia.
   length_rewrite_l.
   auto.
-  omega.
+  lia.
   rewrite mm_dist'; auto.
-  omega.
+  lia.
   rewrite skipn_skipn'.
   erewrite dir2flatmem2_tsupd_updN with (f':=f'); eauto.
   simpl. 
   
-  rewrite skipn_updN_oob_eq; auto; omega.
+  rewrite skipn_updN_oob_eq; auto; lia.
   erewrite firstn_1_selN; eauto.
   rewrite skipn_selN; rewrite <- plus_n_O; eauto.
   
@@ -1823,14 +1823,14 @@ Proof.
   assert (A: block_off < length (DFData f)).
   eapply inlen_bfile with (j:= length head_data); eauto.
   2: pred_apply; cancel.
-  omega.
-  omega.
+  lia.
+  lia.
   apply length_zero_iff_nil in H8.
   assert (A: block_off < length (DFData f)).
   eapply inlen_bfile with (j:= length head_data); eauto.
   2: pred_apply; cancel.
-  omega.
-  omega.
+  lia.
+  lia.
 Qed.
     
     
@@ -1968,18 +1968,18 @@ Proof.
 	- eapply addr_id; eauto.
 	   eapply inlen_bfile; eauto.
 	   solve_rep.
-	   omega.
+	   lia.
 
 	- step.
 	   assert (A: rep f fy).
 	   solve_rep.
 	   assert (A0: block_off < length (DFData f)).
-	   eapply inlen_bfile with (j:= byte_off); eauto; omega.
+	   eapply inlen_bfile with (j:= byte_off); eauto; lia.
 	   erewrite f_pfy_selN_eq; eauto.
 	   rewrite v2l_fst_bs2vs_map_fst_eq; auto.
-	   eapply content_match; eauto; try omega.
+	   eapply content_match; eauto; try lia.
     eapply proto_bytefile_nonnil; eauto.
-    omega.
+    lia.
     proto_bytefile_rewrite.
 	  erewrite selN_map with (default':= valuset0); auto.
 	  length_rewrite_l.
@@ -2033,7 +2033,7 @@ Proof.
     eapply LOG.idempred_hashmap_subset.
     exists l; auto.
     
-  Grab Existential Variables.
+  Unshelve.
   constructor.
 Qed.
 
@@ -2167,7 +2167,7 @@ Proof.
     instantiate (1:= skipn (valubytes - byte_off) data).
     rewrite Nat.add_comm with (n:= valubytes).
     rewrite arrayN_split with (i:= valubytes - byte_off).
-    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; [cancel | omega].
+    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; [cancel | lia].
     length_rewrite_l.
     
     step.
@@ -2396,17 +2396,17 @@ Proof.
   remember (length head_data) as byte_off.
   apply addr_id.
   eapply inlen_bfile with (j:= byte_off); eauto.
-  omega.
+  lia.
   instantiate (1:= old_data);
-  omega.
+  lia.
   pred_apply; cancel.
 
   - step.
     remember (length head_data) as byte_off.
     apply addr_id.
     eapply inlen_bfile with (j:= byte_off); eauto.
-    omega.
-    instantiate (1:= old_data); omega.
+    lia.
+    instantiate (1:= old_data); lia.
     pred_apply; cancel.
 
     + unfold rep in *; split_hypothesis;
@@ -2541,7 +2541,7 @@ Proof.
       auto.
 
       rewrite get_sublist_length at 2; auto;[| solve_ineq_dwrite_middle].
-      replace (valubytes - valubytes) with 0 by omega.
+      replace (valubytes - valubytes) with 0 by lia.
       rewrite Nat.min_0_r; auto.
 
       + step.
@@ -2587,7 +2587,7 @@ Proof.
         rewrite LOG.idempred_hashmap_subset; [| eauto].
         safecancel.
         4: eauto.
-        instantiate (1:= 0); omega.
+        instantiate (1:= 0); lia.
         instantiate (1:= nil).
         simpl; auto.
         simpl; auto.
@@ -2742,7 +2742,7 @@ Proof.
     rewrite arrayN_split with (i:= length data / valubytes * valubytes) in H end.
   step.
   
-  - repeat rewrite firstn_length_l; try omega.
+  - repeat rewrite firstn_length_l; try lia.
     rewrite Nat.mul_comm; apply Nat.mul_div_le; auto.
     match goal with | [H: length _ = length _ |- _ ] => rewrite H end; 
     rewrite Nat.mul_comm; apply Nat.mul_div_le; auto.
@@ -2779,7 +2779,7 @@ Proof.
     2: rewrite <- plus_n_O; pred_apply; cancel.
     length_rewrite_l.
     match goal with | [H: 0 < length (skipn _ _) |- _] => 
-      rewrite skipn_length in H end; omega.
+      rewrite skipn_length in H end; lia.
 
     erewrite <- bfile_selN_tsupd_iter_eq with (f:= f)(f':= f'); eauto; [ |
     unfold datatype; solve_eq_dwrite_middle]. 
@@ -2882,7 +2882,7 @@ Proof.
     unfold hpad_length in H5.
     destruct (length data mod valubytes) eqn:D.
     apply Nat.div_small_iff in Hx; auto.
-    apply mod_lt_nonzero in Hx; auto; try omega.
+    apply mod_lt_nonzero in Hx; auto; try lia.
     rewrite <- D in *; auto.
     apply Nat.div_small_iff in Hx; auto.
     apply Nat.mod_small_iff in Hx. rewrite Hx in H5; auto.
@@ -2894,7 +2894,7 @@ Proof.
       rewrite roundup_lt_one; auto.
       rewrite Nat.div_same; auto.
       apply Nat.div_small_iff in Hx; auto.
-      omega.
+      lia.
       rewrite Hx; simpl; rewrite <- plus_n_O.
       eapply dsupd_eq_dwrite_middle; eauto.
       eapply tsupd_eq_dwrite_middle; eauto.
@@ -2906,7 +2906,7 @@ Proof.
        rewrite crash_xform_lift_empty).
        * safecancel.
           instantiate (1:= 0).
-          omega.
+          lia.
           simpl.
           instantiate(1:= nil); eauto.
           all: simpl; eauto.
@@ -2915,7 +2915,7 @@ Proof.
           eapply inlen_bfile with (j:= 0); eauto.
           apply valubytes_ge_O.
           2: rewrite <- plus_n_O; pred_apply; cancel.
-          omega.
+          lia.
           repeat (rewrite crash_xform_exists_comm; cancel).
           repeat (rewrite crash_xform_sep_star_dist;
           rewrite crash_xform_lift_empty).
@@ -2924,13 +2924,13 @@ Proof.
           rewrite roundup_lt_one; auto.
           rewrite Nat.div_same; auto.
           apply Nat.div_small_iff in Hx; auto.
-          omega.
+          lia.
   
           simpl; rewrite Hx; simpl; rewrite <- plus_n_O.
           destruct (map vsmerge (get_sublist (DFData f) block_off 1)) eqn:D.
           apply map_eq_nil in D; unfold get_sublist in D; 
           apply firstn_eq_nil in D.
-          destruct D; [omega | ].
+          destruct D; [lia | ].
           apply skipn_eq_nil in H10.
           destruct H10.
           exfalso; eapply le_lt_false.
@@ -2968,7 +2968,7 @@ Proof.
           destruct (map vsmerge (get_sublist (DFData f) block_off 1)) eqn:D.
           apply map_eq_nil in D; unfold get_sublist in D; 
           apply firstn_eq_nil in D.
-          destruct D; [omega | ].
+          destruct D; [lia | ].
           apply skipn_eq_nil in H10.
           destruct H10.
           exfalso; eapply le_lt_false.
@@ -3098,13 +3098,13 @@ Proof.
     match goal with |[H: _ <= _ - _ |- _] => apply le_sub_le_add_l' in H end.
     destruct (Nat.eq_dec (length head_data + length data) valubytes).
     rewrite e in *; rewrite Nat.mod_same in H5; auto.
-    replace (valubytes - valubytes) with 0 by omega; simpl in *; auto.
-    inversion H18; try omega.
+    replace (valubytes - valubytes) with 0 by lia; simpl in *; auto.
+    inversion H18; try lia.
     assert (A: length head_data + length data < valubytes).
-    omega.
-    apply Nat.mod_small_iff in A; auto; try omega.
+    lia.
+    apply Nat.mod_small_iff in A; auto; try lia.
     destruct (length head_data + length data) eqn:D.
-    apply plus_is_O in D; destruct D; omega.
+    apply plus_is_O in D; destruct D; lia.
     rewrite H in *.
     rewrite A in H5; auto.
     auto.
@@ -3113,7 +3113,7 @@ Proof.
     instantiate (1:= [bn]).
     match goal with |[H: _ <= _ - _ |- _] => apply le_sub_le_add_l' in H end; auto.
     length_rewrite_l.
-    rewrite roundup_lt_one; auto; try omega.
+    rewrite roundup_lt_one; auto; try lia.
     rewrite Nat.div_same; auto.
     eapply dsupd_dsupd_iter_eq_dwrite_first; eauto.
     eapply tsupd_tsupd_iter_eq_dwrite_first; eauto.
@@ -3130,12 +3130,12 @@ Proof.
     pred_apply.
     instantiate (1:= nil).
     simpl;
-    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try omega.
+    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try lia.
     cancel.
     all: try solve [length_rewrite_l].
     length_rewrite_l.
-    rewrite <- le_plus_minus; try omega.
-    replace (valubytes - valubytes) with 0 by omega.
+    rewrite <- le_plus_minus; try lia.
+    replace (valubytes - valubytes) with 0 by lia.
     apply Nat.min_0_r.
     
     safestep.
@@ -3146,7 +3146,7 @@ Proof.
     rewrite H20; auto.
     pred_apply.
     replace (block_off * valubytes + valubytes) with ((block_off + 1) * valubytes) 
-        by (rewrite Nat.mul_add_distr_r; simpl; omega).
+        by (rewrite Nat.mul_add_distr_r; simpl; lia).
     cancel.
     length_rewrite_l. 
     rewrite Nat.mul_add_distr_r; simpl; rewrite <- plus_n_O.
@@ -3162,23 +3162,23 @@ Proof.
     
     apply Nat.nle_gt in H18.
     apply Nat.lt_sub_lt_add_l in H18.
-    rewrite mm_dist'; try omega.
+    rewrite mm_dist'; try lia.
     unfold hpad_length in *.
-    rewrite mod_subt; auto; try omega.
+    rewrite mod_subt; auto; try lia.
     rewrite Nat.mul_add_distr_r; simpl; rewrite <- plus_n_O.
-    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try omega. 
+    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try lia. 
     erewrite <- bytefile_length_eq with (fy:= fy); eauto.
     replace (block_off * valubytes +
       (length data + length head_data))
       with (block_off * valubytes + length head_data +
-           length data) by omega; auto.
+           length data) by lia; auto.
     replace (length data + length head_data)
-        with (length head_data + length data) by omega; auto.
+        with (length head_data + length data) by lia; auto.
     
     step.
     + rewrite Nat.mul_add_distr_r; simpl; rewrite <- plus_n_O.
-    rewrite mm_dist'; try omega.
-    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try omega.
+    rewrite mm_dist'; try lia.
+    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try lia.
     rewrite <- merge_bs_firstn_comm.
     rewrite <- merge_bs_skipn_comm.
     replace (block_off * valubytes + valubytes)
@@ -3186,15 +3186,15 @@ Proof.
                 (valubytes - length head_data)).
     rewrite <- arrayN_split.
     replace (length data + length head_data)
-        with (length head_data + length data) by omega.
+        with (length head_data + length data) by lia.
     rewrite Nat.add_assoc; cancel.
-    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try omega.
+    rewrite <- Nat.add_assoc; rewrite <- le_plus_minus; try lia.
     
     + instantiate (1:= bn::bnl).
     length_rewrite_l.
     simpl; rewrite H33.
-    rewrite mm_dist'; try omega.
-    rewrite Nat.add_comm; apply roundup_div_minus_S; auto; omega.
+    rewrite mm_dist'; try lia.
+    rewrite Nat.add_comm; apply roundup_div_minus_S; auto; lia.
     
     + eapply dsupd_iter_dsupd_dwrite_first; eauto.
     
@@ -3211,31 +3211,31 @@ Proof.
     length_rewrite_l.
     rewrite skipn_length in H27.
     instantiate (1:= length (bn::x4)).
-    rewrite mm_dist' in H27; try omega.
+    rewrite mm_dist' in H27; try lia.
     simpl.
-    rewrite roundup_div_minus in H27; auto; try omega.
+    rewrite roundup_div_minus in H27; auto; try lia.
     rewrite Nat.add_comm; simpl.
     destruct (length x4).
     apply Nat.div_str_pos; auto.
     split; auto.
     apply valubytes_ge_O.
     apply le_trans with (m:= length data + length head_data).
-    omega.
+    lia.
     apply roundup_ge; auto.
     apply le_sub_le_add_r' in H27.
-    omega.
-    omega.
+    lia.
+    lia.
     
     rewrite skipn_length in H27.
-    rewrite mm_dist' in H27; try omega.
-    rewrite roundup_div_minus in H27; auto; try omega.
+    rewrite mm_dist' in H27; try lia.
+    rewrite roundup_div_minus in H27; auto; try lia.
     rewrite firstn_length_l.
     rewrite skipn_length.
-    rewrite mm_dist'; try omega.
+    rewrite mm_dist'; try lia.
     rewrite dsupd_iter_dsupd_head.
     rewrite combine_cons.
     repeat rewrite <- map_cons.
-    repeat rewrite firstn_length_l; try omega.
+    repeat rewrite firstn_length_l; try lia.
     unfold get_sublist.
     rewrite cons_app with (a:= (selN (DFData f) block_off valuset0) ).
     replace ([(selN (DFData f) block_off valuset0)])
@@ -3245,8 +3245,8 @@ Proof.
     rewrite <- firstn_sum_split.
     rewrite <- Nat.add_assoc.
     rewrite list_split_chunk_cons'.
-    repeat rewrite mm_dist'; try omega.
-    rewrite <- le_plus_minus; try omega.
+    repeat rewrite mm_dist'; try lia.
+    rewrite <- le_plus_minus; try lia.
     replace (skipn valubytes (valu2list (fst  (selN (DFData f) block_off valuset0))))
         with (nil: list byte).
     rewrite app_nil_r.
@@ -3295,22 +3295,22 @@ Proof.
       destruct ((length head_data + length data)
                   mod valubytes) eqn:D.
     rewrite Nat.add_comm in D; rewrite D.
-    repeat rewrite roundup_eq_mod_O; try omega.
+    repeat rewrite roundup_eq_mod_O; try lia.
     rewrite app_assoc; rewrite list_split_chunk_app_l.
     replace (skipn valubytes (valu2list (fst (selN (DFData f) (block_off +
                         (length head_data + length data) /
                         valubytes ) valuset0))))
         with (nil: list byte). rewrite app_nil_r.
     replace (length head_data + length data)
-        with  (length data + length head_data) by omega; eauto.
+        with  (length data + length head_data) by lia; eauto.
     rewrite skipn_oob; auto.
     length_rewrite_l.
     length_rewrite_l.
     rewrite roundup_eq_mod_O in H27; auto.
-    destruct (length x4). simpl in *; try omega.
-    apply le_sub_le_add_r' in H27; try omega.
+    destruct (length x4). simpl in *; try lia.
+    apply le_sub_le_add_r' in H27; try lia.
     replace (valubytes + S n * valubytes) with
-    ((S n + 1) * valubytes) by (rewrite Nat.mul_add_distr_r; simpl; omega).
+    ((S n + 1) * valubytes) by (rewrite Nat.mul_add_distr_r; simpl; lia).
     apply mult_le_compat_r with (p:= valubytes) in H27; auto.
     eapply le_trans.
     apply H27.
@@ -3318,19 +3318,19 @@ Proof.
     
     rewrite <- D.
     replace (length head_data + length data)
-        with  (length data + length head_data) by omega; eauto.
-    rewrite <- le_plus_minus; try omega; eauto.
-    apply Nat.div_str_pos; omega.
-    unfold not; intros; omega.
-    omega.
+        with  (length data + length head_data) by lia; eauto.
+    rewrite <- le_plus_minus; try lia; eauto.
+    apply Nat.div_str_pos; lia.
+    unfold not; intros; lia.
+    lia.
     rewrite app_assoc.
     rewrite firstn_app_le; simpl.
     length_rewrite_l.
     repeat rewrite <- le_plus_minus; eauto.
     rewrite pm_1_3_cancel; rewrite app_assoc_reverse; eauto.
-    omega.
+    lia.
     length_rewrite_l. 
-    rewrite <- le_plus_minus; try omega.
+    rewrite <- le_plus_minus; try lia.
     apply Nat.le_add_r.
     rewrite skipn_oob; auto.
     length_rewrite_l.
@@ -3348,28 +3348,28 @@ Proof.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     apply length_zero_iff_nil in H0.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     length_rewrite_l.
     
     rewrite skipn_length in H27.
-    rewrite mm_dist' in H27; try omega.
-    rewrite roundup_div_minus in H27; auto; try omega.
+    rewrite mm_dist' in H27; try lia.
+    rewrite roundup_div_minus in H27; auto; try lia.
     rewrite firstn_length_l.
     rewrite skipn_length.
-    rewrite mm_dist'; try omega.
-    replace (block_off + 1) with (S block_off) by omega.
+    rewrite mm_dist'; try lia.
+    replace (block_off + 1) with (S block_off) by lia.
     rewrite tsupd_iter_tsupd_head.
-    replace (S block_off) with (block_off + 1) by omega.
+    replace (S block_off) with (block_off + 1) by lia.
     unfold datatype; rewrite combine_cons.
     repeat rewrite <- map_cons.
-    repeat rewrite firstn_length_l; try omega.
+    repeat rewrite firstn_length_l; try lia.
     unfold get_sublist.
     rewrite cons_app with (a:= (selN (DFData f) block_off valuset0) ).
     replace ([(selN (DFData f) block_off valuset0)])
@@ -3380,8 +3380,8 @@ Proof.
     rewrite <- firstn_sum_split.
     rewrite <- Nat.add_assoc.
     rewrite list_split_chunk_cons'.
-    repeat rewrite mm_dist'; try omega.
-    rewrite <- le_plus_minus; try omega.
+    repeat rewrite mm_dist'; try lia.
+    rewrite <- le_plus_minus; try lia.
     replace (skipn valubytes (valu2list (fst  (selN (DFData f) block_off valuset0))))
         with (nil: list byte).
     rewrite app_nil_r.
@@ -3430,22 +3430,22 @@ Proof.
       destruct ((length head_data + length data)
                   mod valubytes) eqn:D.
     rewrite Nat.add_comm in D; rewrite D.
-    repeat rewrite roundup_eq_mod_O; try omega.
+    repeat rewrite roundup_eq_mod_O; try lia.
     rewrite app_assoc; rewrite list_split_chunk_app_l.
     replace (skipn valubytes (valu2list (fst (selN (DFData f) (block_off +
                         (length head_data + length data) /
                         valubytes ) valuset0))))
         with (nil: list byte). rewrite app_nil_r.
     replace (length head_data + length data)
-        with  (length data + length head_data) by omega; eauto.
+        with  (length data + length head_data) by lia; eauto.
     rewrite skipn_oob; auto.
     length_rewrite_l.
     length_rewrite_l.
     rewrite roundup_eq_mod_O in H27; auto.
-    destruct (length x4). simpl in *; try omega.
-    apply le_sub_le_add_r' in H27; try omega.
+    destruct (length x4). simpl in *; try lia.
+    apply le_sub_le_add_r' in H27; try lia.
     replace (valubytes + S n * valubytes) with
-    ((S n + 1) * valubytes) by (rewrite Nat.mul_add_distr_r; simpl; omega).
+    ((S n + 1) * valubytes) by (rewrite Nat.mul_add_distr_r; simpl; lia).
     apply mult_le_compat_r with (p:= valubytes) in H27; auto.
     eapply le_trans.
     apply H27.
@@ -3453,19 +3453,19 @@ Proof.
     
     rewrite <- D.
     replace (length head_data + length data)
-        with  (length data + length head_data) by omega; eauto.
-    rewrite <- le_plus_minus; try omega; eauto.
-    apply Nat.div_str_pos; omega.
-    unfold not; intros; omega.
-    omega.
+        with  (length data + length head_data) by lia; eauto.
+    rewrite <- le_plus_minus; try lia; eauto.
+    apply Nat.div_str_pos; lia.
+    unfold not; intros; lia.
+    lia.
     rewrite app_assoc.
     rewrite firstn_app_le; simpl.
     length_rewrite_l.
     repeat rewrite <- le_plus_minus; eauto.
     rewrite pm_1_3_cancel; rewrite app_assoc_reverse; eauto.
-    omega.
+    lia.
     length_rewrite_l. 
-    rewrite <- le_plus_minus; try omega.
+    rewrite <- le_plus_minus; try lia.
     apply Nat.le_add_r.
     rewrite skipn_oob; auto.
     length_rewrite_l.
@@ -3483,14 +3483,14 @@ Proof.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     apply length_zero_iff_nil in H0.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     length_rewrite_l.
     
     auto.
@@ -3505,7 +3505,7 @@ Proof.
     4: eauto.
 
     instantiate (1:= 0).
-    omega.
+    lia.
 
     instantiate (1:= []).
     auto.
@@ -3527,14 +3527,14 @@ Proof.
     apply Nat.div_str_pos; auto.
     split; auto.
     apply valubytes_ge_O.
-    omega.
+    lia.
     apply Nat.div_le_mono; auto.
     apply roundup_ge; auto.
     simpl.
     
     unfold get_sublist.
     rewrite firstn_length_l.
-    rewrite <- le_plus_minus; try omega.
+    rewrite <- le_plus_minus; try lia.
     instantiate (1:= [x]).
     erewrite firstn_1_selN. 
     simpl.
@@ -3560,19 +3560,19 @@ Proof.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     apply length_zero_iff_nil in H.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     length_rewrite_l.
 
     unfold get_sublist.
     rewrite firstn_length_l.
-    rewrite <- le_plus_minus; try omega.
+    rewrite <- le_plus_minus; try lia.
     erewrite firstn_1_selN. 
     simpl.
     rewrite skipn_selN.
@@ -3597,14 +3597,14 @@ Proof.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     apply length_zero_iff_nil in H.
     assert (A: block_off < length (DFData f)).
     eapply inlen_bfile with (j:= length head_data); eauto.
     2: pred_apply; cancel.
-    omega.
-    omega.
+    lia.
+    lia.
     length_rewrite_l.
     all: auto.
 Qed.
@@ -3801,10 +3801,10 @@ Proof.
   unfold AByteFile.rep in *; split_hypothesis.
   rewrite <- H17; rewrite <- H6; rewrite H26; auto.
   apply list2nmem_array_eq in H8; rewrite H8; auto.
-  replace (length copy_data - length copy_data) with 0 by omega.
+  replace (length copy_data - length copy_data) with 0 by lia.
   apply Nat.min_0_l.
   
-  safestep; try (rewrite map_length in H16; omega).
+  safestep; try (rewrite map_length in H16; lia).
   eauto.
   rewrite <- H29; eauto.
   eauto.

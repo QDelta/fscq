@@ -1,4 +1,4 @@
-Require Import List Arith Omega Bool.
+Require Import List Arith Lia Bool.
 Require Import ListUtils MapUtils.
 Require Import DecidableType OrderedType OrderedTypeEx FMapList.
 

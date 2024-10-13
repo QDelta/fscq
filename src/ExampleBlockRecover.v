@@ -2,7 +2,7 @@ Require Import Prog.
 Require Import Log.
 Require Import BFile.
 Require Import Word.
-Require Import Omega.
+Require Import Lia.
 Require Import BasicProg.
 Require Import Bool.
 Require Import Pred PredCrash.
@@ -174,7 +174,7 @@ Proof.
 
     step.
     pred_apply.
-    replace n with 0 by omega; rewrite nthd_0; simpl.
+    replace n with 0 by lia; rewrite nthd_0; simpl.
     rewrite crash_xform_diskIs_pred by eauto.
     xform_dist; rewrite crash_xform_ptsto; cancel.
 
@@ -189,7 +189,7 @@ Proof.
 
     step.
     pred_apply.
-    replace n with 0 by omega; rewrite nthd_0; simpl.
+    replace n with 0 by lia; rewrite nthd_0; simpl.
     rewrite crash_xform_diskIs_pred by eauto.
     xform_dist; rewrite crash_xform_ptsto; cancel.
 
@@ -304,7 +304,7 @@ Proof.
     destruct v0; simpl in *.
     or_r; norm. cancel.
     pred_apply.
-    replace n with 0 by omega; rewrite nthd_0; simpl.
+    replace n with 0 by lia; rewrite nthd_0; simpl.
     rewrite crash_xform_diskIs_pred by eauto.
     xform_dist; rewrite crash_xform_ptsto; cancel.
 

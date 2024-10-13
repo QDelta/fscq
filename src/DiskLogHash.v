@@ -10,7 +10,7 @@ Require Import Prog ProgMonad.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
-Require Import Omega.
+Require Import Lia.
 Require Import Word.
 Require Import Rec.
 Require Import Array.
@@ -815,7 +815,7 @@ Module PaddedLog.
   Proof.
     unfold padded_log; induction l; simpl; auto.
     rewrite setlen_nil, repeat_is_nil; simpl; auto.
-    unfold roundup; rewrite divup_0; omega.
+    unfold roundup; rewrite divup_0; lia.
     
     destruct a, n; simpl;
     rewrite <- IHl;
@@ -830,7 +830,7 @@ Module PaddedLog.
   Proof.
     unfold vals_nonzero; induction l; intros; simpl; auto.
     destruct a, n; simpl; auto.
-    autorewrite with lists in *; omega.
+    autorewrite with lists in *; lia.
   Qed.
 
   Lemma vals_nonzero_app : forall a b,
@@ -907,10 +907,10 @@ Module PaddedLog.
     f_equal.
     rewrite app_length, setlen_length.
     rewrite roundup_roundup_add; auto.
-    f_equal; omega.
+    f_equal; lia.
     rewrite app_length, setlen_length.
     rewrite roundup_roundup_add; auto.
-    omega.
+    lia.
   Qed.
 
   Ltac solve_checksums :=
@@ -994,7 +994,7 @@ Module PaddedLog.
 
     safestep; subst.
     setoid_rewrite vals_nonzero_addrs; unfold ndata_log.
-    replace DataSig.items_per_val with 1 by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 by (cbv; auto); try lia.
     replace (map ent_valu (log_nonzero l)) with (vals_nonzero l); auto.
     safestep.
     rewrite desc_padding_synced_piff; cancel.
@@ -1068,7 +1068,7 @@ Module PaddedLog.
     step.
     unfold ndesc_log, ndata_log; rewrite divup_0; simpl; cancel.
     repeat rewrite Nat.sub_0_r; cbn; cancel.
-    rewrite Desc.array_rep_sync_nil, Data.array_rep_sync_nil by (auto; omega); cancel.
+    rewrite Desc.array_rep_sync_nil, Data.array_rep_sync_nil by (auto; lia); cancel.
     solve_checksums; simpl; auto.
     setoid_rewrite DescDefs.ipack_nil; simpl.
     solve_hash_list_rep; auto.
@@ -1093,16 +1093,16 @@ Module PaddedLog.
     eapply pimpl_ok2. apply init_ok'.
     intros; unfold initrep; safecancel.
     unfold Desc.avail_rep, Data.avail_rep.
-    rewrite arrayN_isolate_hd by omega.
+    rewrite arrayN_isolate_hd by lia.
     repeat rewrite Nat.add_0_r.
     rewrite arrayN_split with (i := LogDescLen xp).
     rewrite surjective_pairing with (p := selN l 0 ($0, nil)).
     substl (LogData xp); substl (LogDescriptor xp).
     cancel.
     rewrite firstn_length_l; auto.
-    setoid_rewrite skipn_length with (n := 1); omega.
+    setoid_rewrite skipn_length with (n := 1); lia.
     setoid_rewrite skipn_skipn with (m := 1).
-    rewrite skipn_length; omega.
+    rewrite skipn_length; lia.
     auto.
     step.
   Qed.
@@ -1119,7 +1119,7 @@ Module PaddedLog.
   Lemma helper_add_sub_0 : forall a b,
     a <= b -> a + (b - a) + 0 = b.
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
   Lemma helper_trunc_ok : forall xp l prev_len h,
@@ -1254,10 +1254,10 @@ Module PaddedLog.
   Proof.
     unfold Desc.items_valid, loglen_valid.
     intuition.
-    unfold DescSig.RALen; omega.
+    unfold DescSig.RALen; lia.
     autorewrite with lists; unfold DescSig.RALen.
     apply divup_ge; auto.
-    unfold ndesc_log in *; omega.
+    unfold ndesc_log in *; lia.
   Qed.
   Local Hint Resolve loglen_valid_desc_valid.
 
@@ -1270,11 +1270,11 @@ Module PaddedLog.
   Proof.
     unfold Data.items_valid, loglen_valid.
     intuition.
-    unfold DataSig.RALen; omega.
+    unfold DataSig.RALen; lia.
     autorewrite with lists; unfold DataSig.RALen.
     apply divup_ge; auto.
     rewrite divup_1; rewrite <- entry_valid_ndata by auto.
-    unfold ndata_log in *; omega.
+    unfold ndata_log in *; lia.
   Qed.
   Local Hint Resolve loglen_valid_data_valid.
 
@@ -1284,7 +1284,7 @@ Module PaddedLog.
       = LogDescLen xp - ndesc_log old.
   Proof.
     unfold loglen_valid, ndesc_log; intros.
-    omega.
+    lia.
   Qed.
 
   Lemma helper_loglen_data_valid_extend : forall xp new old,
@@ -1293,7 +1293,7 @@ Module PaddedLog.
       = LogLen xp - ndata_log old.
   Proof.
     unfold loglen_valid, ndata_log; intros.
-    omega.
+    lia.
   Qed.
 
   Lemma helper_loglen_data_valid_extend_entry_valid : forall xp new old,
@@ -1323,7 +1323,7 @@ Module PaddedLog.
     b > 0 -> a <= a * b.
   Proof.
     intros; rewrite Nat.mul_comm.
-    destruct (mult_O_le a b); auto; omega.
+    destruct (mult_O_le a b); auto; lia.
   Qed.
 
   Lemma loglen_valid_goodSize_l : forall xp a b,
@@ -1358,7 +1358,7 @@ Module PaddedLog.
   Lemma helper_add_sub : forall a b,
     a <= b -> a + (b - a) = b.
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
 
@@ -1367,7 +1367,7 @@ Module PaddedLog.
   Proof.
     induction a; intros; simpl; auto.
     destruct a; auto.
-    rewrite IHa; omega.
+    rewrite IHa; lia.
   Qed.
 
   Lemma ndata_log_app : forall a b,
@@ -1395,7 +1395,7 @@ Module PaddedLog.
     unfold roundup.
     rewrite Nat.add_comm, Nat.mul_comm.
     rewrite divup_add by auto.
-    omega.
+    lia.
   Qed.
 
   Lemma ndesc_log_padded_app : forall a b,
@@ -1536,7 +1536,7 @@ Module PaddedLog.
     nonzero_addrs l <= length l.
   Proof.
     induction l; simpl; auto.
-    destruct a; omega.
+    destruct a; lia.
   Qed.
 
   Lemma extend_ok_synced_hdr_helper : forall xp prev_len old new h,
@@ -1942,7 +1942,7 @@ Module PaddedLog.
   Lemma helper_add_sub_add : forall a b c,
     b >= c + a -> a + (b - (c + a)) = b - c.
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
   Lemma xform_rep_extended_helper : forall xp old new,
@@ -1979,20 +1979,20 @@ Module PaddedLog.
     replace (length l) with (ndata_log new).
     cancel.
 
-    replace DataSig.items_per_val with 1 in * by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 in * by (cbv; auto); try lia.
     unfold ndesc_list.
     substl (length l0).
     unfold ndesc_log.
     rewrite divup_divup; auto.
 
-    replace DataSig.items_per_val with 1 in * by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 in * by (cbv; auto); try lia.
     intuition; auto.
     all: unfold DescSig.RALen, DataSig.RALen, xparams_ok in *;
-          try omega; auto; intuition.
+          try lia; auto; intuition.
 
-    apply mult_le_compat_r; omega.
+    apply mult_le_compat_r; lia.
 
-    replace DataSig.items_per_val with 1 in * by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 in * by (cbv; auto); try lia.
   Qed.
 
   Lemma sep_star_pimpl_trans : forall AT AEQ V (F p q r: @pred AT AEQ V),
@@ -2087,7 +2087,7 @@ Module PaddedLog.
       rewrite vals_nonzero_app.
       rewrite vals_nonzero_padded_log.
       rewrite <- Data.array_rep_synced_app.
-      replace DataSig.items_per_val with 1 by (cbv; auto); try omega.
+      replace DataSig.items_per_val with 1 by (cbv; auto); try lia.
       rewrite divup_1; simpl.
       repeat rewrite vals_nonzero_addrs.
       rewrite ndata_log_app, ndata_log_padded_log.
@@ -2115,7 +2115,7 @@ Module PaddedLog.
       autorewrite with lists.
       rewrite padded_log_length.
       unfold roundup; eauto.
-      replace DataSig.items_per_val with 1 by (cbv; auto); try omega.
+      replace DataSig.items_per_val with 1 by (cbv; auto); try lia.
       rewrite Nat.mul_1_r; eauto.
       auto.
       autorewrite with lists.
@@ -2173,7 +2173,7 @@ Module PaddedLog.
     rewrite le_plus_minus_r;
     auto.
     unfold loglen_valid in *;
-    omega.
+    lia.
   Qed.
 
   Lemma recover_data_avail_helper : forall T xp old (new : list T) ndesc,
@@ -2186,13 +2186,13 @@ Module PaddedLog.
            (LogLen xp - nonzero_addrs (map fst old)).
   Proof.
     intros.
-    replace DataSig.items_per_val with 1 by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 by (cbv; auto); try lia.
     rewrite divup_1, Data.avail_rep_merge;
     eauto.
     rewrite le_plus_minus_r;
     auto.
     unfold loglen_valid in *;
-    omega.
+    lia.
   Qed.
 
   Lemma xform_rep_rollbackunsync : forall xp l hm,
@@ -2329,7 +2329,7 @@ Module PaddedLog.
     safestep.
     rewrite vals_nonzero_addrs.
     replace DataSig.items_per_val with 1 by (cbv; auto).
-    unfold ndata_log; omega.
+    unfold ndata_log; lia.
     step.
 
     intros.
@@ -2405,16 +2405,16 @@ Module PaddedLog.
     autorewrite with lists.
     rewrite vals_nonzero_addrs, nonzero_addrs_padded_log, Nat.mul_add_distr_r.
     unfold ndata_log.
-    replace DataSig.items_per_val with 1 by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 by (cbv; auto); try lia.
     repeat rewrite Nat.mul_1_r.
     all: auto.
 
     rewrite <- Data.array_rep_synced_app.
     pred_apply.
-    replace DataSig.items_per_val with 1 by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 by (cbv; auto); try lia.
     rewrite vals_nonzero_addrs, nonzero_addrs_padded_log, divup_1.
     cancel.
-    replace DataSig.items_per_val with 1 by (cbv; auto); try omega.
+    replace DataSig.items_per_val with 1 by (cbv; auto); try lia.
     rewrite Nat.mul_1_r; eauto.
 
     step.
@@ -2491,7 +2491,7 @@ Module PaddedLog.
       safestep.
       rewrite vals_nonzero_padded_log, vals_nonzero_addrs.
       unfold ndata_log.
-      replace DataSig.items_per_val with 1 by (cbv; auto); omega.
+      replace DataSig.items_per_val with 1 by (cbv; auto); lia.
 
       step.
       solve_hash_list_rep; eauto.
@@ -2634,7 +2634,7 @@ Module PaddedLog.
     cancel.
     solve_checksums.
 
-    Grab Existential Variables.
+    Unshelve.
     all: eauto; try econstructor.
   Qed.
 
@@ -2935,7 +2935,7 @@ Module DLog.
     eassign F; cancel.
     eauto.
     step.
-    unfold roundup; rewrite divup_0; omega.
+    unfold roundup; rewrite divup_0; lia.
 
     (* crashes *)
     xcrash.
@@ -2989,9 +2989,9 @@ Module DLog.
     step.
     unfold PaddedLog.xparams_ok, PaddedLog.DescSig.xparams_ok, PaddedLog.DataSig.xparams_ok; intuition.
     substl (LogDescriptor xp); unfold PaddedLog.DescSig.RALen.
-    eapply goodSize_trans; [ | eauto ]; omega.
+    eapply goodSize_trans; [ | eauto ]; lia.
     substl (LogData xp); substl (LogDescriptor xp); unfold PaddedLog.DataSig.RALen.
-    eapply goodSize_trans; [ | eauto ]; omega.
+    eapply goodSize_trans; [ | eauto ]; lia.
     step.
     rewrite roundup_0; auto.
   Qed.
@@ -3035,7 +3035,7 @@ Module DLog.
     generalize H2.
     rewrite H.
     rewrite <- PaddedLog.padded_log_length.
-    intro; omega.
+    intro; lia.
   Qed.
 
   Local Hint Resolve extend_length_ok helper_extend_length_ok PaddedLog.log_nonzero_padded_app.
@@ -3060,7 +3060,7 @@ Module DLog.
     repeat rewrite PaddedLog.padded_log_length.
     rewrite roundup_roundup_add by auto.
     rewrite roundup_roundup by auto.
-    omega.
+    lia.
   Qed.
 
   Local Hint Resolve extend_navail_ok PaddedLog.rep_synced_app_pimpl.

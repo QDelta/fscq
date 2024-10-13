@@ -1,5 +1,5 @@
 Require Import Mem.
-Require Import List Omega Ring Word Pred Prog Hoare SepAuto BasicProg Array.
+Require Import List Lia Ring Word Pred Prog Hoare SepAuto BasicProg Array.
 Require Import FunctionalExtensionality.
 
 Set Implicit Arguments.

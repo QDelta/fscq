@@ -12,7 +12,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import BasicProg.
 Require Import FunctionalExtensionality.
-Require Import Omega.
+Require Import Lia.
 Require Import Word.
 Require Import Rec.
 Require Import Array.
@@ -421,7 +421,7 @@ Module LOG.
     repeat deex.
     inversion H; subst; auto.
     inversion H; subst; auto.
-    rewrite app_length; cbn; omega.
+    rewrite app_length; cbn; lia.
   Unshelve.
     all: auto.
   Qed.
@@ -464,7 +464,7 @@ Module LOG.
   Proof.
     induction a; cbn; intros;
       destruct b; cbn in *; try congruence.
-    rewrite IHa by omega.
+    rewrite IHa by lia.
     cancel.
   Qed.
 
@@ -498,7 +498,7 @@ Module LOG.
   Proof.
     induction a; cbn; intros;
       destruct b; cbn in *; try congruence.
-    rewrite IHa, H0 by (auto; omega). cancel.
+    rewrite IHa, H0 by (auto; lia). cancel.
   Qed.
 
 
@@ -1518,8 +1518,8 @@ Module LOG.
     step.
     rewrite firstn_S_selN_expand with (def := $0).
     rewrite fold_left_app; simpl.
-    erewrite selN_map by omega; subst; auto.
-    rewrite map_length; omega.
+    erewrite selN_map by lia; subst; auto.
+    rewrite map_length; lia.
 
     unfold rep_inner; cancel.
     step.
@@ -1543,7 +1543,7 @@ Module LOG.
     rewrite combine_app by (autorewrite with lists; auto); simpl.
     rewrite <- app_assoc.
     repeat rewrite firstn_app_l; auto.
-    all: autorewrite with lists; rewrite firstn_length_l; omega.
+    all: autorewrite with lists; rewrite firstn_length_l; lia.
   Qed.
 
   Lemma skip_vsupsyn_range_skip_S : forall i vs l,
@@ -1555,9 +1555,9 @@ Module LOG.
     setoid_rewrite skipn_selN_skipn with (def := ($0, nil)) at 4.
     rewrite <- cons_nil_app.
     repeat rewrite skipn_app_eq;
-      autorewrite with lists; repeat rewrite firstn_length_l by omega;
-      simpl; auto; try omega.
-    rewrite firstn_length_l; omega.
+      autorewrite with lists; repeat rewrite firstn_length_l by lia;
+      simpl; auto; try lia.
+    rewrite firstn_length_l; lia.
   Qed.
 
   Lemma sep_star_reorder_helper1 : forall AT AEQ V (a b c d : @pred AT AEQ V),
@@ -1574,15 +1574,15 @@ Module LOG.
     unfold vsupsyn_range; intros.
     apply arrayN_unify.
     rewrite updN_app2; autorewrite with lists.
-    all: repeat rewrite firstn_length_l; try omega.
-    erewrite firstn_S_selN, repeat_app_tail by omega.
+    all: repeat rewrite firstn_length_l; try lia.
+    erewrite firstn_S_selN, repeat_app_tail by lia.
     rewrite combine_app, <- app_assoc.
     f_equal.
     rewrite Nat.sub_diag, updN_0_skip_1, skipn_skipn.
     rewrite Nat.add_1_l, cons_app.
     apply eq_refl.
-    rewrite skipn_length; omega.
-    rewrite firstn_length_l, repeat_length; omega.
+    rewrite skipn_length; lia.
+    rewrite firstn_length_l, repeat_length; lia.
   Qed.
 
   Lemma write_range_length_ok : forall F a i ms d vs,
@@ -1594,7 +1594,7 @@ Module LOG.
     apply list2nmem_arrayN_bound in H0; destruct H0; subst; simpl in *.
     inversion H.
     rewrite replay_disk_length in *.
-    omega.
+    lia.
   Qed.
 
   Theorem write_range_ok : forall xp a l ms,
@@ -1615,8 +1615,8 @@ Module LOG.
 
     safestep. reflexivity. eauto. eauto.
     rewrite vsupsyn_range_length; auto.
-    omega.
-    rewrite firstn_length_l; omega.
+    lia.
+    rewrite firstn_length_l; lia.
 
     step.
     eapply vsupsyn_range_progress; eauto.
@@ -1694,8 +1694,8 @@ Module LOG.
     apply not_true_is_false; auto.
     rewrite firstn_S_selN_expand with (def := $0).
     rewrite fold_left_app; simpl.
-    erewrite selN_map by omega; subst; auto.
-    rewrite map_length; omega.
+    erewrite selN_map by lia; subst; auto.
+    rewrite map_length; lia.
 
     pimpl_crash. unfold rep_inner; norm. cancel. intuition simpl. pred_apply.
     eassign (mk_mstate (MSTxn a1) (MSGLog ms'_1)); cancel.
@@ -1991,7 +1991,7 @@ Module LOG.
     destruct_lifts.
     erewrite listmatch_length_pimpl in H.
     destruct_lift H.
-    autorewrite with lists in *; omega.
+    autorewrite with lists in *; lia.
 
     step; subst; try rewrite dssync_vecs_latest.
     apply map_valid_vssync_vecs; auto.
@@ -2080,7 +2080,7 @@ Module LOG.
     inversion Ha; eauto.
     autorewrite with lists; auto.
     intros.
-    eapply in_combine_ex_l; eauto; omega.
+    eapply in_combine_ex_l; eauto; lia.
 
     (* split unsynced from all on disk *)
     unfold listmatch.
@@ -2096,7 +2096,7 @@ Module LOG.
     rewrite sort_by_index_combine; auto.
     rewrite map_snd_combine; auto.
     intros.
-    eapply in_combine_ex_l; auto; omega.
+    eapply in_combine_ex_l; auto; lia.
     rewrite <- filter_r; auto.
     autorewrite with lists; auto.
     Unshelve.
@@ -2121,7 +2121,7 @@ Module LOG.
     rewrite sort_by_index_combine; auto.
     rewrite map_snd_combine; auto.
     intros.
-    eapply in_combine_ex_l; auto; omega.
+    eapply in_combine_ex_l; auto; lia.
     cbn beta.
     erewrite filter_ext.
     erewrite filter_r; auto.

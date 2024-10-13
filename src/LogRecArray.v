@@ -1,4 +1,4 @@
-Require Import Eqdep_dec Arith Omega List ListUtils Rounding Psatz.
+Require Import Eqdep_dec Arith Lia List ListUtils Rounding Psatz.
 Require Import Word WordAuto AsyncDisk Pred PredCrash GenSepN Array SepAuto.
 Require Import Rec Prog BasicProg Hoare RecArrayUtils Log.
 Require Import FMapAVL FMapMem.
@@ -246,7 +246,7 @@ Module LogRecArray (RA : RASig).
     unfold init, rep.
     hoare.
 
-    rewrite repeat_length; omega.
+    rewrite repeat_length; lia.
     rewrite vsupsyn_range_synced_list by (rewrite repeat_length; auto).
     apply arrayN_unify; f_equal.
     apply repeat_ipack_item0.
@@ -529,7 +529,7 @@ Module LogRecArray (RA : RASig).
     f_equal.
     unfold items_valid in *; intuition.
     unfold item in *.
-    omega.
+    lia.
     eassumption.
   Qed.
 
@@ -553,7 +553,7 @@ Module LogRecArray (RA : RASig).
     destruct (lt_dec i (length l)).
     apply Forall_selN; auto.
     eapply items_wellformed; eauto.
-    rewrite selN_oob by omega.
+    rewrite selN_oob by lia.
     apply item0_wellformed.
   Qed.
 
@@ -717,8 +717,8 @@ Module LogRecArrayCache (RA : RASig).
     repeat deex.
     all: eapply mem_union_sel_none.
     all : solve [
-      cbv in H2; intuition auto; apply H3; omega |
-      eapply IHl; eauto; omega].
+      cbv in H2; intuition auto; apply H3; lia |
+      eapply IHl; eauto; lia].
   Qed.
 
   Lemma cache_rep_some : forall items i cache v d,
@@ -747,9 +747,9 @@ Module LogRecArrayCache (RA : RASig).
     inversion H. eauto.
     rewrite mem_union_sel_none in H; try congruence.
     apply mem_union_sel_none.
-    eapply arrayN_cache_ptsto_oob; eauto. omega.
+    eapply arrayN_cache_ptsto_oob; eauto. lia.
     eapply arrayN_cache_ptsto_oob; eauto.
-    rewrite firstn_length_l; omega.
+    rewrite firstn_length_l; lia.
   Qed.
 
   Lemma cache_rep_add : forall items i cache d,
@@ -825,7 +825,7 @@ Module LogRecArrayCache (RA : RASig).
     destruct addr_eq_dec; subst; eauto 10.
     destruct addr_eq_dec; subst; eauto 10.
     erewrite arrayN_cache_ptsto_oob in H6; eauto; try congruence.
-    rewrite firstn_length_l; omega.
+    rewrite firstn_length_l; lia.
     apply mem_disjoint_union in H0 as ?.
     assert (mem_disjoint (Mem.upd m3 i v) m2).
     cbv [cache_ptsto or ptsto] in H6.
@@ -833,7 +833,7 @@ Module LogRecArrayCache (RA : RASig).
     intuition repeat deex.
     destruct addr_eq_dec; subst; eauto 10.
     destruct addr_eq_dec; subst; eauto 10.
-    erewrite arrayN_cache_ptsto_oob in H9; eauto; try congruence; omega.
+    erewrite arrayN_cache_ptsto_oob in H9; eauto; try congruence; lia.
     repeat eexists; try eapply cache_ptsto_upd; eauto.
     rewrite mem_union_comm with (m1 := m0) by auto.
     repeat rewrite <- mem_union_upd.

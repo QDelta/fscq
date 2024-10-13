@@ -1,7 +1,8 @@
 Require Import Mem.
-Require Import List Omega Ring Word Pred PredCrash Prog Hoare SepAuto BasicProg Array ListUtils.
+Require Import List Lia Ring Word Pred PredCrash Prog Hoare SepAuto BasicProg Array ListUtils.
 Require Import FunctionalExtensionality.
 Require Import Permutation.
+Import PeanoNat.
 
 Set Implicit Arguments.
 
@@ -34,23 +35,23 @@ Section LISTPRED.
     i < length l ->
       listpred l =p=> listpred (firstn i l) * (prd (selN l i def)) * listpred (skipn (S i) l).
   Proof.
-    induction l; simpl; intros; [omega |].
+    induction l; simpl; intros; [lia |].
     destruct i; simpl; cancel.
-    apply IHl; omega.
+    apply IHl; lia.
   Qed.
 
   Theorem listpred_bwd : forall l i def, 
     i < length l ->
       listpred (firstn i l) * (prd (selN l i def)) * listpred (skipn (S i) l) =p=> listpred l.
   Proof.
-    induction l; simpl; intros; [omega |].
+    induction l; simpl; intros; [lia |].
     destruct i; [cancel | simpl].
-    destruct l; simpl in H; [omega |].
+    destruct l; simpl in H; [lia |].
     cancel.
     eapply pimpl_trans; [| apply IHl ].
     cancel.
     apply pimpl_refl.
-    omega.
+    lia.
   Qed.
 
   Theorem listpred_extract : forall l i def,
@@ -467,8 +468,8 @@ Section LISTMATCH.
     rewrite removeN_combine.
     rewrite selN_combine; auto.
     rewrite combine_length; rewrite <- H2; rewrite Nat.min_id; auto.
-    repeat rewrite removeN_length by omega.
-    omega.
+    repeat rewrite removeN_length by lia.
+    lia.
 
     cancel.
     eapply removeN_length_eq with (a:=a) (b:=b) in H0; eauto.
@@ -478,7 +479,7 @@ Section LISTMATCH.
     rewrite selN_combine; auto.
     apply pimpl_refl.
     rewrite combine_length; rewrite <- H0; rewrite Nat.min_id; auto.
-    repeat rewrite removeN_length by omega.
+    repeat rewrite removeN_length by lia.
     cancel.
     eapply removeN_length_eq with (a:=a) (b:=b) in H1; eauto.
   Qed.
@@ -495,8 +496,8 @@ Section LISTMATCH.
     rewrite removeN_combine.
     rewrite selN_combine; auto.
     rewrite combine_length; rewrite <- H1; rewrite Nat.min_id; auto.
-    repeat rewrite removeN_length by omega.
-    omega.
+    repeat rewrite removeN_length by lia.
+    lia.
   Qed.
 
   Theorem listmatch_updN_removeN : forall a b i av bv,
@@ -549,7 +550,7 @@ Section LISTMATCH.
     intros.
     eapply pimpl_trans2.
     eapply listmatch_isolate with (i := length a);
-    try rewrite app_length; simpl; omega.
+    try rewrite app_length; simpl; lia.
     rewrite removeN_tail.
     rewrite selN_last with (def := av); auto.
     rewrite H.
@@ -564,7 +565,7 @@ Section LISTMATCH.
     unfold listmatch; intros; cancel.
     repeat rewrite combine_app by auto.
     rewrite listpred_app; cancel.
-    repeat rewrite app_length; omega.
+    repeat rewrite app_length; lia.
   Qed.
 
   Theorem listmatch_app_rev : forall a1 b1 a2 b2,
@@ -573,7 +574,7 @@ Section LISTMATCH.
   Proof.
     unfold listmatch; cancel;
     repeat rewrite app_length in *;
-    repeat (omega || rewrite combine_app || apply listpred_app).
+    repeat (lia || rewrite combine_app || apply listpred_app).
   Qed.
 
   Theorem listmatch_split : forall a b n,
@@ -749,10 +750,10 @@ Lemma arrayN_listpred_seq : forall V l st n,
   length l = n ->
   arrayN (@ptsto _ _ V) st l =p=> listpred (fun a => a |->?) (seq st n).
 Proof.
-  induction l; destruct n; simpl; intros; try omega; auto.
+  induction l; destruct n; simpl; intros; try lia; auto.
   rewrite IHl.
   cancel.
-  omega.
+  lia.
 Qed.
 
 Lemma arrayN_listpred_seq_fp : forall V FP l st n,
@@ -760,11 +761,11 @@ Lemma arrayN_listpred_seq_fp : forall V FP l st n,
   Forall FP l ->
   arrayN (@ptsto _ _ V) st l =p=> listpred (fun a => exists v, a |-> v * [[ FP v ]]) (seq st n).
 Proof.
-  induction l; destruct n; simpl; intros; try omega; auto.
+  induction l; destruct n; simpl; intros; try lia; auto.
   inversion H0; subst.
   rewrite IHl; auto.
   cancel.
-  replace (length l) with n by omega.
+  replace (length l) with n by lia.
   cancel.
 Qed.
 
@@ -857,7 +858,7 @@ Proof.
   2 : rewrite <- map_snd_combine with (a := la) (b := l1); auto.
   2 : rewrite <- map_snd_combine with (a := lb) (b := l2); auto.
   all : f_equal; eapply listpred_unify; eauto.
-  all : repeat rewrite combine_length_eq2; try omega.
+  all : repeat rewrite combine_length_eq2; try lia.
   all : intros; destruct a, b; simpl in *.
   all : edestruct H;
         solve [eauto | subst; eauto |
@@ -1034,16 +1035,16 @@ Proof.
     specialize (IHal vl).
     rewrite crash_xform_sep_star_dist, crash_xform_lift_empty in IHal.
     inversion H; subst.
-    setoid_rewrite lift_impl with (Q := length vl = length al) at 3; intros; eauto.
+    setoid_rewrite lift_impl with (Q := length vl = length al) at 6; intros; eauto.
     rewrite IHal; simpl.
 
     cancel.
     eassign (v' :: l); cancel.
     simpl; cancel.
     apply possible_crash_list_cons; simpl; auto.
-    rewrite synced_list_length in *; simpl; omega.
+    rewrite synced_list_length in *; simpl; lia.
     apply possible_crash_list_cons; simpl; auto.
-    rewrite synced_list_length in *; simpl; omega.
+    rewrite synced_list_length in *; simpl; lia.
 Qed.
 
 Theorem sync_invariant_listpred : forall T prd (l : list T),

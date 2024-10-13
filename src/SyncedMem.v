@@ -1,6 +1,6 @@
 Require Import FunctionalExtensionality.
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import List.
 Require Import Pred.
 Require Import Mem.
@@ -71,7 +71,7 @@ Proof.
   destruct (addr_eq_dec i a); subst.
   rewrite selN_updN_eq; auto.
   rewrite selN_updN_ne; auto.
-  rewrite updN_oob by omega; auto.
+  rewrite updN_oob by lia; auto.
 Qed.
 
 Lemma sm_vs_valid_upd_unsynced: forall sm d a v,
@@ -146,7 +146,7 @@ Proof.
   intros.
   destruct (lt_dec a (length vs)) as [Hl|Hl].
   apply H in Hl; intuition.
-  rewrite selN_oob by omega.
+  rewrite selN_oob by lia.
   auto.
 Qed.
 
@@ -600,13 +600,13 @@ Proof.
   specialize (H m 0).
   rewrite Nat.add_0_r in *.
   apply H; auto.
-  omega.
+  lia.
   intros.
   eapply IHl; auto.
   intros.
   rewrite plus_Snm_nSm in *.
   apply H; auto.
-  omega.
+  lia.
 Qed.
 
 Lemma sm_sync_invariant_piff: forall (p q : pred),

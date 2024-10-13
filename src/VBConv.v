@@ -1,6 +1,6 @@
 Require Import Arith.
 Require Import Word.
-Require Import Omega.
+Require Import Lia.
 Require Import List ListUtils.
 Require Import FunctionalExtensionality.
 Require Import NArith.
@@ -29,7 +29,7 @@ Definition valu0 := bytes2valu  (natToWord (valubytes*8) 0).
 Definition valuset0 := (valu0, nil: list valu).
 
 Definition bytes_eq: forall sz, sz <= valubytes -> sz + (valubytes - sz) = valubytes.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Definition bytes2valubytes sz (b: bytes sz): bytes valubytes:=
     let c:= le_dec sz valubytes in
@@ -191,12 +191,12 @@ Proof.
   destruct H; reflexivity.
   intros.
   rewrite valuset2bytesets_rec_expand.
-  replace (S i - 1) with i by omega.
+  replace (S i - 1) with i by lia.
   simpl.
   rewrite IHi.
   reflexivity.
   unfold not; intros; inversion H0.
-  omega.
+  lia.
 Qed.
 
 Lemma valuset2bytesets_len: forall vs, 
@@ -211,53 +211,53 @@ Qed.
 
 (* XXX: START Arithmetic Lemmas. *)
 Lemma le_trans: forall n m k, n <= m -> m <= k -> n <= k.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Fact lt_le_trans: forall n m p, n < m -> m <= p -> n < p.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma le_weaken_l: forall n m k, n + m <= k -> n <= k.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma le_weaken_r: forall n m k, n + m <= k -> m <= k.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma lt_weaken_l: forall n m k, n + m < k -> n < k.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma lt_weaken_r: forall n m k, n + m < k -> m < k.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma le2lt_l: forall n m k, n + m <= k -> m > 0 -> n < k.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma le2lt_r: forall n m k, n + m <= k -> n > 0 -> m < k.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma mult_ne_O_l: forall n m p, p * n < p * m -> p > 0.
 Proof. 
   induction p; intros.
   repeat rewrite <- mult_n_O in H; inversion H.
-  omega.
+  lia.
 Qed.
 
 Lemma mult_ne_O_r: forall n m p, n * p < m * p -> p > 0.
 Proof. 
   induction p; intros.
   repeat rewrite <- mult_n_O in H; inversion H.
-  omega.
+  lia.
 Qed.
 
 Lemma plus_lt_compat_rev: forall n m p, p + n < p + m -> n < m.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma lt_mult_weaken: forall p n m, n * p < m * p  -> n < m.
 Proof.
-  assert(A: forall x, 0 * x = 0). intros. omega.
+  assert(A: forall x, 0 * x = 0). intros. lia.
   induction n. intros.
   destruct m.
   rewrite A in H; inversion H.
-  omega. intros.
+  lia. intros.
   destruct m.
   rewrite A in H; inversion H.
   apply lt_n_S.
@@ -270,13 +270,13 @@ Qed.
 Lemma le_le_weaken: forall n m p k,
 n + m <= p -> k <= m -> n + k <= p.
 Proof. intros.
-omega.
+lia.
 Qed.
 
 Lemma le_lt_weaken: forall n m p k,
 n + m <= p -> k < m -> n + k < p.
 Proof. intros.
-omega.
+lia.
 Qed.
 
 Lemma div_eq: forall m n k, k < m -> (n * m + k)/m = n.
@@ -327,14 +327,14 @@ Proof.
   apply H0.
   remember (n * length a + i) as x.
   replace (length a + n * length a + i - length a) with (length a + x - length a).
-  omega.
+  lia.
   rewrite Heqx.
-  omega.
+  lia.
   unfold ge.
   remember (n * length a + i) as x.
   replace (length a + n * length a + i) with (length a + x).
   apply le_plus_l.
-  omega.
+  lia.
 Qed.
 
 
@@ -452,7 +452,7 @@ Proof.
   rewrite bytes2valu2bytes.
 
   unfold bytes2valubytes.
-  destruct (le_dec (length l) valubytes); try omega.
+  destruct (le_dec (length l) valubytes); try lia.
   simpl.
 
   generalize_proof.
@@ -480,7 +480,7 @@ Proof.
   match goal with
   | [ |- context[match ?d with _ => _ end] ] =>
     destruct d
-  end; try omega.
+  end; try lia.
 
   unfold bytes.
   unfold bcombine.
@@ -531,7 +531,7 @@ Proof.
   intros.
   destruct l.
   inversion H.
-  simpl in H; omega.
+  simpl in H; lia.
 Qed.
 
 Lemma mapfst_valuset2bytesets_single: forall w,
@@ -567,7 +567,7 @@ Proof.
 	reflexivity.
 	destruct a.
 	simpl in H; inversion H.
-	simpl in H; omega.
+	simpl in H; lia.
 	rewrite Forall_forall; intros.
 	apply in_map_iff in H1.
 	repeat destruct H1.
@@ -575,7 +575,7 @@ Proof.
 	apply H0 in H2.
 	destruct x0.
 	simpl in H2; inversion H2.
-	simpl in H2; omega.
+	simpl in H2; lia.
 Qed.
 
 Lemma mapfst_valuset2bytesets: forall vs,
@@ -705,12 +705,12 @@ Proof.
   generalize valubytes.
   induction n; intros; subst; auto.
   destruct vs; cbn [length] in *.
-  omega.
+  lia.
   cbn -[skipn selN_each].
   f_equal.
   rewrite <- seq_shift.
   rewrite map_map.
-  rewrite IHn by (cbn; omega).
+  rewrite IHn by (cbn; lia).
   apply map_ext. intros.
   rewrite selN_each_S. reflexivity.
 Qed.
@@ -731,7 +731,7 @@ Proof.
   rewrite map_selN_seq; auto.
   rewrite valu2list_len; auto.
   autorewrite with list.
-  destruct vs; cbn. omega.
+  destruct vs; cbn. lia.
 Qed.
 
 Lemma bytesets2valuset_rec_eq_map: forall n bs,
@@ -742,11 +742,11 @@ Proof.
   induction n; intros; subst; auto.
   cbn -[skipn].
   destruct bs; cbn [length] in *.
-  omega.
+  lia.
   f_equal.
   rewrite <- seq_shift.
   rewrite map_map.
-  rewrite IHn by (cbn; omega).
+  rewrite IHn by (cbn; lia).
   apply map_ext. intros.
   rewrite selN_each_S. reflexivity.
 Qed.
@@ -791,9 +791,9 @@ Proof.
   rewrite H'.
   apply map_ext. intros.
   rewrite selN_each_snd_list2byteset. auto.
-  rewrite Valulen.valubytes_is in H0. omega.
+  rewrite Valulen.valubytes_is in H0. lia.
   autorewrite with list.
-  rewrite Valulen.valubytes_is in H0. omega.
+  rewrite Valulen.valubytes_is in H0. lia.
 Qed.
 
 Lemma valuset2bytesets2valuset: forall vs,
@@ -868,7 +868,7 @@ Proof.
   simpl.
   apply IHl.
   simpl in H.
-  omega.
+  lia.
 Qed.
 
 Fact b2v_rec_nil: forall i bn,
@@ -893,29 +893,29 @@ Qed.
 Lemma mod_Sn_n_1: forall a, a >1 -> (a + 1) mod a = 1.
 Proof.
 intros.
-rewrite <- Nat.add_mod_idemp_l; try omega.
-rewrite Nat.mod_same; simpl; try omega.
+rewrite <- Nat.add_mod_idemp_l; try lia.
+rewrite Nat.mod_same; simpl; try lia.
 apply Nat.mod_1_l; auto.
 Qed.
 
 
 Lemma le_mult_weaken: forall p n m, p > 0 -> n * p <= m * p  -> n <= m.
 Proof.
-  assert(A: forall x, 0 * x = 0). intros. omega.
+  assert(A: forall x, 0 * x = 0). intros. lia.
   induction n. intros.
   destruct m.
-  omega.
-  omega. intros.
+  lia.
+  lia. intros.
   destruct m.
   inversion H0.
   apply plus_is_O in H2.
   destruct H2.
-  omega.
+  lia.
   apply le_n_S.
   apply IHn.
   auto.
   simpl in H0.
-  omega.
+  lia.
 Qed.
 
 
@@ -932,7 +932,7 @@ rewrite valuset2bytesets_rec_expand.
 simpl.
 unfold selN'.
 rewrite map_map; reflexivity.
-rewrite valubytes_is; omega.
+rewrite valubytes_is; lia.
 Qed.
 
 Lemma updN_eq: forall A v v' a (l: list A), v = v' -> updN l a v  = updN l a v'.
@@ -947,12 +947,12 @@ apply skipn_app_l.
 rewrite Forall_forall in H1.
 destruct H1 with (x:= l).
 apply in_eq.
-omega.
+lia.
 inversion H0.
 erewrite IHj.
 reflexivity.
 eauto.
-simpl in H0; omega.
+simpl in H0; lia.
 eapply Forall_cons2.
 eauto.
 Qed.
@@ -994,7 +994,7 @@ destruct m.
 inversion H0.
 apply eq_S.
 apply IHn.
-omega. omega.
+lia. lia.
 Qed.
 
 Fact valubytes_ne_O: valubytes <> 0.
@@ -1006,7 +1006,7 @@ Proof.
 intros.   
 rewrite Nat.add_sub_assoc.
 replace (n + m - n mod m) 
-    with (m + n - n mod m) by omega.
+    with (m + n - n mod m) by lia.
 rewrite <- Nat.add_sub_assoc.
 rewrite Nat.add_cancel_l with (p:= m); eauto.
 rewrite Nat.mod_eq; eauto.
@@ -1030,7 +1030,7 @@ apply Nat.mod_eq; eauto.
 Qed.
 
 Fact grouping_minus: forall n m k a, n - (m - k + a) = n - (m - k) - a.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma mod_dem_neq_dem: forall a b, a <> 0 -> b <> 0 -> b <> a mod b.
 Proof.
@@ -1047,7 +1047,7 @@ simpl in H1.
 destruct b.
 reflexivity.
 simpl in *.
-destruct (snd (Nat.divmod a (S b) 0 b)); omega.
+destruct (snd (Nat.divmod a (S b) 0 b)); lia.
 Qed.
 
 
@@ -1060,7 +1060,7 @@ unfold get_sublist.
 rewrite firstn_length_l.
 reflexivity.
 rewrite skipn_length.
-omega.
+lia.
 Qed.
 
 Lemma bsplit_list_b2vb: forall b,
@@ -1087,7 +1087,7 @@ Proof.
   unfold word2bytes.
   eq_rect_simpl.
   reflexivity.
-  rewrite valubytes_is in n; omega.
+  rewrite valubytes_is in n; lia.
 Qed.
 
 
@@ -1099,8 +1099,8 @@ length (firstn a l ++ l' ++ skipn (a + length l') l) = len.
 		repeat rewrite map_length.
 		rewrite firstn_length_l.
 		rewrite skipn_length.
-		omega.
-		omega.
+		lia.
+		lia.
 	Qed.
 	
 Lemma off_mod_v_l_data_le_v: forall length_data off,
@@ -1118,43 +1118,43 @@ Lemma off_mod_v_l_data_le_v: forall length_data off,
 Lemma v_off_mod_v_le_length_data: forall length_data off,
 ~ length_data <= valubytes - off mod valubytes ->
 valubytes - off mod valubytes <= length_data.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 Lemma three_reorder: forall a b c,
 a + b + c = c + b + a.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma last_two_reorder: forall a b c,
 a + b + c = a + c + b.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 
 Lemma pm_1_3_cancel: forall a b,
 a + b - a = b.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 Lemma n_le_n_p_1: forall n,
 n <= n + 1.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 
 Lemma ppmp_2_4_cancel: forall a b c d,
 a + b + c - b + d = a + c + d.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 
 Lemma mm_dist: forall a b c,
 b <= a ->
 c <= b ->
 a - (b - c) = a - b + c.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 	Lemma ppmm_4_5_minus_distr_le: forall a b c d e,
 d <= a + b + c ->
 e <= d ->
 a + b + c - (d - e) = a + b + c - d + e.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 Lemma le_2: forall a b c,
 b <= a + b + c.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 Lemma app_assoc_middle_2: forall A (l1 l2 l3 l4 l5: list A),
 l1++l2++l3++l4++l5 = l1++l2++(l3++l4)++l5.
@@ -1162,11 +1162,11 @@ l1++l2++l3++l4++l5 = l1++l2++(l3++l4)++l5.
 	
 Lemma ppmp_3_4_cancel: forall a b c d,
 a + b + c - c + d = a + b + d.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 Lemma mm_1_3_cancel: forall a b,
 a - b - a = 0.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 
 
 
@@ -1178,16 +1178,16 @@ Proof.
   induction n; intros; simpl.
   reflexivity.
   destruct (length l / m) eqn:D.
-  destruct m eqn:D1; simpl; try omega.
-  apply Nat.div_small_iff in D; try omega.
+  destruct m eqn:D1; simpl; try lia.
+  apply Nat.div_small_iff in D; try lia.
   rewrite H0 in D.
   destruct n.
-  simpl in D. rewrite <- plus_n_O in D; omega.
+  simpl in D. rewrite <- plus_n_O in D; lia.
   simpl in D. apply lt_S_n in D.
   assert (forall a b, a + (S b) < a -> False).
-  intros; omega.
+  intros; lia.
   apply H1 in D; inversion D.
-  rewrite IHn; try omega.
+  rewrite IHn; try lia.
   rewrite skipn_length.
   rewrite H0.
   replace (S n * m - m) with (n * m).
@@ -1195,7 +1195,7 @@ Proof.
   rewrite Nat.div_mul in *.
   inversion D.
   reflexivity.
-  all: try omega.
+  all: try lia.
   simpl.
   rewrite pm_1_3_cancel.
   reflexivity.
@@ -1234,7 +1234,7 @@ Proof.
   eq_rect_simpl.
   reflexivity.
   rewrite valu2list_len; reflexivity.
-  rewrite valubytes_is in n; omega.
+  rewrite valubytes_is in n; lia.
 Qed.
 
 Lemma list_split_chunk_app_1: forall A a b (l l': list A) ,
@@ -1252,8 +1252,8 @@ Proof.
   rewrite IHa.
   rewrite firstn_app_l.
   reflexivity.
-  all: try omega.
-  all: try rewrite H; simpl; try apply le_plus_trans; try omega.
+  all: try lia.
+  all: try rewrite H; simpl; try apply le_plus_trans; try lia.
   rewrite skipn_length. rewrite H; simpl. apply pm_1_3_cancel.
 Qed.
 
@@ -1305,7 +1305,7 @@ length l = m1 * valubytes + valubytes ->
 list_split_chunk (m1 + 1) valubytes l  = firstn valubytes l :: list_split_chunk m1 valubytes (skipn valubytes l).
 Proof.
   intros.
-  replace (m1 + 1) with (S m1) by omega.
+  replace (m1 + 1) with (S m1) by lia.
   reflexivity.
 Qed.
 
@@ -1322,7 +1322,7 @@ Proof.
   unfold not; intros.
   rewrite <- H1 in H2.
   apply length_zero_iff_nil in H2.
-  rewrite firstn_length_l in H2; try omega.
+  rewrite firstn_length_l in H2; try lia.
   rewrite H0; apply le_plus_trans. apply le_n.
   eapply IHa; eauto.
   rewrite skipn_length.
@@ -1332,24 +1332,24 @@ Qed.
 
 Lemma le_minus_weaken: forall a b c,
 a <= b -> a-c <= b - c.
-Proof.  intros. omega. Qed.
+Proof.  intros. lia. Qed.
 
 
 Lemma le_minus_dist: forall a b c,
 a >= b ->
 b >= c ->
 a - (b - c) = a - b + c.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma plus_minus_arrange: forall a b c d,
 a >= b ->
 a - b + c >= d ->
 a - b + c - d + b = a + c - d + b - b.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma le_minus_weaken_r: forall a b c,
 a <= b - c -> a <= b.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Fact merge_bs_length: forall l l',
 length (merge_bs l l') = length l.
@@ -1368,7 +1368,7 @@ intros.
 unfold updN_list.
 repeat rewrite app_length.
 rewrite merge_bs_length.
-rewrite firstn_length_l; try omega.
+rewrite firstn_length_l; try lia.
 rewrite skipn_length.
 rewrite Nat.add_assoc.
 symmetry; apply le_plus_minus.
@@ -1400,21 +1400,21 @@ Lemma app_head_eq: forall A (l l' l'':list A),
 Proof. intros; rewrite H; reflexivity. Qed.
 
 Lemma valubytes_ge_O: valubytes > 0.
-Proof. rewrite valubytes_is; omega. Qed.
+Proof. rewrite valubytes_is; lia. Qed.
 
 
 Lemma old_data_m1_ge_0: forall l_old_data m1 l_old_blocks,
 m1 < l_old_blocks ->
 l_old_data = l_old_blocks * valubytes ->
 l_old_data - m1 * valubytes > 0.
-Proof. intros; rewrite valubytes_is in *; omega. Qed.
+Proof. intros; rewrite valubytes_is in *; lia. Qed.
 
 Lemma length_data_ge_m1: forall l_data l_old_data m1 l_old_blocks,
 l_data = l_old_data ->
 m1 < l_old_blocks ->
 l_old_data = l_old_blocks * valubytes ->
 m1 * valubytes <= l_data.
-Proof. intros; rewrite valubytes_is in *; omega. Qed.
+Proof. intros; rewrite valubytes_is in *; lia. Qed.
 
 Lemma get_sublist_div_length: forall A (data: list A) l_old_data m1 l_old_blocks,
 length data = l_old_data ->
@@ -1425,7 +1425,7 @@ Proof.
 intros.
 rewrite get_sublist_length.
 rewrite Nat.div_mul.
-omega.
+lia.
 apply valubytes_ne_O.
 simpl.
 eapply length_data_ge_m1; eauto.
@@ -1436,28 +1436,28 @@ l_data = l_old_data ->
 m1 < l_old_blocks ->
 l_old_data = l_old_blocks * valubytes ->
 l_old_data > 0.
-Proof. intros; rewrite valubytes_is in *; omega. Qed.
+Proof. intros; rewrite valubytes_is in *; lia. Qed.
 
 Lemma old_data_ne_nil: forall A (old_data: list A) m1 l_old_blocks,
 old_data = nil ->
 m1 < l_old_blocks ->
 length old_data = l_old_blocks * valubytes ->
 False.
-Proof. intros; apply length_zero_iff_nil in H; rewrite valubytes_is in *; omega. Qed.
+Proof. intros; apply length_zero_iff_nil in H; rewrite valubytes_is in *; lia. Qed.
 
 Lemma length_bytefile_ge_minus: forall l_fy block_off l_old_data m1 l_old_blocks,
 block_off * valubytes + l_old_data <= l_fy ->
 m1 < l_old_blocks ->
 l_old_data = l_old_blocks * valubytes ->
 valubytes <= l_fy - (block_off + m1) * valubytes.
-Proof. intros; rewrite valubytes_is in *; omega. Qed.
+Proof. intros; rewrite valubytes_is in *; lia. Qed.
 
 Lemma length_data_ge_m1_v: forall l_data l_old_data m1 l_old_blocks,
 l_data = l_old_data ->
 m1 < l_old_blocks ->
 l_old_data = l_old_blocks * valubytes ->
 m1 * valubytes + valubytes <= l_data.
-Proof. intros; rewrite valubytes_is in *; omega. Qed.
+Proof. intros; rewrite valubytes_is in *; lia. Qed.
 
 Lemma nonnil_exists: forall A (l: list A),
 l <> nil -> exists a l', l = a::l'.
@@ -1473,7 +1473,7 @@ Proof. intros; subst; reflexivity. Qed.
 
 Lemma pmm_1_3_cancel: forall a b c,
 a + b - a -c = b - c.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma le_div_mult_add: forall a b,
 b <> 0 -> a <= a/b * b + b.
@@ -1490,16 +1490,16 @@ Qed.
 
 Lemma le_minus_middle_cancel: forall a b c d e,
 a - c <= d - e -> a - b - c <= d - b - e.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma mppp_two_five_cancel: forall a b c d,
 a >= b ->
 a - b + c + d + b = a + c + d.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma le_minus_lt: forall a b c,
 b > 0 -> c > 0 -> a <= b - c -> a < b.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma modulo_eq: forall b a,
   b <> 0 -> a >= b -> (a - b) mod b = a mod b.
@@ -1516,7 +1516,7 @@ Proof.
   rewrite Nat.add_assoc.
   rewrite Heqx.
   rewrite Nat.mul_add_distr_l.
-  omega.
+  lia.
   all: auto.
 Qed.
 
@@ -1534,10 +1534,10 @@ Proof.
   rewrite Nat.mul_sub_distr_l.
   replace (b * (x / b)) with (x - x mod b).
   rewrite modulo_eq.
-  omega.
+  lia.
   all: auto.
   rewrite Heqx.
-  omega.
+  lia.
   replace (x - x mod b) 
     with (b*(x / b) + x mod b - x mod b).
   apply Nat.add_sub.
@@ -1578,7 +1578,7 @@ Qed.
 	
 		Lemma lt_minus_r: forall a b c,
 	b > c -> a > c -> a - c > a -b.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 
 	
@@ -1623,7 +1623,7 @@ Lemma lt_mp: forall a b c,
 a > b -> 
 c < b ->
 a - b + c < a.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 
 Lemma between_lt_upper: forall a b c,
@@ -1634,14 +1634,14 @@ a mod b > 0 ->
 a < c * b.
 Proof.
   intros.
-  destruct c; simpl in *; try omega.
+  destruct c; simpl in *; try lia.
   rewrite Nat.sub_0_r in *.
-  destruct (Nat.eq_dec a (b + c * b)); try omega.
+  destruct (Nat.eq_dec a (b + c * b)); try lia.
   subst.
   exfalso.
   rewrite Nat.mod_add in H2 by auto.
   rewrite Nat.mod_same in * by auto.
-  omega.
+  lia.
 Qed.
 
 Lemma list_zero_pad_length: forall a l,
@@ -1651,7 +1651,7 @@ Proof.
   simpl; apply plus_n_O.
   simpl.
   rewrite IHa.
-  rewrite app_length; simpl; omega.
+  rewrite app_length; simpl; lia.
 Qed.
 
 Lemma list_zero_pad_selN_l: forall a l i def,
@@ -1666,7 +1666,7 @@ Proof.
   reflexivity.
   auto.
   rewrite app_length.
-  simpl; omega.
+  simpl; lia.
 Qed.
 
 Lemma list_zero_pad_selN_pad: forall a l i,
@@ -1682,17 +1682,17 @@ Proof.
   simpl.
   destruct (le_dec (S (length l)) i).
   apply IHa.
-  rewrite app_length; simpl; omega.
-  rewrite app_length; simpl; omega.
+  rewrite app_length; simpl; lia.
+  rewrite app_length; simpl; lia.
   apply Nat.nle_gt in n.
   rewrite list_zero_pad_selN_l.
   rewrite selN_app2.
   simpl.
-  destruct (i - length l); try omega; reflexivity.
+  destruct (i - length l); try lia; reflexivity.
   auto.
-  rewrite app_length; simpl; omega.
+  rewrite app_length; simpl; lia.
   apply selN_oob.
-  rewrite list_zero_pad_length; omega.
+  rewrite list_zero_pad_length; lia.
 Qed.
 
 Lemma between_mod_ne_0: forall c a b,
@@ -1710,16 +1710,16 @@ Proof.
   rewrite H2 in H0; inversion H0.
   auto.
   apply Nat.nlt_ge in n.
-  replace (S c - 1) with c in H0 by omega.
+  replace (S c - 1) with c in H0 by lia.
   simpl in *.
   rewrite <- modulo_eq.
   apply IHc.
-  all: try omega.
+  all: try lia.
   rewrite Nat.mul_sub_distr_r.
   apply Nat.lt_add_lt_sub_r.
   simpl; rewrite <- plus_n_O.
-  rewrite Nat.sub_add; try omega.
-  destruct c. omega.
+  rewrite Nat.sub_add; try lia.
+  destruct c. lia.
   simpl;  apply le_plus_l.
 Qed.
 
@@ -1775,7 +1775,7 @@ Qed.
 
 Lemma pmp_1_4_cancel: forall a b c,
 a + b - a + c = b + c.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma lt_minus_S: forall a b,
 a > b ->
@@ -1785,16 +1785,16 @@ Proof.
   inversion H.
   destruct b.
   exists a.
-  omega.
+  lia.
   simpl.
   apply IHa.
-  omega.
+  lia.
 Qed.
 
 Lemma mod_upper_bound_le: forall a b,
 a mod b < b ->
 a mod b + 1 <= b.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 
 Lemma list_zero_pad_nil_firstn: forall a b,
 firstn a (list_zero_pad nil b) = list_zero_pad nil (min a b).
@@ -1828,7 +1828,7 @@ Qed.
 	
 	Lemma mp_2_3_cancel: forall a b,
 	a >= b -> a - b + b = a.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 	Lemma mod_upper_bound_le': forall a b,
 	b <> 0 ->
@@ -1845,21 +1845,21 @@ Proof.
 	intros. 
 	rewrite Nat.div_mod with (x:= a)(y:= b).
 	apply Nat.add_nonneg_pos.
-	all: try omega.
+	all: try lia.
 	apply le_0_n.
 Qed.
 
 Lemma minus_le_0_eq: forall a b,
 a >= b -> a - b = 0 -> a = b.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
  Lemma lt_plus_minus_l: forall a b c,
   c > 0 -> a < b + c -> a - b < c.
-Proof.  intros; omega. Qed.
+Proof.  intros; lia. Qed.
 
 Lemma plus_minus_eq_le: forall a b c,
   a >=  b -> a - b = c -> a = b + c.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma between_exists: forall b a c,
     a >= (b-1) * c -> a < b*c -> c<>0 -> a = (b-1) * c + a mod c.
@@ -1871,8 +1871,8 @@ Proof.
 
   pose proof (Nat.le_exists_sub (b*c) a); intuition; deex.
   rewrite Nat.mod_add by auto.
-  rewrite Nat.mod_small by omega.
-  omega.
+  rewrite Nat.mod_small by lia.
+  lia.
 Qed.
 
 Lemma mod_between_upper: forall a b c,
@@ -1886,6 +1886,6 @@ Lemma mod_between_upper: forall a b c,
 		destruct (lt_dec a (c * b)).
 		apply Nat.lt_le_incl in H0 as H'.
 		apply between_exists in H'; auto.
-		omega.
-		omega.
+		lia.
+		lia.
 	Qed.

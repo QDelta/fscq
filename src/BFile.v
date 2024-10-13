@@ -5,7 +5,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
-Require Import Omega.
+Require Import Lia.
 Require Import Log.
 Require Import Array.
 Require Import List ListUtils.
@@ -565,12 +565,12 @@ Module BFILE.
       rewrite <- surjective_pairing. cancel.
     - erewrite listmatch_length_r; eauto.
       destruct (lt_dec inum (length ilist)); eauto.
-      rewrite selN_oob in * by omega.
-      unfold INODE.inode0 in H2; simpl in *; omega.
+      rewrite selN_oob in * by lia.
+      unfold INODE.inode0 in H2; simpl in *; lia.
     - destruct (lt_dec inum (length ilist)); eauto.
-      rewrite selN_oob in * by omega.
-      unfold INODE.inode0 in *; simpl in *; omega.
-  Grab Existential Variables.
+      rewrite selN_oob in * by lia.
+      unfold INODE.inode0 in *; simpl in *; lia.
+  Unshelve.
     all: eauto.
     all: solve [exact ($0, nil) | exact bfile0].
   Qed.
@@ -618,10 +618,10 @@ Module BFILE.
       apply incl_refl.
       destruct (addr_eq_dec off inum); subst.
       rewrite selN_updN_eq in * by auto.
-      rewrite H in *; cbn in *; omega.
+      rewrite H in *; cbn in *; lia.
       rewrite selN_updN_ne in * by auto.
       intuition auto.
-    - rewrite updN_oob by omega; auto.
+    - rewrite updN_oob by lia; auto.
   Qed.
 
   Lemma block_belong_to_file_inum_ok : forall ilist bn inum off,
@@ -631,9 +631,9 @@ Module BFILE.
     intros.
     destruct (lt_dec inum (length ilist)); eauto.
     unfold block_belong_to_file in *.
-    rewrite selN_oob in H by omega.
+    rewrite selN_oob in H by lia.
     simpl in H.
-    omega.
+    lia.
   Qed.
 
   Lemma rep_used_block_eq_Some_helper : forall T (x y: T),
@@ -680,7 +680,7 @@ Module BFILE.
     pred_apply.
     cancel.
 
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
   Qed.
 
@@ -716,8 +716,8 @@ Module BFILE.
     induction ilist; cbn.
     split; cancel.
     intros.
-    rewrite smrep_single_helper_add_oob by omega.
-    rewrite IHilist by omega.
+    rewrite smrep_single_helper_add_oob by lia.
+    rewrite IHilist by lia.
     auto.
   Qed.
 
@@ -729,8 +729,8 @@ Module BFILE.
     induction ilist; cbn.
     split; cancel.
     intros.
-    rewrite smrep_single_helper_remove_oob by omega.
-    rewrite IHilist by omega.
+    rewrite smrep_single_helper_remove_oob by lia.
+    rewrite IHilist by lia.
     auto.
   Qed.
 
@@ -744,12 +744,12 @@ Module BFILE.
     - rewrite arrayN_smrep_single_helper_add_oob.
       rewrite arrayN_smrep_single_helper_add_oob.
       auto.
-      autorewrite with core. omega.
-      rewrite firstn_length_l; omega.
-    - rewrite skipn_oob by omega.
-      rewrite firstn_oob by omega.
-      rewrite arrayN_smrep_single_helper_add_oob by omega.
-      rewrite arrayN_smrep_single_helper_add_oob by omega.
+      autorewrite with core. lia.
+      rewrite firstn_length_l; lia.
+    - rewrite skipn_oob by lia.
+      rewrite firstn_oob by lia.
+      rewrite arrayN_smrep_single_helper_add_oob by lia.
+      rewrite arrayN_smrep_single_helper_add_oob by lia.
       auto.
   Qed.
 
@@ -763,12 +763,12 @@ Module BFILE.
     - rewrite arrayN_smrep_single_helper_remove_oob.
       rewrite arrayN_smrep_single_helper_remove_oob.
       auto.
-      autorewrite with core. omega.
-      rewrite firstn_length_l; omega.
-    - rewrite skipn_oob by omega.
-      rewrite firstn_oob by omega.
-      rewrite arrayN_smrep_single_helper_remove_oob by omega.
-      rewrite arrayN_smrep_single_helper_remove_oob by omega.
+      autorewrite with core. lia.
+      rewrite firstn_length_l; lia.
+    - rewrite skipn_oob by lia.
+      rewrite firstn_oob by lia.
+      rewrite arrayN_smrep_single_helper_remove_oob by lia.
+      rewrite arrayN_smrep_single_helper_remove_oob by lia.
       auto.
   Qed.
 
@@ -805,15 +805,15 @@ Module BFILE.
     ~In x (firstn i l).
   Proof.
     induction l; cbn; intros.
-    omega.
+    lia.
     subst.
     destruct i; cbn.
     auto.
     inversion H0; subst.
     intuition subst.
     eapply H3.
-    eapply in_selN; omega.
-    eapply IHl; eauto; omega.
+    eapply in_selN; lia.
+    eapply IHl; eauto; lia.
   Qed.
 
   Lemma selN_NoDup_notin_skipn: forall T (l : list T) i x d,
@@ -823,13 +823,13 @@ Module BFILE.
     ~In x (skipn (S i) l).
   Proof.
     induction l; cbn; intros.
-    omega.
+    lia.
     subst.
     inversion H0; subst.
     destruct i; cbn.
     auto.
     intuition subst.
-    eapply IHl; eauto; omega.
+    eapply IHl; eauto; lia.
   Qed.
 
   Lemma selN_NoDup_notin_removeN: forall T (l : list T) i x d,
@@ -974,7 +974,7 @@ Module BFILE.
     intros.
     cancel.
     destruct (lt_dec inum (length ilist)).
-    2: rewrite updN_oob by omega; cancel.
+    2: rewrite updN_oob by lia; cancel.
 
     rewrite arrayN_except_upd by auto.
     rewrite arrayN_except with (i := inum) by auto.
@@ -1119,7 +1119,7 @@ Module BFILE.
     eapply Hf; auto.
     rewrite <- selN_combine by auto.
     apply in_selN.
-    rewrite combine_length_eq; omega.
+    rewrite combine_length_eq; lia.
     unfold incl.
     denote SS.For_all as Hs.
     intros a.
@@ -1190,7 +1190,7 @@ Module BFILE.
     erewrite selN_eq_updN_eq by ( erewrite selN_map; eauto; reflexivity ).
     cancel.
 
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
     all: try exact BFILE.bfile0.
     all: try exact None.
@@ -1297,7 +1297,7 @@ Module BFILE.
     apply Nat.add_pos_l.
     apply Nat.add_pos_r.
     rewrite valulen_is; apply Nat.ltb_lt; compute; reflexivity.
-    omega.
+    lia.
   Qed.
 
   Lemma file_match_init_ok : forall n,
@@ -1316,7 +1316,7 @@ Module BFILE.
   Proof.
     intros.
     destruct (ge_dec inum (length ilist)).
-    rewrite selN_oob by omega.
+    rewrite selN_oob by lia.
     constructor.
     rewrite listmatch_extract with (i := inum) in H.
     unfold file_match in H.
@@ -1328,7 +1328,7 @@ Module BFILE.
     rewrite listmatch_sym.
     cancel. apply pimpl_refl.
     erewrite listmatch_length_r by (pred_apply' H; apply pimpl_refl).
-    omega.
+    lia.
   Unshelve.
     exact bfile0.
   Qed.
@@ -1463,7 +1463,7 @@ Module BFILE.
     simpl in H.
     eapply sep_star_none; intros; [ | | exact H ].
     destruct a; simpl in *.
-    eapply ptsto_none; [ | eauto ]; omega.
+    eapply ptsto_none; [ | eauto ]; lia.
     eauto.
     eapply IHl; eauto.
   Qed.
@@ -1479,13 +1479,13 @@ Module BFILE.
     eapply sep_star_none; eauto; intros.
     destruct a; simpl in *.
     eapply ptsto_none; [ | eauto ].
-    destruct idx; try omega; try congruence.
+    destruct idx; try lia; try congruence.
     eauto.
     destruct idx.
-    eapply cache_ptsto_none''; eauto; omega.
-    replace (start + S idx) with (S start + idx) by omega.
+    eapply cache_ptsto_none''; eauto; lia.
+    replace (start + S idx) with (S start + idx) by lia.
     eapply IHl; eauto.
-    simpl in *; omega.
+    simpl in *; lia.
   Qed.
 
   Lemma cache_ptsto_none : forall l m idx def,
@@ -1495,7 +1495,7 @@ Module BFILE.
     m idx = None.
   Proof.
     intros.
-    replace (idx) with (0 + idx) by omega.
+    replace (idx) with (0 + idx) by lia.
     eapply cache_ptsto_none'; eauto.
   Qed.
 
@@ -1551,8 +1551,8 @@ Module BFILE.
       rewrite arrayN_isolate with (i := inum) by simplen.
       unfold cache_ptsto at 2; simpl.
       erewrite selN_map by simplen. rewrite selN_updN_eq by simplen. cancel.
-      rewrite map_updN. rewrite firstn_updN_oob by omega.
-      rewrite skipn_updN by omega.
+      rewrite map_updN. rewrite firstn_updN_oob by lia.
+      rewrite skipn_updN by lia.
       pred_apply.
       rewrite arrayN_isolate with (i := inum) by simplen.
       unfold cache_ptsto at 2.
@@ -1561,8 +1561,8 @@ Module BFILE.
       2: eapply BFM.mm_add; eauto.
       rewrite arrayN_isolate with (i := inum) by simplen.
       rewrite arrayN_isolate with (i := inum) (vs := map _ _) by simplen.
-      rewrite map_updN. rewrite firstn_updN_oob by omega.
-      simpl; rewrite skipn_updN by omega.
+      rewrite map_updN. rewrite firstn_updN_oob by lia.
+      simpl; rewrite skipn_updN by lia.
       cancel.
       unfold cache_ptsto.
       erewrite selN_map by simplen. rewrite H1.
@@ -1594,8 +1594,8 @@ Module BFILE.
       rewrite arrayN_isolate with (i := inum) by simplen.
       unfold cache_ptsto at 2; simpl.
       erewrite selN_map by simplen. rewrite selN_updN_eq by simplen. cancel.
-      rewrite map_updN. rewrite firstn_updN_oob by omega.
-      rewrite skipn_updN by omega.
+      rewrite map_updN. rewrite firstn_updN_oob by lia.
+      rewrite skipn_updN by lia.
       pred_apply.
       rewrite arrayN_isolate with (i := inum) by simplen.
       unfold cache_ptsto at 2.
@@ -1605,8 +1605,8 @@ Module BFILE.
       2: eapply BFM.mm_remove_none; eauto.
       rewrite arrayN_isolate with (i := inum) by simplen.
       rewrite arrayN_isolate with (i := inum) (vs := map _ _) by simplen.
-      rewrite map_updN. rewrite firstn_updN_oob by omega.
-      simpl; rewrite skipn_updN by omega.
+      rewrite map_updN. rewrite firstn_updN_oob by lia.
+      simpl; rewrite skipn_updN by lia.
       cancel.
       unfold cache_ptsto.
       erewrite selN_map by simplen. rewrite H1.
@@ -1694,25 +1694,25 @@ Module BFILE.
     eapply forN_ok'.
     cancel.
     step.
-    unfold BALLOCC.bn_valid; split; auto. omega.
+    unfold BALLOCC.bn_valid; split; auto. lia.
     denote (lt m1) as Hm.
-    rewrite Nat.sub_add in Hm by omega.
-    apply Rounding.lt_div_mul_lt in Hm; omega.
+    rewrite Nat.sub_add in Hm by lia.
+    apply Rounding.lt_div_mul_lt in Hm; lia.
     denote In as Hb.
     eapply Hb.
     unfold BALLOCC.bn_valid; split; auto.
     denote (lt m1) as Hm.
-    rewrite Nat.sub_add in Hm by omega.
-    apply Rounding.lt_div_mul_lt in Hm; omega.
+    rewrite Nat.sub_add in Hm by lia.
+    apply Rounding.lt_div_mul_lt in Hm; lia.
     step.
-    unfold BALLOCC.bn_valid; split; auto. omega.
+    unfold BALLOCC.bn_valid; split; auto. lia.
     substl (BmapNBlocks bxps_2); auto.
     denote (lt m1) as Hm.
-    rewrite Nat.sub_add in Hm by omega.
-    apply Rounding.lt_div_mul_lt in Hm; omega.
+    rewrite Nat.sub_add in Hm by lia.
+    apply Rounding.lt_div_mul_lt in Hm; lia.
     step.
     apply remove_other_In.
-    omega.
+    lia.
     intuition.
     step.
     cancel.
@@ -1771,8 +1771,8 @@ Module BFILE.
     (* data alloc2 is the last chunk *)
     apply sep_star_assoc.
     eauto.
-    omega. omega.
-    rewrite skipn_length; omega.
+    lia. lia.
+    rewrite skipn_length; lia.
 
     (* BALLOC.init *)
     prestep. norm. cancel.
@@ -1789,12 +1789,12 @@ Module BFILE.
     repeat rewrite firstn_length.
     substl (length sl).
     cancel.
-    omega.
+    lia.
     rewrite skipn_length.
-    rewrite firstn_length_l; omega.
+    rewrite firstn_length_l; lia.
     repeat rewrite firstn_firstn.
-    repeat rewrite Nat.min_l; try omega.
-    rewrite firstn_length_l; omega.
+    repeat rewrite Nat.min_l; try lia.
+    rewrite firstn_length_l; lia.
 
     (* IAlloc.init *)
     prestep. norm. cancel.
@@ -1809,9 +1809,9 @@ Module BFILE.
     substl (IAlloc.Sig.BMPStart ibxp); intro.
     eapply add_nonzero_exfalso_helper2; eauto.
     rewrite skipn_skipn, firstn_firstn.
-    rewrite Nat.min_l, skipn_length by omega.
-    rewrite firstn_length_l by omega.
-    omega.
+    rewrite Nat.min_l, skipn_length by lia.
+    rewrite firstn_length_l by lia.
+    lia.
 
     (* Inode.init *)
     prestep. norm. cancel.
@@ -1820,8 +1820,8 @@ Module BFILE.
     denote BALLOCC.smrep as Hs. exact Hs.
 
     rewrite firstn_firstn, firstn_length, skipn_length, firstn_length.
-    repeat rewrite Nat.min_l with (n := (BmapStart bxps_1)) by omega.
-    rewrite Nat.min_l; omega.
+    repeat rewrite Nat.min_l with (n := (BmapStart bxps_1)) by lia.
+    rewrite Nat.min_l; lia.
     denote (IXStart ixp) as Hx; contradict Hx.
     substl (IXStart ixp); intro.
     eapply add_nonzero_exfalso_helper2 with (b := 0).
@@ -1842,11 +1842,11 @@ Module BFILE.
     apply Nat.div_str_pos; split.
     apply INODE.IRec.Defs.items_per_val_gt_0.
     rewrite Nat.mul_comm.
-    apply Rounding.div_le_mul; try omega.
-    cbv; omega.
+    apply Rounding.div_le_mul; try lia.
+    cbv; lia.
     unfold INODE.IRecSig.items_per_val.
     rewrite valulen_is.
-    vm_compute; omega.
+    vm_compute; lia.
 
     denote (_ =p=> freepred0) as Hx; apply Hx.
     substl (length dl); substl (IXLen ixp).
@@ -1981,7 +1981,7 @@ Module BFILE.
     5: reflexivity.
     4: sepauto.
     2: eauto.
-    eapply listmatch_updN_selN; try omega.
+    eapply listmatch_updN_selN; try lia.
     unfold file_match; cancel.
     seprewrite.
     rewrite <- smrep_upd_keep_blocks.
@@ -2043,7 +2043,7 @@ Module BFILE.
     5: reflexivity.
     4: sepauto.
     2: eauto.
-    eapply listmatch_updN_selN; try omega.
+    eapply listmatch_updN_selN; try lia.
     unfold file_match; cancel.
     seprewrite.
     rewrite <- smrep_upd_keep_blocks.
@@ -2097,15 +2097,15 @@ Module BFILE.
 
     sepauto.
     denote (_ (list2nmem m)) as Hx.
-    setoid_rewrite listmatch_extract with (i := off) in Hx at 2; try omega.
+    setoid_rewrite listmatch_extract with (i := off) in Hx at 2; try lia.
     destruct_lift Hx; filldef.
     safestep.
-    rewrite listmatch_extract with (i := off) (b := map _ _) by omega.
-    erewrite selN_map by omega; filldef.
+    rewrite listmatch_extract with (i := off) (b := map _ _) by lia.
+    erewrite selN_map by lia; filldef.
     rewrite <- surjective_pairing.
     cancel.
     step.
-    rewrite listmatch_isolate with (a := flist) (i := inum) by omega.
+    rewrite listmatch_isolate with (a := flist) (i := inum) by lia.
     unfold file_match. cancel.
     cancel; eauto.
     cancel; eauto.
@@ -2147,15 +2147,15 @@ Module BFILE.
     sepauto.
 
     denote (_ (list2nmem m)) as Hx.
-    setoid_rewrite listmatch_extract with (i := off) in Hx at 2; try omega.
+    setoid_rewrite listmatch_extract with (i := off) in Hx at 2; try lia.
     destruct_lift Hx; filldef.
     step.
 
     setoid_rewrite INODE.inode_rep_bn_nonzero_pimpl in H.
     destruct_lift H; denote (_ <> 0) as Hx; subst.
-    eapply Hx; try eassumption; omega.
-    rewrite listmatch_extract with (b := map _ _) (i := off) by omega.
-    erewrite selN_map by omega; filldef.
+    eapply Hx; try eassumption; lia.
+    rewrite listmatch_extract with (b := map _ _) (i := off) by lia.
+    erewrite selN_map by lia; filldef.
     rewrite <- surjective_pairing.
     cancel.
     prestep. norm. cancel.
@@ -2181,7 +2181,7 @@ Module BFILE.
     eauto.
 
     pimpl_crash; cancel; auto.
-  Grab Existential Variables.
+  Unshelve.
     all: try exact unit.
     all: intros; eauto.
     all: try solve [exact bfile0 | exact INODE.inode0].
@@ -2206,7 +2206,7 @@ Module BFILE.
     split.
     erewrite selN_updN_eq; simpl.
     erewrite app_length.
-    omega.
+    lia.
     simplen'.
     intuition.
     erewrite selN_updN_eq; simpl.
@@ -2288,7 +2288,7 @@ Module BFILE.
       rewrite <- listmatch_app_tail.
       cancel.
 
-      rewrite map_length; omega.
+      rewrite map_length; lia.
       rewrite wordToNat_natToWord_idempotent'; auto.
       eapply BALLOCC.bn_valid_goodSize; eauto.
       seprewrite.
@@ -2296,12 +2296,12 @@ Module BFILE.
       rewrite <- smrep_upd_add; eauto.
       cancel.
       unfold smrep. destruct MSAlloc; cancel.
-      eapply BALLOCC.bn_valid_goodSize; eauto. omega.
+      eapply BALLOCC.bn_valid_goodSize; eauto. lia.
       sepauto.
       cbn; auto.
       apply list2nmem_app; eauto.
 
-      2: { eapply grow_treeseq_ilist_safe. omega. eauto. }
+      2: { eapply grow_treeseq_ilist_safe. lia. eauto. }
       2: cancel.
       2: or_l; cancel.
 
@@ -2323,8 +2323,8 @@ Module BFILE.
           eapply BALLOCC.bn_valid_goodSize; eauto.
         * left.
           rewrite app_length in *; simpl in *.
-          split. omega.
-          subst. rewrite selN_app1 by omega. auto.
+          split. lia.
+          subst. rewrite selN_app1 by lia. auto.
       + unfold block_belong_to_file in *; intuition.
         all: erewrite selN_updN_ne in * by eauto; simpl; eauto.
     }
@@ -2378,13 +2378,13 @@ Module BFILE.
       rewrite INODE.inode_rep_bn_valid_piff in Hx; destruct_lift Hx.
       denote Forall as Hv; specialize (Hv inum); subst.
       rewrite <- Forall_map.
-      apply forall_skipn; apply Hv; eauto. omega.
+      apply forall_skipn; apply Hv; eauto. lia.
       erewrite <- listmatch_ptsto_listpred.
-      rewrite listmatch_extract with (i := inum) (a := flist) by omega.
+      rewrite listmatch_extract with (i := inum) (a := flist) by lia.
       unfold file_match at 2.
       setoid_rewrite listmatch_split at 2.
       rewrite skipn_map_comm; cancel.
-      rewrite arrayN_except with (i := inum) by omega.
+      rewrite arrayN_except with (i := inum) by lia.
       rewrite smrep_single_helper_split_tail. cancel.
       instantiate (1 := INODE.mk_inode _ _). cbn; eauto.
       eapply file_match_no_dup.
@@ -2423,7 +2423,7 @@ Module BFILE.
       cancel.
 
       seprewrite.
-      rewrite listmatch_updN_removeN by omega.
+      rewrite listmatch_updN_removeN by lia.
       rewrite Heq.
       unfold file_match, cuttail; cancel; eauto.
       seprewrite.
@@ -2437,7 +2437,7 @@ Module BFILE.
       rewrite arrayN_ex_smrep_single_helper_remove_dirty_vec.
       cancel.
       destruct MSAlloc; cancel.
-      omega.
+      lia.
       3: eauto.
 
       denote (list2nmem ilist') as Hilist'.
@@ -2450,14 +2450,14 @@ Module BFILE.
       destruct (addr_eq_dec inum inum0); subst.
       + unfold block_belong_to_file in *; intuition simpl.
         all: erewrite selN_updN_eq in * by eauto; simpl in *; eauto.
-        rewrite cuttail_length in *. omega.
+        rewrite cuttail_length in *. lia.
         rewrite selN_cuttail in *; auto.
       + unfold block_belong_to_file in *; intuition simpl.
         all: erewrite selN_updN_ne in * by eauto; simpl; eauto.
       + erewrite list2nmem_array_updN with (nl := ilist') (i := inum).
         erewrite selN_updN_ne; eauto.
         pred_apply; cancel.
-        omega.
+        lia.
       + pimpl_crash.
         cancel.
     }
@@ -2529,7 +2529,7 @@ Module BFILE.
     rewrite map_length in *.
     simplen.
     simplen.
-    rewrite combine_length_eq by omega.
+    rewrite combine_length_eq by lia.
     erewrite listmatch_length_pimpl with (b := ilist) in *.
     destruct_lift H. simplen.
     Unshelve. split; eauto. exact INODE.inode0.
@@ -2603,17 +2603,17 @@ Module BFILE.
 
     sepauto.
     denote removeN as Hx.
-    setoid_rewrite listmatch_extract with (i := off) (bd := 0) in Hx; try omega.
+    setoid_rewrite listmatch_extract with (i := off) (bd := 0) in Hx; try lia.
     destruct_lift Hx.
-    rewrite arrayN_except with (i := inum) in * by omega.
+    rewrite arrayN_except with (i := inum) in * by lia.
     erewrite smrep_single_helper_split_dirty with (off := off) (ino' := INODE.mk_inode _ _) in *.
     2: now eauto.
     2: { match goal with H1: length _ = length (INODE.IBlocks _), H2: _ < length (BFData _) |- _ =>
                            rewrite H1 in H2 end. eauto. }
     2: now eauto.
     step.
-    rewrite listmatch_extract with (i := off) (b := map _ _) by omega.
-    erewrite selN_map by omega; filldef.
+    rewrite listmatch_extract with (i := off) (b := map _ _) by lia.
+    erewrite selN_map by lia; filldef.
     rewrite <- surjective_pairing. cancel.
 
     prestep. norm. cancel.
@@ -2621,11 +2621,11 @@ Module BFILE.
     2: sepauto. 2: sepauto.
     pred_apply; cancel.
     setoid_rewrite <- updN_selN_eq with (l := ilist) (ix := inum) at 4.
-    rewrite listmatch_updN_removeN by omega.
+    rewrite listmatch_updN_removeN by lia.
     unfold file_match at 3; cancel; eauto.
     setoid_rewrite <- updN_selN_eq with (l := INODE.IBlocks _) (ix := off) at 3.
-    erewrite map_updN by omega; filldef.
-    rewrite listmatch_updN_removeN by omega.
+    erewrite map_updN by lia; filldef.
+    rewrite listmatch_updN_removeN by lia.
     cancel.
     eauto.
 
@@ -2803,7 +2803,7 @@ Module BFILE.
     hoare.
 
     denote (arrayN _ a vsl) as Hx.
-    destruct (list2nmem_arrayN_bound vsl _ Hx); subst; simpl in *; omega.
+    destruct (list2nmem_arrayN_bound vsl _ Hx); subst; simpl in *; lia.
     rewrite isolateN_fwd with (i:=i) by auto.
     cancel.
   Unshelve.
@@ -2837,7 +2837,7 @@ Module BFILE.
     unfold write_array.
     prestep. cancel.
     denote (arrayN _ a vsl) as Hx.
-    destruct (list2nmem_arrayN_bound vsl _ Hx); subst; simpl in *; try omega.
+    destruct (list2nmem_arrayN_bound vsl _ Hx); subst; simpl in *; try lia.
     rewrite isolateN_fwd with (i:=i) by auto; filldef; cancel.
 
     step.
@@ -2903,7 +2903,7 @@ Module BFILE.
 
     assert (m1 < length vsl).
     denote (arrayN _ a vsl) as Hx.
-    destruct (list2nmem_arrayN_bound vsl _ Hx); subst; simpl in *; omega.
+    destruct (list2nmem_arrayN_bound vsl _ Hx); subst; simpl in *; lia.
     safestep.
 
     rewrite firstn_S_selN_expand with (def := $0) by (rewrite map_length; auto).
@@ -3117,7 +3117,7 @@ Module BFILE.
     safestep.
     cancel.
     or_r; cancel.
-    erewrite firstn_S_selN_expand by omega.
+    erewrite firstn_S_selN_expand by lia.
     rewrite synced_list_app, <- app_assoc.
     unfold synced_list at 3; simpl; eauto.
     msalloc_eq.
@@ -3173,8 +3173,8 @@ Module BFILE.
       eauto.
       step.
       or_r; safecancel.
-      rewrite setlen_inbound, Rounding.sub_sub_assoc by omega; auto.
-      exfalso; omega.
+      rewrite setlen_inbound, Rounding.sub_sub_assoc by lia; auto.
+      exfalso; lia.
       cancel.
 
     - safestep.
@@ -3184,7 +3184,7 @@ Module BFILE.
       step.
 
       or_r; safecancel.
-      rewrite setlen_oob by omega.
+      rewrite setlen_oob by lia.
       unfold synced_list.
       rewrite repeat_length, combine_repeat; auto.
       cancel.
@@ -3273,7 +3273,7 @@ Module BFILE.
     cancel.
     cancel.
     eauto.
-  Grab Existential Variables.
+  Unshelve.
     all : try easy.
     all : solve [ exact bfile0 | intros; exact emp | exact nil].
   Qed.
@@ -3506,7 +3506,7 @@ Module BFILE.
     cancel.
     eassign (f' :: fs'); cancel.
     apply Forall2_cons; auto.
-    simpl; omega.
+    simpl; lia.
   Qed.
 
   Lemma flist_crash_caches_cleared: forall flist flist',
@@ -3723,7 +3723,7 @@ Module BFILE.
     simpl in *.
     eapply possible_crash_list_length in H1.
     destruct vs; simpl in *; eauto.
-    omega.
+    lia.
   Qed.
 
   Lemma freepred_bfile0 : freepred bfile0.

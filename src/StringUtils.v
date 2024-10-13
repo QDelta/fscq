@@ -1,4 +1,4 @@
-Require Import Ascii String Omega OrderedTypeEx.
+Require Import Ascii String Lia OrderedTypeEx.
 
 
 (**** String_as_OT borrowed from Fiat *)
@@ -60,9 +60,9 @@ Module String_as_OT <: UsualOrderedType.
       | [ |- context [Nat.compare ?a ?b] ] =>
         let H := fresh in
         first [
-            assert (Nat.compare a b = Eq) as H by (autorewrite_nat_compare; omega) |
-            assert (Nat.compare a b = Lt) as H by (autorewrite_nat_compare; omega) |
-            assert (Nat.compare a b = Gt) as H by (autorewrite_nat_compare; omega)
+            assert (Nat.compare a b = Eq) as H by (autorewrite_nat_compare; lia) |
+            assert (Nat.compare a b = Lt) as H by (autorewrite_nat_compare; lia) |
+            assert (Nat.compare a b = Gt) as H by (autorewrite_nat_compare; lia)
         ]; rewrite H; intuition
     end.
 

@@ -3,7 +3,7 @@ Require Import Arith.
 Require Import Eqdep_dec.
 Require Import AsyncDisk.
 Require Import List ListUtils.
-Require Import Omega.
+Require Import Lia.
 Require Import FunctionalExtensionality.
 Import EqNotations.
 

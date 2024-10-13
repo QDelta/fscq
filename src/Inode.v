@@ -6,7 +6,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
-Require Import Omega.
+Require Import Lia.
 Require Import Log.
 Require Import Array.
 Require Import List ListUtils.
@@ -95,7 +95,7 @@ Module INODE.
     Definition NDirect  := NDirect.
 
     Fact NDirect_bound : NDirect <= addrlen.
-      compute; omega.
+      compute; lia.
     Qed.
 
     Definition IRLen     (x : irec) := Eval compute_rec in # ( x :-> "len").
@@ -481,7 +481,7 @@ Module INODE.
     unfold IRec.Defs.item0 at 1.
     rewrite Rec.of_word_zero_reczero; cbn.
     intros.
-    rewrite Ind.rep_piff_direct by (cbn; omega).
+    rewrite Ind.rep_piff_direct by (cbn; lia).
     unfold Ind.rep_direct.
     split; cancel; rewrite ?Ind.indrep_0 by auto; try cancel.
     constructor.

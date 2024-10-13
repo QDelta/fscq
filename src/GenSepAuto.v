@@ -1,4 +1,4 @@
-Require Import Arith Omega Word Setoid.
+Require Import Arith Lia Word Setoid.
 Require Import Pred Hoare SepAuto AsyncDisk Word.
 Require Import Array List ListUtils.
 Require Import GenSepN ListPred.
@@ -11,7 +11,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
-Require Import Omega.
+Require Import Lia.
 Require Import Log.
 Require Import Array.
 Require Import List ListUtils.
@@ -76,7 +76,7 @@ Ltac simplen_rewrite := repeat match goal with
   | [H : ?l = _ , H2 : context [ ?l ] |- _ ] => first [ rewrite_ignore H2 | rewrite H in H2 ]
   | [H : @length ?T ?l = 0 |- context [?l] ] => replace l with (@nil T) by eauto
   | [H : @eqlen _ ?T ?l nil |- context [?l] ] => replace l with (@nil T) by eauto
-  | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try omega ]
+  | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try lia ]
   end.
 
 Ltac genseplen_rewrite := repeat match goal with
@@ -105,7 +105,7 @@ Ltac simplen' := unfold eqlen in *; eauto;
   repeat (try subst; simpl; auto;
     genseplen_rewrite; simplen_rewrite;
     autorewrite with defaults core lists);
-  simpl; eauto; try omega.
+  simpl; eauto; try lia.
 
 
 Ltac extract_listmatch_at H ix :=

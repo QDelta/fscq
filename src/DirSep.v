@@ -285,7 +285,7 @@ Proof.
   eapply ptsto_upd'; eauto.
   right.
   eapply dir2flatmem2_find_subtree_ptsto_none; eauto.
-Grab Existential Variables.
+Unshelve.
   all: eauto.
 Qed.
 

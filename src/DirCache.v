@@ -3,7 +3,7 @@ Require Import Word.
 Require Import Ascii.
 Require Import String.
 Require Import Dir.
-Require Import Omega.
+Require Import Lia.
 Require Import Prog.
 Require Import BasicProg.
 Require Import Pred PredCrash.

@@ -9,7 +9,7 @@ Require Import BasicProg.
 Require Import Log.
 Require Import Hoare.
 Require Import Pred PredCrash.
-Require Import Omega.
+Require Import Lia.
 Require Import Rec.
 Require Import Array.
 Require Import ListPred.
@@ -322,7 +322,7 @@ Module DIR.
     eapply pimpl_trans with (b := (DEName a |-> _ * listpred dmatch l * _)%pred).
     cancel. rewrite dmatch_ex_ptsto; cancel.
 
-    assert (ix < length l) by omega.
+    assert (ix < length l) by lia.
     rewrite IHl; eauto; try solve [ cancel ].
     unfold dmatch_ex at 2, dmatch, name_is.
     destruct (bool_dec (is_valid _) false);
@@ -419,9 +419,9 @@ Module DIR.
     pose proof (Dent.Defs.items_per_val_gt_0).
     erewrite <- Nat.sub_diag, <- updN_app2, Dent.Defs.block0_repeat by auto.
     apply listpred_updN; auto.
-    rewrite app_length, repeat_length; omega.
+    rewrite app_length, repeat_length; lia.
 
-    replace (length l) with (length l + 0) by omega.
+    replace (length l) with (length l + 0) by lia.
     rewrite removeN_app_r, removeN_repeat, listpred_app by auto.
     rewrite listpred_dmatch_repeat_dent0.
     rewrite dmatch_mk_dent by auto.

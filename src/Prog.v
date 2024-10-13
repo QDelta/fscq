@@ -1,7 +1,6 @@
 Require Import FunctionalExtensionality.
 Require Import Structures.OrderedType.
 Require Import Structures.OrderedTypeEx.
-Require Import Omega.
 Require Import List.
 Require Import Mem.
 Require Import PredCrash.

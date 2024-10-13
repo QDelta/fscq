@@ -1447,7 +1447,7 @@ Import ListNotations.
       + rewrite app_assoc in H2.
         eapply IHl in H2; eauto.
         nodupapp.
-  Grab Existential Variables.
+  Unshelve.
     all: exact addr_eq_dec.
   Qed.
 

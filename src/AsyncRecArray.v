@@ -5,7 +5,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
-Require Import Omega.
+Require Import Lia.
 Require Import Word.
 Require Import Rec.
 Require Import Array.
@@ -86,13 +86,13 @@ Module AsyncRecArray (RA : RASig).
   Lemma le_add_helper: forall a b c d,
     b <= d -> a + d <= c -> a + b <= c.
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
   Lemma le_add_le_sub : forall a b c,
     a <= c -> b <= c - a -> a + b <= c.
   Proof.
-    intros. omega.
+    intros. lia.
   Qed.
 
   Lemma items_valid_app2 : forall xp st a b,
@@ -123,7 +123,7 @@ Module AsyncRecArray (RA : RASig).
     apply le_add_le_sub; auto.
     eapply Nat.mul_le_mono_pos_r.
     apply items_per_val_gt_0.
-    rewrite <- H; omega.
+    rewrite <- H; lia.
 
     rewrite Nat.sub_add_distr.
     rewrite Nat.mul_sub_distr_r.
@@ -143,7 +143,7 @@ Module AsyncRecArray (RA : RASig).
     rewrite Nat.sub_add_distr in H8.
     rewrite Nat.mul_sub_distr_r in H8.
     rewrite <- H in H8.
-    omega.
+    lia.
   Qed.
 
   Lemma synced_array_is : forall xp start items,
@@ -224,11 +224,11 @@ Module AsyncRecArray (RA : RASig).
     | [H : ?l = _ , H2 : context [ ?l ] |- _ ] => rewrite H in H2
     | [H : @length ?T ?l = 0 |- context [?l] ] => replace l with (@nil T) by eauto
     | [H : @eqlen _ ?T ?l nil |- context [?l] ] => replace l with (@nil T) by eauto
-    | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try omega ]
+    | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try lia ]
     end.
 
   Ltac simplen := unfold eqlen; eauto; repeat (try subst; simpl;
-    auto; simplen'; autorewrite with core lists); simpl; eauto; try omega.
+    auto; simplen'; autorewrite with core lists); simpl; eauto; try lia.
 
   Lemma xform_synced_array : forall xp st l,
     crash_xform (synced_array xp st l) =p=> synced_array xp st l.
@@ -354,9 +354,9 @@ Module AsyncRecArray (RA : RASig).
     cancel.
     intuition.
     rewrite firstn_length.
-    rewrite Nat.min_l; omega.
+    rewrite Nat.min_l; lia.
     rewrite skipn_length.
-    omega.
+    lia.
   Qed.
 
   Lemma avail_rep_merge : forall xp start nr n1 n2,
@@ -369,19 +369,19 @@ Module AsyncRecArray (RA : RASig).
     rewrite Nat.add_assoc.
     cancel.
     intuition.
-    rewrite app_length; omega.
+    rewrite app_length; lia.
   Qed.
 
   Lemma helper_add_sub : forall a b c,
     b <= c -> c <= a -> a >= b + (a - c).
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
   Lemma helper_add_le : forall a b nb n,
     b <= nb -> n >= a + nb -> a + b <= n.
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
   Local Hint Resolve items_per_val_not_0 items_per_val_gt_0 items_per_val_gt_0'.
@@ -410,7 +410,7 @@ Module AsyncRecArray (RA : RASig).
     setoid_rewrite Nat.mul_sub_distr_r at 2.
     apply helper_add_sub.
     apply roundup_ge; auto.
-    apply Nat.mul_le_mono_r; omega.
+    apply Nat.mul_le_mono_r; lia.
 
     erewrite ipack_app; eauto.
     simplen.
@@ -492,8 +492,8 @@ Module AsyncRecArray (RA : RASig).
     unfold vsupd_range, unsync_array, rep_common, eqlen.
     intros.
     rewrite nopad_ipack_length in *.
-    rewrite firstn_oob by omega.
-    rewrite skipn_oob by omega.
+    rewrite firstn_oob by lia.
+    rewrite skipn_oob by lia.
     cancel.
     apply arrayN_unify.
     rewrite app_nil_r.
@@ -597,7 +597,6 @@ Module AsyncRecArray (RA : RASig).
     rewrite map_fst_combine by simplen.
     rewrite firstn_skipn; auto.
     simplen.
-    lia.
   Qed.
 
 

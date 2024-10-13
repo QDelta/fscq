@@ -109,7 +109,7 @@ Proof.
 
   solve_hash_list_rep.
   all: cancel_with solve_hash_list_rep.
-  Grab Existential Variables.
+  Unshelve.
   all: eauto.
 Qed.
 
@@ -256,6 +256,6 @@ Proof.
       cancel;
       cancel_with solve_hash_list_rep).
 
-  Grab Existential Variables.
+  Unshelve.
   all: eauto.
 Qed.

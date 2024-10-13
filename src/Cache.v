@@ -10,7 +10,7 @@ Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
 Require Import WordAuto.
-Require Import Omega.
+Require Import Lia.
 Require Import ListUtils.
 Require Import AsyncDisk.
 Require Import OrderedTypeEx.
@@ -318,7 +318,7 @@ Module BUFCACHE.
   Proof.
     unfold size_valid; intros.
     rewrite map_remove_cardinal.
-    omega.
+    lia.
     apply In_MapsTo; auto.
   Qed.
 
@@ -430,14 +430,14 @@ Module BUFCACHE.
     unfold size_valid; intuition; simpl.
 
     destruct (Map.find a0 (CSMap cs)) eqn:?; try congruence.
-    rewrite map_add_cardinal. omega.
+    rewrite map_add_cardinal. lia.
     intuition repeat deex.
     apply MapFacts.find_mapsto_iff in H3; congruence.
 
     destruct (Map.find a0 (CSMap cs)) eqn:?.
     rewrite map_add_dup_cardinal; auto.
     eexists; eapply MapFacts.find_mapsto_iff; eauto.
-    rewrite map_add_cardinal. omega.
+    rewrite map_add_cardinal. lia.
     intuition repeat deex.
     apply MapFacts.find_mapsto_iff in H3; congruence.
   Qed.
@@ -691,7 +691,7 @@ Module BUFCACHE.
 
     (* victim not found, cache is empty *)
     - unfold size_valid in *; cancel.
-      rewrite Map.cardinal_1, Heql; simpl; omega.
+      rewrite Map.cardinal_1, Heql; simpl; lia.
 
     (* victim not found, cache is non-empty *)
     - clear Heqo.
@@ -1939,8 +1939,8 @@ Module BUFCACHE.
     intros.
     rewrite crash_xform_rep.
     unfold rep at 1; xform_norm.
-    edestruct arrayN_selN_subset with (a := a + i); eauto; try omega; intuition.
-    replace (a + i - a) with i in * by omega.
+    edestruct arrayN_selN_subset with (a := a + i); eauto; try lia; intuition.
+    replace (a + i - a) with i in * by lia.
     edestruct possible_crash_sel_exis; eauto; intuition.
     rewrite mem_pred_extract with (a := a + i) by eauto.
 
@@ -2124,8 +2124,8 @@ Module BUFCACHE.
 
     rewrite firstn_S_selN_expand with (def := $0).
     rewrite fold_left_app; simpl.
-    erewrite selN_map by omega; auto.
-    rewrite map_length; omega.
+    erewrite selN_map by lia; auto.
+    rewrite map_length; lia.
     all: step.
 
     Unshelve. exact tt. eauto.
@@ -2147,22 +2147,22 @@ Module BUFCACHE.
     destruct (le_dec n (length l)).
     - rewrite app_length in *; simpl in *.
       rewrite firstn_app_l in H by auto.
-      rewrite IHl; eauto; try omega.
+      rewrite IHl; eauto; try lia.
       rewrite vsupd_range_app_tl; eauto.
       xform_norm.
       rewrite write_array_xcrash_ok with (i := length l); eauto.
-      2: rewrite vsupd_range_length; try omega; rewrite firstn_length, app_length, Nat.min_l; simpl; omega.
+      2: rewrite vsupd_range_length; try lia; rewrite firstn_length, app_length, Nat.min_l; simpl; lia.
       xform_norm; cancel.
       apply crash_xform_pimpl.
       cancel.
-    - assert (n = length l + 1) by omega; subst.
+    - assert (n = length l + 1) by lia; subst.
       rewrite app_length in *; simpl in *.
-      rewrite firstn_oob in H by (rewrite app_length; simpl; omega).
+      rewrite firstn_oob in H by (rewrite app_length; simpl; lia).
       apply crash_xform_pimpl.
       cancel.
     - rewrite firstn_oob in H.
       apply crash_xform_pimpl; cancel.
-      rewrite app_length; simpl; omega.
+      rewrite app_length; simpl; lia.
   Qed.
 
   Lemma vsupd_range_xcrash_firstn : forall F a n l vs,
@@ -2196,10 +2196,10 @@ Module BUFCACHE.
     safestep. auto. auto.
     prestep; unfold rep; cancel.
 
-    rewrite vsupd_range_length; try omega.
-    rewrite firstn_length_l; omega.
+    rewrite vsupd_range_length; try lia.
+    rewrite firstn_length_l; lia.
     prestep; unfold rep; cancel.
-    erewrite firstn_S_selN_expand by omega.
+    erewrite firstn_S_selN_expand by lia.
     setoid_rewrite <- vsupd_range_progress; auto.
 
     cancel.
@@ -2231,11 +2231,11 @@ Module BUFCACHE.
     unfold sync_range; intros.
     step.
     step.
-    rewrite vssync_range_length; omega.
+    rewrite vssync_range_length; lia.
 
     step.
     apply arrayN_unify.
-    apply vssync_range_progress; omega.
+    apply vssync_range_progress; lia.
 
     step.
 
@@ -2264,8 +2264,8 @@ Module BUFCACHE.
     apply arrayN_subset_memupd; eauto.
     apply incl_refl.
     rewrite vsupd_vecs_length; auto.
-    edestruct arrayN_selN_subset with (m := d) (a := a + k); eauto; try omega.
-    intuition; replace (a + k - a) with k in * by omega.
+    edestruct arrayN_selN_subset with (m := d) (a := a + k); eauto; try lia.
+    intuition; replace (a + k - a) with k in * by lia.
     erewrite <- upd_nop with (m := d); eauto.
     apply mem_incl_upd; auto.
 
@@ -2300,7 +2300,7 @@ Module BUFCACHE.
     - inversion H0; subst; simpl in *.
       rewrite crash_xform_rep.
       unfold rep at 1; xform_norm.
-      edestruct arrayN_selN_subset with (a := a + a0_1); eauto; try omega; intuition.
+      edestruct arrayN_selN_subset with (a := a + a0_1); eauto; try lia; intuition.
 
       edestruct possible_crash_sel_exis; eauto; intuition.
       rewrite mem_pred_extract with (a := a + a0_1) by eauto.

@@ -7,7 +7,7 @@ Require Import FunctionalExtensionality.
 Require Import Morphisms.
 Require Import GenSepN.
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import List.
 Require Import ListUtils.
 Require Import DirSep.

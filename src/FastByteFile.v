@@ -19,7 +19,7 @@ Require Import FSLayout.
 Require Import Cache.
 Require Import Rec.
 Require Import FileRecArray RecArrayUtils LogRecArray.
-Require Import Omega.
+Require Import Lia.
 Require Import Eqdep_dec.
 Require Import Bytes.
 Require Import ProofIrrelevance.
@@ -75,7 +75,7 @@ Module FASTBYTEFILE.
     intros.
     apply roundup_ge.
     rewrite valubytes_is.
-    (* produces a nicer proof term than omega *)
+    (* produces a nicer proof term than lia *)
     apply gt_Sn_O.
   Qed.
 
@@ -199,18 +199,18 @@ Module FASTBYTEFILE.
     rewrite H15.
     rewrite <- firstn_double_skipn
       with (len2 := # (INODE.ISize (BFILE.BFAttr f)))
-      by omega.
+      by lia.
     apply list2nmem_arrayN_xyz_frame.
-    omega.
+    lia.
 
     step.
-    rewrite le_plus_minus_r by omega.
+    rewrite le_plus_minus_r by lia.
     eapply goodSize_word_bound.
     eapply le_trans.
     apply divup_lt_arg.
     eauto.
 
-    rewrite le_plus_minus_r by omega.
+    rewrite le_plus_minus_r by lia.
     erewrite BFileRec.array_items_num_blocks; eauto.
     apply divup_mono.
     apply firstn_length_l_iff; auto.
@@ -219,10 +219,10 @@ Module FASTBYTEFILE.
     rewrite H15.
     rewrite <- firstn_double_skipn
       with (len2 := # (INODE.ISize (BFILE.BFAttr f)))
-      by omega.
+      by lia.
     apply list2nmem_arrayN_xyz_frame.
     rewrite H4.
-    omega.
+    lia.
 
     step.
     (* off out of bounds *)
@@ -304,7 +304,7 @@ Module FASTBYTEFILE.
         end.
         rewrite <- firstn_skipn with (l := ilist') (n := flen) in Hilist'.
         assert (length (firstn flen ilist') = flen) as Hflen.
-        apply firstn_length_l; omega.
+        apply firstn_length_l; lia.
 
         eapply pimpl_apply in Hilist'; [|apply sep_star_abc_to_acb].
         rewrite <- Hflen in Hilist' at 1.
@@ -314,10 +314,10 @@ Module FASTBYTEFILE.
         apply list2nmem_arrayN_app_iff in Hilist'.
         assumption.
         exact ($ 0).
-        autorewrite with lengths; omega.
+        autorewrite with lengths; lia.
     - (* no-op case len = 0 *)
       step.
-      assert (olddata = nil) by (apply length_nil; omega).
+      assert (olddata = nil) by (apply length_nil; lia).
       subst olddata.
       simpl.
       pred_apply; cancel.
@@ -398,7 +398,7 @@ Module FASTBYTEFILE.
      assert (Hnewlenround := roundup_valu_ge newlen).
      assert (roundup (filelen f) valubytes <= roundup newlen valubytes) as
       Hnewlen_round.
-     apply roundup_mono; omega.
+     apply roundup_mono; lia.
      assert (filelen f <= length allbytes) as Hflen_all.
      replace (length allbytes).
      apply roundup_valu_ge.
@@ -418,7 +418,7 @@ Module FASTBYTEFILE.
      replace (firstn (filelen f) allbytes) with
       (firstn (filelen f) (allbytes ++ a7)) at 1.
      apply list2nmem_arrayN_firstn_skipn.
-     apply firstn_app_l; omega.
+     apply firstn_app_l; lia.
      reflexivity.
      unfold BFileRec.hidden.
      fold (filelen f).
@@ -436,12 +436,12 @@ Module FASTBYTEFILE.
      rewrite block_items_ok.
      replace (length allbytes).
      fold (roundup (filelen f) valubytes).
-     omega.
+     lia.
      rewrite skipn_length.
-     omega.
-     omega.
+     lia.
+     lia.
      fold (filelen f).
-     omega.
+     lia.
 
      step.
      time step. (* 15s *)
@@ -477,16 +477,16 @@ Module FASTBYTEFILE.
      eapply BFileRec.bfrec_bound with (itemtype := byte_type); eauto.
      replace ilist'.
      autorewrite with lengths.
-     omega.
+     lia.
      replace ilist'.
      (* split repeat into two parts - those that bring the length up to newlen,
         and then the rest that make it roundup newlen *)
      replace (roundup newlen valubytes - filelen f) with
-      (newlen - filelen f + (roundup newlen valubytes - newlen)) by omega.
+      (newlen - filelen f + (roundup newlen valubytes - newlen)) by lia.
      rewrite <- repeat_app.
      rewrite app_assoc.
-     rewrite firstn_app_l by (autorewrite with lengths; omega).
-     rewrite firstn_oob by (autorewrite with lengths; omega).
+     rewrite firstn_app_l by (autorewrite with lengths; lia).
+     rewrite firstn_oob by (autorewrite with lengths; lia).
      reflexivity.
 
      step.
@@ -501,7 +501,7 @@ Module FASTBYTEFILE.
      apply le_word_le_nat.
      rewrite natToWord_wordToNat.
      auto.
-     omega.
+     lia.
      apply pimpl_or_r; right.
      cancel.
      unfold filelen.
@@ -519,7 +519,7 @@ Module FASTBYTEFILE.
       with (n := filelen f) by auto.
      auto.
 
-   Grab Existential Variables.
+   Unshelve.
    all: try exact nil.
    all: try exact emp.
    exact BFILE.bfile0.
@@ -612,11 +612,11 @@ Module FASTBYTEFILE.
     eapply pimpl_apply with (p := (Fi *
       arrayN (filelen f) (repeat $0 (off + len - filelen f)))%pred).
     cancel.
-    replace (off + len - filelen f) with (off - filelen f + len) by omega.
+    replace (off + len - filelen f) with (off - filelen f + len) by lia.
     rewrite <- repeat_app.
     apply arrayN_combine.
     rewrite repeat_length.
-    omega.
+    lia.
     replace (filelen f) at 1.
     apply list2nmem_arrayN_app.
     auto.
@@ -634,7 +634,7 @@ Module FASTBYTEFILE.
     assert (filelen f >= off + len).
     apply not_wlt_ge in H15.
     apply le_word_le_nat'; auto.
-    assert (len = 0) by omega.
+    assert (len = 0) by lia.
     subst len.
     intuition; eauto.
     instantiate (Fx0 := Fi).
@@ -645,10 +645,10 @@ Module FASTBYTEFILE.
     time step.
     eapply pimpl_or_r; right; cancel; eauto.
     (* there are no zeroes, since we're appending nothing *)
-    replace (off - filelen f) with 0 by omega.
+    replace (off - filelen f) with 0 by lia.
     pred_apply; cancel.
 
-    Grab Existential Variables.
+    Unshelve.
     all: auto.
   Qed.
 

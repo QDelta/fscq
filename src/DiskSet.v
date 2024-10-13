@@ -1,5 +1,5 @@
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import Bool.
 Require Import List.
 Require Import ListUtils.
@@ -151,8 +151,8 @@ Proof.
   destruct n.
   rewrite Nat.sub_0_r; auto.
   destruct (length ds - n) eqn:?.
-  omega.
-  replace (length ds - S n) with n0 by omega; auto.
+  lia.
+  replace (length ds - S n) with n0 by lia; auto.
 Qed.
 
 Lemma dssync_vecs_nop: forall vs l,
@@ -284,7 +284,7 @@ Module ReplaySeq.
     pose proof (replay_seq_length H).
     inversion H; auto; subst; simpl in *.
     specialize (IHn (d0, ds0)).
-    apply IHn; simpl; auto; omega.
+    apply IHn; simpl; auto; lia.
   Qed.
 
   Lemma replay_seq_nthd : forall n ds ts,
@@ -293,14 +293,14 @@ Module ReplaySeq.
   Proof.
     unfold nthd; intros.
     destruct n; simpl.
-    rewrite selN_oob, skipn_oob by omega; auto.
+    rewrite selN_oob, skipn_oob by lia; auto.
     erewrite <- replay_seq_length by eauto.
     destruct (lt_dec (length (snd ds)) (S n)).
-    replace (length (snd ds) - S n) with 0 by omega; simpl.
+    replace (length (snd ds) - S n) with 0 by lia; simpl.
     rewrite <- repaly_seq_latest by auto.
     unfold latest; destruct ds; simpl.
     destruct l0; firstorder.
-    apply replay_seq_selN; auto; omega.
+    apply replay_seq_selN; auto; lia.
   Qed.
 
   Lemma fold_right_replay_disk_length : forall l d,

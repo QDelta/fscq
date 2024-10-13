@@ -7,7 +7,7 @@ Require Import FunctionalExtensionality.
 Require Import Morphisms.
 Require Import GenSepN.
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import List.
 Require Import ListUtils.
 
@@ -167,13 +167,13 @@ Proof.
   - right. unfold flist_crash in *.
     do 2 eexists.
     unfold list2nmem.
-    erewrite selN_map by omega.
-    erewrite selN_map by ( erewrite <- flist_crash_length by eauto; omega ).
+    erewrite selN_map by lia.
+    erewrite selN_map by ( erewrite <- flist_crash_length by eauto; lia ).
     intuition eauto.
     eapply forall2_selN; auto.
   - left. unfold list2nmem. repeat rewrite selN_oob; auto; rewrite map_length.
-    erewrite <- flist_crash_length by eauto. omega. omega.
-Grab Existential Variables.
+    erewrite <- flist_crash_length by eauto. lia. lia.
+Unshelve.
   all: exact BFILE.bfile0.
 Qed.
 

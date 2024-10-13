@@ -2,7 +2,7 @@ Require Import Prog.
 Require Import Log.
 Require Import BFile.
 Require Import Word.
-Require Import Omega.
+Require Import Lia.
 Require Import Hashmap.   (* must go before basicprog, because notation using hashmap *)
 Require Import BasicProg.
 Require Import Bool.
@@ -26,7 +26,7 @@ Require Import DirTree.
 Require Import DirSep.
 Require Import Arith.
 Require Import SepAuto.
-Require Import Omega.
+Require Import Lia.
 Require Import SuperBlock.
 Require Import FSLayout.
 Require Import AsyncFS.
@@ -513,7 +513,7 @@ Module TREESEQ.
     rewrite map_length in H1.
     eauto.
 
-  Grab Existential Variables.
+  Unshelve.
     exact BFILE.bfile0.
   Qed.
 
@@ -1092,7 +1092,7 @@ Module TREESEQ.
       eapply rep_tree_names_distinct; eauto.
       destruct d; simpl in *; eauto.
 
-      destruct (lt_dec off (Datatypes.length (DFData d))); try omega.
+      destruct (lt_dec off (Datatypes.length (DFData d))); try lia.
       exfalso.
       edestruct treeseq_block_belong_to_file; eauto.
       eassign (nthd n ds). unfold tree_rep. pred_apply; cancel.
@@ -1142,7 +1142,7 @@ Module TREESEQ.
       eapply rep_tree_names_distinct; eauto.
       destruct d; simpl in *; eauto.
 
-      destruct (lt_dec off (Datatypes.length (DFData d))); try omega.
+      destruct (lt_dec off (Datatypes.length (DFData d))); try lia.
       exfalso.
       edestruct treeseq_block_belong_to_file; eauto.
       eassign (ds !!). unfold tree_rep. pred_apply; cancel.
@@ -1763,7 +1763,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
 
     eassumption.
 
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
   Qed.
 
@@ -1818,10 +1818,10 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
   Proof.
     induction vsl; simpl; intros; eauto.
     rewrite synced_up_to_n_nil; eauto.
-    destruct n; try omega.
+    destruct n; try lia.
     simpl; f_equal.
     eapply IHvsl.
-    omega.
+    lia.
   Qed.
 
   Lemma cons_synced_up_to_n' : forall synclen d l default,
@@ -1834,7 +1834,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
     destruct l; simpl.
     rewrite synced_up_to_n_nil; eauto.
     erewrite IHsynclen; simpl in *; eauto.
-    omega.
+    lia.
   Qed.
 
   Lemma cons_synced_up_to_n : forall synclen d l default,
@@ -1844,9 +1844,9 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
     intros.
     destruct (le_dec synclen (Datatypes.length l)).
     eapply cons_synced_up_to_n'; eauto.
-    rewrite updN_oob by (simpl; omega).
-    rewrite synced_up_to_n_too_long by omega. rewrite <- synced_list_up_to_n.
-    rewrite synced_up_to_n_too_long by (simpl; omega). rewrite <- synced_list_up_to_n.
+    rewrite updN_oob by (simpl; lia).
+    rewrite synced_up_to_n_too_long by lia. rewrite <- synced_list_up_to_n.
+    rewrite synced_up_to_n_too_long by (simpl; lia). rewrite <- synced_list_up_to_n.
     firstorder.
   Qed.
 
@@ -1873,11 +1873,11 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
     synced_file_alt_helper (mk_dirfile (updN (DFData f) off' v) (DFAttr f)) off.
   Proof.
     induction off; simpl; intros; eauto.
-    - rewrite IHoff by omega; simpl.
+    - rewrite IHoff by lia; simpl.
       f_equal.
       f_equal.
-      rewrite updN_comm by omega.
-      rewrite selN_updN_ne by omega.
+      rewrite updN_comm by lia.
+      rewrite selN_updN_ne by lia.
       auto.
   Qed.
 
@@ -1887,8 +1887,8 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
     selN (DFData f) off' default.
   Proof.
     induction off; simpl; eauto; intros.
-    rewrite IHoff by omega; simpl.
-    rewrite selN_updN_ne by omega.
+    rewrite IHoff by lia; simpl.
+    rewrite selN_updN_ne by lia.
     auto.
   Qed.
 
@@ -1897,10 +1897,10 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
   Proof.
     induction off; intros; simpl; auto.
     rewrite <- IHoff; clear IHoff.
-    rewrite synced_file_alt_helper2_oob by omega.
+    rewrite synced_file_alt_helper2_oob by lia.
     f_equal.
     f_equal.
-    rewrite synced_file_alt_helper_selN_oob by omega.
+    rewrite synced_file_alt_helper_selN_oob by lia.
     auto.
   Qed.
 
@@ -1940,9 +1940,9 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
     - rewrite <- IHsynclen; simpl.
       f_equal.
       destruct (DFData f).
-      simpl in *; omega.
+      simpl in *; lia.
       eapply cons_synced_up_to_n.
-      rewrite length_updN. omega.
+      rewrite length_updN. lia.
   Qed.
 
   Lemma treeseq_one_upd_noop : forall t pathname off v inum f def,
@@ -2009,7 +2009,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
         rewrite update_update_subtree_same. reflexivity.
       + unfold treeseq_one_upd. rewrite H0. destruct t; eauto.
       + unfold treeseq_one_upd. rewrite H0. destruct t; eauto.
-      + simpl. rewrite length_updN. omega.
+      + simpl. rewrite length_updN. lia.
       + unfold treeseq_one_upd. rewrite H0. simpl.
         eapply tree_names_distinct_update_subtree.
         eauto. constructor.
@@ -2017,12 +2017,12 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
         unfold treeseq_one_upd. rewrite H0; simpl.
         erewrite selN_map.
         erewrite find_update_subtree; eauto.
-        unfold datatype in *; omega.
+        unfold datatype in *; lia.
       + subst; simpl.
         rewrite map_updN; simpl.
         erewrite selN_eq_updN_eq; eauto.
         erewrite selN_map; eauto.
-  Grab Existential Variables.
+  Unshelve.
     exact $0.
   Qed.
 
@@ -2056,7 +2056,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
     unfold synced_file_alt.
     rewrite synced_file_alt_helper_helper2_equiv.
     rewrite <- H0.
-    assert (Datatypes.length al <= Datatypes.length (DFData f)) by omega.
+    assert (Datatypes.length al <= Datatypes.length (DFData f)) by lia.
     clear H0.
 
     induction al using rev_ind; simpl; intros.
@@ -2071,7 +2071,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       rewrite app_length; simpl.
       rewrite plus_comm; simpl.
 
-      rewrite synced_file_alt_helper2_selN_oob by omega.
+      rewrite synced_file_alt_helper2_selN_oob by lia.
       replace (selN (vssync_vecs m al) x ($0, nil)) with
               (selN (DFData f) (Datatypes.length al) ($0, nil)).
 
@@ -2082,55 +2082,55 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       eapply IHal.
       {
         intros. specialize (H1 i).
-        rewrite selN_app1 in H1 by omega.
-        eapply H1. rewrite app_length. omega.
+        rewrite selN_app1 in H1 by lia.
+        eapply H1. rewrite app_length. lia.
       }
-      rewrite app_length in *; omega.
+      rewrite app_length in *; lia.
 
       erewrite find_update_subtree. reflexivity. eauto.
       {
         specialize (H1 (Datatypes.length al)).
-        rewrite selN_last in H1 by omega.
-        eapply H1. rewrite app_length. simpl. omega.
+        rewrite selN_last in H1 by lia.
+        eapply H1. rewrite app_length. simpl. lia.
       }
-      omega.
+      lia.
 
       3: eapply find_update_subtree; eauto.
 
       eapply rep_tree_inodes_distinct. eapply IHal.
       {
         intros. specialize (H1 i).
-        rewrite selN_app1 in H1 by omega.
-        eapply H1. rewrite app_length. omega.
+        rewrite selN_app1 in H1 by lia.
+        eapply H1. rewrite app_length. lia.
       }
-      rewrite app_length in *; omega.
+      rewrite app_length in *; lia.
 
       eapply rep_tree_names_distinct. eapply IHal.
       {
         intros. specialize (H1 i).
-        rewrite selN_app1 in H1 by omega.
-        eapply H1. rewrite app_length. omega.
+        rewrite selN_app1 in H1 by lia.
+        eapply H1. rewrite app_length. lia.
       }
-      rewrite app_length in *; omega.
+      rewrite app_length in *; lia.
 
       {
         rewrite synced_file_alt_helper2_length.
-        rewrite app_length in *; simpl in *; omega.
+        rewrite app_length in *; simpl in *; lia.
       }
 
       eapply IHal.
       {
         intros. specialize (H1 i).
-        rewrite selN_app1 in H1 by omega.
-        eapply H1. rewrite app_length. omega.
+        rewrite selN_app1 in H1 by lia.
+        eapply H1. rewrite app_length. lia.
       }
-      rewrite app_length in *; omega.
+      rewrite app_length in *; lia.
 
       eapply find_update_subtree; eauto.
       specialize (H1 (Datatypes.length al)).
       rewrite selN_last in * by auto.
       eapply H1.
-      rewrite app_length; simpl; omega.
+      rewrite app_length; simpl; lia.
   Qed.
 
   Lemma block_belong_to_file_off_ok : forall Fm Ftop fsxp sm mscs ts t ds inum off pathname f,
@@ -2198,10 +2198,10 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
     length (DFData b) <= length (DFData f).
   Proof.
     intros.
-    case_eq (length (DFData b)); intros; try omega.
+    case_eq (length (DFData b)); intros; try lia.
     edestruct H0; intuition.
     eexists; intuition eauto.
-    eapply block_belong_to_file_off_ok with (off := n0); eauto; try omega.
+    eapply block_belong_to_file_off_ok with (off := n0); eauto; try lia.
     eapply nthd_in_ds.
 
     eapply Nat.le_succ_l.
@@ -2243,7 +2243,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       subst.
       rewrite <- firstn_skipn with (l := al) (n := (length (DFData d))) at 2.
       rewrite app_length.
-      eapply Plus.plus_le_compat; try omega.
+      eapply Plus.plus_le_compat; try lia.
       rewrite firstn_length.
       rewrite H0.
       rewrite min_l; eauto.
@@ -2264,7 +2264,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
         * rewrite firstn_length.
           rewrite Nat.min_l; eauto.
 
-          case_eq (Datatypes.length (DFData d)); intros; try omega.
+          case_eq (Datatypes.length (DFData d)); intros; try lia.
 
         * intros.
           rewrite firstn_length in H9.
@@ -2284,7 +2284,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
             exfalso.
             edestruct H5; intuition.
             eexists; intuition eauto.
-            eapply block_belong_to_file_off_ok with (off := i); eauto; try omega.
+            eapply block_belong_to_file_off_ok with (off := i); eauto; try lia.
             eapply nthd_in_ds.
 
             rewrite H in H14; inversion H14; subst.
@@ -2311,31 +2311,31 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
         Unshelve.
         intros.
         specialize (H9 i).
-        rewrite selN_app1 in H9 by omega. apply H9. rewrite app_length. omega.
+        rewrite selN_app1 in H9 by lia. apply H9. rewrite app_length. lia.
 
-        rewrite app_length in *; simpl in *; omega.
+        rewrite app_length in *; simpl in *; lia.
 
         shelve.
 
         edestruct H7 with (off := length (DFData d) + length al_tail).
         eexists. intuition eauto.
         eapply H1.
-        rewrite app_length in *; simpl in *; omega.
+        rewrite app_length in *; simpl in *; lia.
 
         (* [treeseq_safe_bwd] says that the block is present in the old file.  Should be a contradiction. *)
         deex.
         eapply block_belong_to_file_bfdata_length in H14; eauto.
-        rewrite H13 in H6; inversion H6; subst. omega.
+        rewrite H13 in H6; inversion H6; subst. lia.
         eapply nthd_in_ds.
 
         (* [treeseq_safe_bwd] says the block is unused. *)
         rewrite <- H9 in H12.
-        rewrite selN_last in H12 by omega.
+        rewrite selN_last in H12 by lia.
         eapply H12.
-        rewrite app_length. simpl. omega.
+        rewrite app_length. simpl. lia.
 
     - (* TreeDir *)
-      assert (length al <= length (DFData f)) by omega.
+      assert (length al <= length (DFData f)) by lia.
       clear H0.
       induction al using rev_ind; simpl; eauto.
 
@@ -2348,20 +2348,20 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       eassumption.
       shelve. Unshelve.
       intros. specialize (H1 i).
-      rewrite selN_app1 in H1 by omega. apply H1. rewrite app_length. omega.
-      rewrite app_length in *; simpl in *; omega.
+      rewrite selN_app1 in H1 by lia. apply H1. rewrite app_length. lia.
+      rewrite app_length in *; simpl in *; lia.
 
       shelve.
 
       edestruct H7.
       eexists; intuition eauto.
-      eapply H1 with (i := length al); rewrite app_length; simpl; omega.
+      eapply H1 with (i := length al); rewrite app_length; simpl; lia.
 
       deex; congruence.
       rewrite selN_last in H0; eauto.
 
     - (* None *)
-      assert (length al <= length (DFData f)) by omega.
+      assert (length al <= length (DFData f)) by lia.
       clear H0.
       induction al using rev_ind; simpl; eauto.
 
@@ -2374,14 +2374,14 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       eassumption.
       shelve. Unshelve.
       intros. specialize (H1 i).
-      rewrite selN_app1 in H1 by omega. apply H1. rewrite app_length. omega.
-      rewrite app_length in *; simpl in *; omega.
+      rewrite selN_app1 in H1 by lia. apply H1. rewrite app_length. lia.
+      rewrite app_length in *; simpl in *; lia.
 
       shelve.
 
       edestruct H7.
       eexists; intuition eauto.
-      eapply H1 with (i := length al); rewrite app_length; simpl; omega.
+      eapply H1 with (i := length al); rewrite app_length; simpl; lia.
 
       deex; congruence.
       rewrite selN_last in H0; eauto.
@@ -2418,7 +2418,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       subst.
       rewrite <- firstn_skipn with (l := al) (n := (length (DFData d))) at 2.
       rewrite app_length.
-      eapply Plus.plus_le_compat; try omega.
+      eapply Plus.plus_le_compat; try lia.
       rewrite firstn_length.
       rewrite H0.
       rewrite min_l; eauto.
@@ -2440,7 +2440,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
         * rewrite firstn_length.
           rewrite Nat.min_l; eauto.
 
-          case_eq (Datatypes.length (DFData d)); intros; try omega.
+          case_eq (Datatypes.length (DFData d)); intros; try lia.
 
         * intros.
           rewrite firstn_length in H9.
@@ -2461,7 +2461,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
             exfalso.
             edestruct H5; intuition.
             eexists; intuition eauto.
-            eapply block_belong_to_file_off_ok with (off := i); eauto; try omega.
+            eapply block_belong_to_file_off_ok with (off := i); eauto; try lia.
             eapply latest_in_ds.
 
             rewrite H in H14; inversion H14; subst.
@@ -2480,29 +2480,29 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
         eapply IHal_tail.
         intros.
         specialize (H9 i).
-        rewrite selN_app1 in H9 by omega. apply H9. rewrite app_length. omega.
+        rewrite selN_app1 in H9 by lia. apply H9. rewrite app_length. lia.
 
-        rewrite app_length in *; simpl in *; omega.
+        rewrite app_length in *; simpl in *; lia.
 
         edestruct H7 with (off := length (DFData d) + length al_tail).
         exists f. intuition eauto.
         eapply H1.
-        rewrite app_length in *; simpl in *; omega.
+        rewrite app_length in *; simpl in *; lia.
 
         (* [treeseq_safe_bwd] says that the block is present in the old file.  Should be a contradiction. *)
         deex.
         eapply block_belong_to_file_bfdata_length in H13; eauto.
-        rewrite H12 in H6; inversion H6; subst. omega.
+        rewrite H12 in H6; inversion H6; subst. lia.
         eapply latest_in_ds.
 
         (* [treeseq_safe_bwd] says the block is unused. *)
         rewrite <- H9 in H11.
-        rewrite selN_last in H11 by omega.
+        rewrite selN_last in H11 by lia.
         eapply H11.
-        rewrite app_length. simpl. omega.
+        rewrite app_length. simpl. lia.
 
     - (* TreeDir *)
-      assert (length al <= length (DFData f)) by omega.
+      assert (length al <= length (DFData f)) by lia.
       clear H0.
       induction al using rev_ind; simpl; eauto.
 
@@ -2511,18 +2511,18 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       eapply dirtree_update_free.
       eapply IHal.
       intros. specialize (H1 i).
-      rewrite selN_app1 in H1 by omega. apply H1. rewrite app_length. omega.
-      rewrite app_length in *; simpl in *; omega.
+      rewrite selN_app1 in H1 by lia. apply H1. rewrite app_length. lia.
+      rewrite app_length in *; simpl in *; lia.
 
       edestruct H7.
       eexists; intuition eauto.
-      eapply H1 with (i := length al); rewrite app_length; simpl; omega.
+      eapply H1 with (i := length al); rewrite app_length; simpl; lia.
 
       deex; congruence.
       rewrite selN_last in H0; eauto.
 
     - (* None *)
-      assert (length al <= length (DFData f)) by omega.
+      assert (length al <= length (DFData f)) by lia.
       clear H0.
       induction al using rev_ind; simpl; eauto.
 
@@ -2531,12 +2531,12 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       eapply dirtree_update_free.
       eapply IHal.
       intros. specialize (H1 i).
-      rewrite selN_app1 in H1 by omega. apply H1. rewrite app_length. omega.
-      rewrite app_length in *; simpl in *; omega.
+      rewrite selN_app1 in H1 by lia. apply H1. rewrite app_length. lia.
+      rewrite app_length in *; simpl in *; lia.
 
       edestruct H7.
       eexists; intuition eauto.
-      eapply H1 with (i := length al); rewrite app_length; simpl; omega.
+      eapply H1 with (i := length al); rewrite app_length; simpl; lia.
 
       deex; congruence.
       rewrite selN_last in H0; eauto.

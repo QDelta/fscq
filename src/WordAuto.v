@@ -1,4 +1,4 @@
-Require Import Arith Omega NArith Nomega Word.
+Require Import Arith Lia NArith Nomega Word.
 
 
 Ltac set_evars :=
@@ -36,7 +36,7 @@ Qed.
 Lemma N2Nat_word'
    : forall sz n, goodSize sz (N.to_nat n) -> wordToNat (NToWord sz n) = N.to_nat n.
 Proof.
-  intros. rewrite N2Nat_word. trivial. unfold goodSize in H. rewrite <- Npow2_nat in H. nomega.
+  intros. rewrite N2Nat_word. trivial. unfold goodSize in H. rewrite <- Npow2_nat in H. lia.
 Qed.
 Hint Rewrite NToWord_nat : W2Nat.
 
@@ -52,8 +52,8 @@ Theorem plus_ovf_l : forall sz x y, $ (wordToNat (natToWord sz x) + y) = natToWo
 Proof.
   intros.
   destruct (wordToNat_natToWord sz x) as [? [Heq ?]]; rewrite Heq.
-  replace (x - x0 * pow2 sz + y) with (x + y - x0 * pow2 sz) by omega.
-  apply drop_sub; omega.
+  replace (x - x0 * pow2 sz + y) with (x + y - x0 * pow2 sz) by lia.
+  apply drop_sub; lia.
 Qed.
 
 Theorem plus_ovf_r : forall sz x y, $ (x + wordToNat (natToWord sz y)) = natToWord sz (x + y).
@@ -160,7 +160,7 @@ Proof.
   apply (f_equal nat_of_N) in HN.
   rewrite nat_of_Nplus in HN.
   rewrite nat_of_Nmult in HN.
-  repeat rewrite positive_N_nat in HN.
+  repeat rewrite Znat.positive_N_nat in HN.
   rewrite H in HN.
   rewrite Nat.mul_0_r in H0.
   rewrite Nat.sub_diag in H0.
@@ -171,21 +171,21 @@ Proof.
   clear H0.
   assert (N.pos Sb <> 0%N).
   apply Nneq_in. simpl.
-  generalize (Pos2Nat.is_pos Sb).
-  omega.
+  generalize (Pnat.Pos2Nat.is_pos Sb).
+  lia.
   apply Nlt_out in HNR; [|auto].
-  rewrite positive_N_nat in HNR.
+  rewrite Znat.positive_N_nat in HNR.
   simpl in HNR.
   assert (N.to_nat n = n1).
   destruct (lt_eq_lt_dec (N.to_nat n) n1); [destruct s; auto|]; [
     remember (n1 - N.to_nat n) as d;
-    assert (n1 = d + N.to_nat n) as He by omega |
+    assert (n1 = d + N.to_nat n) as He by lia |
     remember (N.to_nat n - n1) as d;
-    assert (N.to_nat n = d + n1) as He by omega
-  ]; assert (d > 0) by omega;
+    assert (N.to_nat n = d + n1) as He by lia
+  ]; assert (d > 0) by lia;
      rewrite He in HN;
      rewrite Nat.mul_add_distr_r in HN;
-     destruct (mult_O_le (S b) d); omega.
+     destruct (mult_O_le (S b) d); lia.
   intuition.
 Qed.
 
@@ -203,12 +203,12 @@ Proof.
     destruct a'.
     reflexivity.
     inversion He.
-    generalize (Pos2Nat.is_pos p0).
-    omega.
+    generalize (Pnat.Pos2Nat.is_pos p0).
+    lia.
   + intros.
     simpl.
     destruct a'; try discriminate.
-    rewrite positive_N_nat in H.
+    rewrite Znat.positive_N_nat in H.
     apply divmod_Ndiv_eucl; auto.
 Qed.
 
@@ -222,7 +222,7 @@ Proof.
   unfold Nmod, Nat.modulo.
   intros.
   case_eq (N.to_nat a').
-  omega.
+  lia.
   simpl.
   destruct a'; try discriminate.
   intro n.
@@ -247,11 +247,11 @@ Lemma div_le : forall a b, b <> 0 -> a / b <= a.
 Proof.
   intros.
   destruct (Nat.eq_dec a 0).
-  rewrite e. rewrite Nat.div_0_l by assumption. omega.
+  rewrite e. rewrite Nat.div_0_l by assumption. lia.
   destruct (Nat.eq_dec b 1).
-  rewrite e. rewrite Nat.div_1_r. omega.
+  rewrite e. rewrite Nat.div_1_r. lia.
   apply Nat.lt_le_incl.
-  apply Nat.div_lt; omega.
+  apply Nat.div_lt; lia.
 Qed.
 
 
@@ -279,7 +279,7 @@ Proof.
     rewrite wordToNat_natToWord_idempotent' in H |
     (* ... or it's true even without the hypothesis *)
     generalize (wordToNat_bound (natToWord sz y))];
-  intuition; unfold goodSize in *; omega.
+  intuition; unfold goodSize in *; lia.
 Qed.
 
 
@@ -330,7 +330,7 @@ Ltac word2nat_simpl :=
   goodsizes.
 
 Ltac word2nat_solve := unfold goodSize in *; subst;
-  (omega ||
+  (lia ||
    congruence ||
    (apply f_equal; word2nat_solve) ||
    ((apply div_le; [| word2nat_auto] ||

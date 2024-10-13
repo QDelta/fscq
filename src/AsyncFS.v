@@ -3,7 +3,7 @@ Require Import Prog ProgMonad.
 Require Import Log.
 Require Import BFile.
 Require Import Word.
-Require Import Omega.
+Require Import Lia.
 Require Import BasicProg.
 Require Import Bool.
 Require Import Pred PredCrash.
@@ -146,13 +146,13 @@ Module AFS.
   Lemma S_minus_1_helper : forall n a b,
     S (n + 1 + a + b) - 1 - n = S (a + b).
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
   Lemma S_minus_1_helper2 : forall n,
     S n - 1 = n.
   Proof.
-    intros; omega.
+    intros; lia.
   Qed.
 
 
@@ -233,7 +233,7 @@ Module AFS.
     rewrite S_minus_1_helper2.
     generalize (data_bitmaps * valulen + inode_bitmaps * valulen / INODE.IRecSig.items_per_val); intros.
     generalize (log_descr_blocks * PaddedLog.DescSig.items_per_val); intros.
-    omega.
+    lia.
 
     eapply goodSize_trans; [ | eauto ].
     rewrite skipn_length.
@@ -241,7 +241,7 @@ Module AFS.
     substl (length disk).
     generalize (data_bitmaps * valulen + inode_bitmaps * valulen / INODE.IRecSig.items_per_val); intros.
     generalize (log_descr_blocks * PaddedLog.DescSig.items_per_val); intros.
-    omega.
+    lia.
     auto.
     auto.
     step.
@@ -274,7 +274,7 @@ Module AFS.
 
     assert (1 < length (repeat BFILE.bfile0 (inode_bitmaps * valulen
        / INODE.IRecSig.items_per_val * INODE.IRecSig.items_per_val))) as Hlen.
-    rewrite repeat_length; omega.
+    rewrite repeat_length; lia.
 
     specialize (Hz _ (list2nmem_array _)).
     pred_apply; cancel.

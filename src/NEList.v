@@ -1,5 +1,5 @@
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import Bool.
 Require Import List.
 Require Import ListUtils.
@@ -23,7 +23,7 @@ Section ListRevSel.
     n >= length l -> selR n def = def.
   Proof.
     unfold selR; intros.
-    destruct (lt_dec n (length l)); try omega; auto.
+    destruct (lt_dec n (length l)); try lia; auto.
   Qed.
 
   Lemma selR_inb : forall n def,
@@ -57,13 +57,13 @@ Section NonEmptyList.
 
   Lemma nthd_0 : forall ds, nthd 0 ds = fst ds.
   Proof.
-    unfold nthd; intros; rewrite selN_oob; auto; omega.
+    unfold nthd; intros; rewrite selN_oob; auto; lia.
   Qed.
 
   Lemma nthd_oob : forall ds n, n >= length (snd ds) -> nthd n ds = latest ds.
   Proof.
     unfold nthd, latest; intros; destruct ds; simpl in *.
-    replace (length l - n) with 0 by omega.
+    replace (length l - n) with 0 by lia.
     destruct l; firstorder.
   Qed.
 
@@ -99,8 +99,8 @@ Section NonEmptyList.
     n >= length (snd ds) -> popn n ds = (latest ds, nil).
   Proof.
     unfold popn; intros.
-    rewrite nthd_oob by omega.
-    rewrite cuttail_oob by omega; auto.
+    rewrite nthd_oob by lia.
+    rewrite cuttail_oob by lia; auto.
   Qed.
 
   Lemma singular_latest : forall ds, snd ds = nil -> latest ds = fst ds.
@@ -117,14 +117,14 @@ Section NonEmptyList.
     n >= length (snd ds) -> snd (popn n ds) = nil.
   Proof.
     unfold popn; intros.
-    rewrite cuttail_oob by omega; auto.
+    rewrite cuttail_oob by lia; auto.
   Qed.
 
   Lemma popn_oob_singular : forall ds n,
     n >= length (snd ds) -> popn n ds = singular (latest ds).
   Proof.
     unfold popn, singular; intros.
-    rewrite cuttail_oob by omega.
+    rewrite cuttail_oob by lia.
     rewrite nthd_oob; auto.
   Qed.
 
@@ -137,16 +137,16 @@ Section NonEmptyList.
     unfold nthd; simpl.
     rewrite cuttail_length.
     destruct (le_dec n (length (snd ds))).
-    replace (length (snd ds) - (n + m)) with (length (snd ds) - n - m) by omega.
+    replace (length (snd ds) - (n + m)) with (length (snd ds) - n - m) by lia.
     unfold cuttail.
     destruct (lt_dec (length (snd ds) - n - m) (length (snd ds) - n)).
     rewrite selN_firstn at 1; auto.
-    apply selN_inb; omega.
+    apply selN_inb; lia.
     rewrite selN_oob.
-    f_equal; omega.
-    rewrite firstn_length; apply Nat.min_case_strong; omega.
-    rewrite cuttail_oob by omega.
-    simpl; f_equal; omega.
+    f_equal; lia.
+    rewrite firstn_length; apply Nat.min_case_strong; lia.
+    rewrite cuttail_oob by lia.
+    simpl; f_equal; lia.
   Qed.
 
 
@@ -154,14 +154,14 @@ Section NonEmptyList.
     popn (S n) (d0, ds ++ [d]) = popn n (d, ds).
   Proof.
     intros.
-    replace (S n) with (1 + n) by omega.
+    replace (S n) with (1 + n) by lia.
     rewrite <- popn_popn.
     unfold popn at 2; simpl.
     rewrite cuttail_tail, cuttail_0.
     unfold nthd; simpl.
     rewrite app_length; simpl.
-    rewrite selN_app2 by omega.
-    replace (length ds + 1 - 1 - length ds) with 0 by omega; simpl; auto.
+    rewrite selN_app2 by lia.
+    replace (length ds + 1 - 1 - length ds) with 0 by lia; simpl; auto.
   Qed.
 
   Lemma pushdlist_app : forall d l' l,
@@ -184,11 +184,11 @@ Section NonEmptyList.
     rewrite selN_oob; auto.
     rewrite cuttail_length; auto.
     rewrite selN_cuttail; auto.
-    erewrite selN_inb by omega; eauto.
-    rewrite cuttail_length; omega.
-    replace (length (snd ds) - m - n) with 0 by omega.
-    rewrite cuttail_oob by omega; simpl.
-    replace (length (snd ds) - m) with 0 by omega; auto.
+    erewrite selN_inb by lia; eauto.
+    rewrite cuttail_length; lia.
+    replace (length (snd ds) - m - n) with 0 by lia.
+    rewrite cuttail_oob by lia; simpl.
+    replace (length (snd ds) - m) with 0 by lia; auto.
  Qed.
 
   Definition d_in d (l : nelist) := d = fst l \/ In d (snd l).
@@ -226,12 +226,12 @@ Section NonEmptyList.
     destruct ds.
     destruct n.
     - left.
-      apply selN_oob. omega.
+      apply selN_oob. lia.
     - destruct l; simpl snd.
       + eauto.
       + right.
         apply in_selN.
-        simpl; omega.
+        simpl; lia.
   Qed.
 
   Theorem latest_in_ds : forall ds,
@@ -272,7 +272,7 @@ Section NonEmptyList.
       destruct H'.
       unfold nthd.
       exists (Datatypes.length (snd l)-x).
-      replace (Datatypes.length (snd l) - (Datatypes.length (snd l) - x)) with x by omega.
+      replace (Datatypes.length (snd l) - (Datatypes.length (snd l) - x)) with x by lia.
       intuition.
       rewrite H2; eauto.
   Qed.
@@ -285,7 +285,7 @@ Section NonEmptyList.
     induction l.
     - simpl; auto.
     - unfold hd, fst, snd.
-      replace (Datatypes.length (a :: l) - Datatypes.length (a :: l)) with 0 by omega.
+      replace (Datatypes.length (a :: l) - Datatypes.length (a :: l)) with 0 by lia.
       simpl; auto.
   Qed.
 
@@ -312,9 +312,9 @@ Section NonEmptyList.
     rewrite length_popn.
     rewrite nthd_popn.
     destruct (le_dec n (length (snd ds))).
-    f_equal; omega.
+    f_equal; lia.
     rewrite nthd_oob, latest_nthd; auto.
-    omega.
+    lia.
   Qed.
 
 
@@ -360,14 +360,14 @@ Section NonEmptyList.
       generalize dependent t0.
       induction H; simpl in *; intros.
       + assert (@length T [] = length (l ++ [t])) by congruence.
-        rewrite app_length in *; simpl in *; omega.
+        rewrite app_length in *; simpl in *; lia.
       + destruct l.
         * inversion Heqlt; subst.
           inversion H; subst; simpl in *.
           destruct l0.
          -- inversion Heqlt0; subst. apply NESubsetNil.
          -- assert (length [t] = length ((t1 :: l0) ++ [t0])) by congruence.
-            rewrite app_length in *; simpl in *; omega.
+            rewrite app_length in *; simpl in *; lia.
         * inversion Heqlt; subst.
           destruct l0.
          -- inversion Heqlt0; subst.
@@ -382,7 +382,7 @@ Section NonEmptyList.
         * inversion Heqlt; subst.
           inversion H.
           assert (@length T [] = length (l0 ++ [t0])) by congruence.
-          rewrite app_length in *; simpl in *; omega.
+          rewrite app_length in *; simpl in *; lia.
         * simpl in *.
           inversion Heqlt; subst.
           replace (t, t1 :: l) with (pushd t1 (t, l)) by reflexivity.
@@ -461,7 +461,7 @@ Section NonEmptyList.
         eapply NESubsetHead.
       + replace (selN (a :: t1 :: l) (length (a :: t1 :: l) - 1) t) with (selN (t1 :: l) (length (t1 :: l) - 1) t) in H.
         2: simpl; rewrite <- minus_n_O; eauto.
-        rewrite cuttail_cons in H by ( simpl; omega ).
+        rewrite cuttail_cons in H by ( simpl; lia ).
         inversion H; subst.
         * replace (t, t0 :: t1 :: l) with (pushd t0 (t, t1 :: l)) by reflexivity.
           eapply NESubsetHead.
@@ -482,7 +482,7 @@ Section NonEmptyList.
   Proof.
     induction n; simpl; intros.
     rewrite popn_0 in H; auto.
-    replace (S n) with (1 + n) in H by omega.
+    replace (S n) with (1 + n) in H by lia.
     rewrite <- popn_popn in H.
     apply IHn in H.
     eapply nelist_subset_popn1; eauto.
@@ -495,13 +495,13 @@ Section NonEmptyList.
     induction n; simpl; intros.
     rewrite nthd_0.
     apply nelist_subset_oldest_latest; auto.
-    replace (S n) with (1 + n) by omega.
+    replace (S n) with (1 + n) by lia.
     rewrite <- nthd_popn.
     erewrite <- latest_popn.
     eapply nelist_subset_popn.
     apply IHn; simpl.
     rewrite cuttail_length.
-    omega.
+    lia.
   Qed.
 
   Lemma nelist_subset_popn1' : forall ds ds',
@@ -523,7 +523,7 @@ Section NonEmptyList.
         generalize dependent l1.
         induction l; intros.
         * inversion H. assert (@length T [] = length (l1 ++ [t])) by congruence.
-          rewrite app_length in *; simpl in *; omega.
+          rewrite app_length in *; simpl in *; lia.
         * inversion H; subst.
          -- destruct l1. apply list_subset_nil.
             inversion H3; subst.
@@ -532,7 +532,7 @@ Section NonEmptyList.
       + unfold cuttail. simpl. rewrite <- minus_n_O.
         induction l0 using rev_ind; simpl; auto.
         rewrite app_length; simpl.
-        replace (length l0 + 1) with (S (length l0)) by omega.
+        replace (length l0 + 1) with (S (length l0)) by lia.
         rewrite selN_last by auto.
         replace (t0 :: l0 ++ [x]) with ((t0 :: l0) ++ [x]) by reflexivity.
         rewrite firstn_app2 by (simpl; auto).
@@ -545,7 +545,7 @@ Section NonEmptyList.
   Proof.
     induction n; simpl; intros.
     rewrite popn_0; auto.
-    replace (S n) with (1 + n) by omega.
+    replace (S n) with (1 + n) by lia.
     rewrite <- popn_popn.
     apply IHn.
     eapply nelist_subset_popn1'; eauto.
@@ -567,7 +567,7 @@ Section NonEmptyList.
     intros.
     rewrite IHdlist.
     rewrite pushd_length.
-    omega.
+    lia.
   Qed.
 
   Lemma nthd_pushd : forall l t n d,
@@ -578,12 +578,12 @@ Section NonEmptyList.
     destruct (Nat.eq_dec n 0).
 
     subst; simpl.
-    f_equal; omega.
+    f_equal; lia.
 
     replace (snd (_)) with ([d] ++ l) by auto.
     rewrite selN_app2; simpl.
     destruct n; intuition.
-    f_equal; omega.
+    f_equal; lia.
     destruct n; intuition.
   Qed.
 
@@ -645,15 +645,15 @@ Section NonEmptyList.
     inversion H1.
     exists x; intuition.
     rewrite nthd_pushd; auto.
-    rewrite pushd_length in l; omega.
-    rewrite pushd_length in l; simpl in *; omega.
+    rewrite pushd_length in l; lia.
+    rewrite pushd_length in l; simpl in *; lia.
 
     rewrite nthd_pushd_latest in H1; subst.
     exists (S (length l)); intuition.
     rewrite nthd_pushd_latest; auto.
     replace l0 with (snd (t0, l0)) by auto.
     rewrite <- pushd_length with (d:=d).
-    omega.
+    lia.
 
     apply IHNEListSubset in H1; auto.
     inversion H1.
@@ -693,9 +693,9 @@ Proof.
   repeat rewrite nthd_0; auto.
   unfold nthd; destruct (lt_dec n (length (snd ds))); simpl.
   erewrite selN_map, map_length; auto.
-  rewrite map_length; omega.
+  rewrite map_length; lia.
   rewrite map_length.
-  replace (length (snd ds) - S n) with 0 by omega.
+  replace (length (snd ds) - S n) with 0 by lia.
   destruct ds, l; simpl; auto.
 Qed.
 
@@ -802,9 +802,9 @@ Proof.
   eapply forall2_map2_selN with (q := q); auto; intros.
   destruct (lt_dec n (length (snd l1))).
   - eapply H with (n := (length (snd l1) - n)); unfold nthd; subst; eauto.
-    replace (length (snd l1) - (length (snd l1) - n)) with n by omega; eauto.
-    replace (length (snd l2) - (length (snd l1) - n)) with n by omega; eauto.
-  - rewrite selN_oob in * by omega; subst.
+    replace (length (snd l1) - (length (snd l1) - n)) with n by lia; eauto.
+    replace (length (snd l2) - (length (snd l1) - n)) with n by lia; eauto.
+  - rewrite selN_oob in * by lia; subst.
     eapply H; auto.
     rewrite nthd_0; auto.
     rewrite nthd_0; auto.
@@ -855,17 +855,17 @@ Proof.
   apply NEforall2_length in H as H'.
   destruct n.
 
-  repeat rewrite selN_oob by omega.
+  repeat rewrite selN_oob by lia.
   firstorder.
 
   case_eq (Datatypes.length (snd l1)); intros.
-  repeat rewrite selN_oob by omega.
+  repeat rewrite selN_oob by lia.
   firstorder.
 
   rewrite <- H'. rewrite H2.
   eapply forall2_selN.
   firstorder.
-  omega.
+  lia.
 Qed.
 
 Lemma NEforall2_latest: forall (T1 T2 : Type) (p : T1 -> T2 -> Prop) (l1 : nelist T1)

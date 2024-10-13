@@ -2,7 +2,7 @@ Require Import Prog.
 Require Import Log.
 Require Import BFile.
 Require Import Word.
-Require Import Omega.
+Require Import Lia.
 Require Import BasicProg.
 Require Import Bool.
 Require Import Pred PredCrash.
@@ -266,7 +266,7 @@ Module AFS_RECOVER.
 
       pred_apply; cancel.
 *)
-  Grab Existential Variables.
+  Unshelve.
     all: try exact emp.
   Qed. *)
 
@@ -401,7 +401,7 @@ Module AFS_RECOVER.
 
       step.
       denote crash_xform as Hx.
-      replace n with 0 in Hx by omega; rewrite nthd_0 in Hx; simpl in Hx.
+      replace n with 0 in Hx by lia; rewrite nthd_0 in Hx; simpl in Hx.
       denote! (_ (list2nmem x1)) as Hy.
       apply (crash_xform_diskIs_pred _ Hy) in Hx.
       apply crash_xform_sep_star_dist in Hx.
@@ -468,14 +468,14 @@ Module AFS_RECOVER.
 
     cancel.
     rewrite LOG.notxn_after_crash_diskIs. cancel.
-    rewrite nthd_0; eauto. omega.
+    rewrite nthd_0; eauto. lia.
 
     safestep; subst.
     eassign d0; eauto.
     pred_apply; instantiate (1 := nil).
     replace n with 0 in *.
     rewrite nthd_0; simpl; auto.
-    simpl in *; omega.
+    simpl in *; lia.
 
     cancel; cancel.
     rewrite LOG.after_crash_idem.
@@ -539,7 +539,7 @@ Module AFS_RECOVER.
       safestep.
       cancel.
       pred_apply; subst.
-      replace n with 0 by omega.
+      replace n with 0 by lia.
       rewrite nthd_0; eauto.
       cancel; cancel.
 
@@ -597,7 +597,7 @@ Module AFS_RECOVER.
       safestep.
       cancel.
       pred_apply; subst.
-      replace n with 0 by omega.
+      replace n with 0 by lia.
       rewrite nthd_0; eauto.
       cancel; cancel.
 

@@ -5,7 +5,7 @@ Require Import Prog ProgMonad.
 Require Import Hoare.
 Require Import SepAuto.
 Require Import BasicProg.
-Require Import Omega.
+Require Import Lia.
 Require Import Log.
 Require Import Array.
 Require Import List ListUtils.
@@ -160,7 +160,7 @@ rewrite <- plus_n_O.
 apply functional_extensionality.
 intros.
 destruct (le_dec a x);
-destruct (lt_dec x a); try omega; try reflexivity.
+destruct (lt_dec x a); try lia; try reflexivity.
 Qed.
 
 Fact out_except_range_then_in: forall (l: list valuset) s a n def,
@@ -174,18 +174,18 @@ apply sep_star_comm.
 apply mem_except_ptsto with (a:= a).
 unfold mem_except_range.
 destruct H0.
-destruct (le_dec s a); try omega.
+destruct (le_dec s a); try lia.
 unfold list2nmem, some_strip.
 erewrite selN_map.
 reflexivity. auto.
-destruct (lt_dec a (s + n)); try omega.
-destruct (le_dec s a); try omega.
+destruct (lt_dec a (s + n)); try lia.
+destruct (le_dec s a); try lia.
 unfold list2nmem, some_strip.
 erewrite selN_map.
 reflexivity. auto.
 instantiate (1:= diskIs (mem_except (mem_except_range (list2nmem l) s n) a)).
 apply diskIs_id.
-Grab Existential Variables.
+Unshelve.
 apply valuset0.
 apply valuset0.
 Qed. 
@@ -201,24 +201,24 @@ rewrite e.
 destruct (le_dec i i).
 destruct (lt_dec i (i + (j + 1))).
 reflexivity.
-omega.
-omega.
+lia.
+lia.
 
 destruct (le_dec i x).
 destruct (le_dec (i+1) x).
 destruct (lt_dec x (i + 1 + j)).
 destruct (lt_dec x (i + (j + 1))).
 reflexivity.
-omega.
+lia.
 destruct (lt_dec x (i + (j + 1))).
-omega.
+lia.
 reflexivity.
 destruct (lt_dec x (i + (j + 1))).
-omega.
+lia.
 reflexivity.
 destruct (le_dec (i+1) x).
 destruct (lt_dec x (i + 1 + j)).
-omega.
+lia.
 all: reflexivity.
 Qed.
 
@@ -233,16 +233,16 @@ rewrite e.
 destruct (le_dec i (i + j)).
 destruct (lt_dec (i + j) (i + (j + 1))).
 reflexivity.
-omega.
-omega.
+lia.
+lia.
 
 destruct (le_dec i x).
 destruct (lt_dec x (i + j)).
 destruct (lt_dec x (i + (j + 1))).
 reflexivity.
-omega.
+lia.
 destruct (lt_dec x (i + (j + 1))).
-omega.
+lia.
 reflexivity.
 reflexivity.
 Qed.
@@ -356,7 +356,7 @@ unfold get_sublist, unified_bytefile_valid.
 intros.
 rewrite H.
 rewrite concat_hom_skipn with (k:= k).
-replace (k) with (1 * k) by omega.
+replace (k) with (1 * k) by lia.
 rewrite concat_hom_firstn.
 rewrite firstn1.
 rewrite skipn_selN.
@@ -397,7 +397,7 @@ apply H1.
 apply list2nmem_inbound in H1.
 rewrite map_length in H1.
 apply H1.
-Grab Existential Variables.
+Unshelve.
 apply nil.
 apply valuset0.
 Qed. 
@@ -463,7 +463,7 @@ destruct H5.
 inversion H5.
 rewrite <- H6.
 apply valuset2bytesets_len.
-omega.
+lia.
 eapply byte2unifiedbyte.
 eauto.
 pred_apply.
@@ -471,7 +471,7 @@ rewrite arrayN_isolate with (i:=0).
 rewrite <- plus_n_O .
 cancel.
 auto.
-Grab Existential Variables.
+Unshelve.
 apply byteset0.
 Qed.
 
@@ -548,7 +548,7 @@ rewrite mapfst_valuset2bytesets.
 reflexivity.
 
 rewrite valuset2bytesets_len.
-omega.
+lia.
 
 all: try eapply inlen_bfile; eauto.
 all: try eapply proto_len; eauto.
@@ -563,12 +563,12 @@ unfold rep; repeat eexists; eauto.
 apply list2nmem_arrayN_bound in H2.
 destruct H2.
 rewrite H2 in H4; inversion H4.
-omega.
+lia.
 
 
 apply byteset0.
 
-Grab Existential Variables.
+Unshelve.
 apply valuset0.
 apply nil.
 Qed.
@@ -621,7 +621,7 @@ Proof.
   eauto.
   apply listmatch_length_r in H as H'.
   apply listmatch_length_r in H0 as H0'.
-  omega.
+  lia.
 Qed.
 
 
@@ -705,11 +705,11 @@ destruct H'.
 rewrite <- length_zero_iff_nil in H6.
 rewrite H6 in H4; symmetry in H4; apply mult_is_O in H4.
 destruct H4.
-omega.
-rewrite valubytes_is in *; omega.
+lia.
+rewrite valubytes_is in *; lia.
 apply list2nmem_arrayN_bound in H2.
 destruct H2.
-apply length_zero_iff_nil in H2; rewrite valubytes_is in *; omega.
+apply length_zero_iff_nil in H2; rewrite valubytes_is in *; lia.
 
 
 rewrite bytefile_unified_byte_len with (ufy:= ufy) in H6; eauto.
@@ -721,7 +721,7 @@ apply lt_mult_weaken in H6.
 rewrite H in H6.
 rewrite map_length in H6.
 auto.
-rewrite valubytes_is in *; omega.
+rewrite valubytes_is in *; lia.
 eapply proto_len; eauto.
 Qed.
 
@@ -746,7 +746,7 @@ rewrite Nat.mul_comm in H4.
 apply Nat.mul_cancel_r in H4; auto.
 apply valubytes_ne_O.
 unfold not; intros.
-unfold not in *; apply mod_dem_neq_dem with (a:= length (ByFData fy)) (b:= valubytes); intros; rewrite valubytes_is in *; omega.
+unfold not in *; apply mod_dem_neq_dem with (a:= length (ByFData fy)) (b:= valubytes); intros; rewrite valubytes_is in *; lia.
 Qed.
 
 
@@ -781,7 +781,7 @@ auto.
 apply functional_extensionality; intros.
 destruct (le_dec (length l1) x);
 destruct (lt_dec x (length l1)); try reflexivity.
-omega.
+lia.
 
 subst.
 rewrite arrayN_isolate with (i := 0).
@@ -802,13 +802,13 @@ unfold mem_except_range.
 erewrite selN_map.
 rewrite selN_app.
 rewrite selN_app2.
-replace (length l1 - length l1) with 0 by omega.
+replace (length l1 - length l1) with 0 by lia.
 simpl.
 rewrite app_length; simpl.
-destruct (le_dec (length l1 + 1) (length l1)); try omega; try reflexivity.
-omega.
-rewrite app_length; simpl; omega.
-repeat rewrite app_length; simpl; omega.
+destruct (le_dec (length l1 + 1) (length l1)); try lia; try reflexivity.
+lia.
+rewrite app_length; simpl; lia.
+repeat rewrite app_length; simpl; lia.
 apply emp_star_r.
 unfold mem_except, mem_except_range.
 rewrite <- plus_n_O.
@@ -826,13 +826,13 @@ auto.
 unfold mem_except_range.
 apply functional_extensionality; intros.
 
-replace ((length l1 + 1 + length l2)) with (length l1 + S (length l2)) by omega.
+replace ((length l1 + 1 + length l2)) with (length l1 + S (length l2)) by lia.
 replace (((l1 ++ a :: nil) ++ l2 ++ l3)) with (l1 ++ a :: l2 ++ l3).
 
 destruct (le_dec (length l1 + 1) x);
 destruct (le_dec (length l1) x);
-destruct (addr_eq_dec x (length l1)); try omega; try reflexivity.
-destruct (lt_dec x (length l1 + S (length l2))); try omega; try reflexivity.
+destruct (addr_eq_dec x (length l1)); try lia; try reflexivity.
+destruct (lt_dec x (length l1 + S (length l2))); try lia; try reflexivity.
 
 rewrite <- app_assoc.
 rewrite <- cons_app.
@@ -842,8 +842,8 @@ rewrite <- app_assoc.
 rewrite <- cons_app.
 reflexivity.
 
-rewrite app_length; simpl; omega.
-simpl; omega.
+rewrite app_length; simpl; lia.
+simpl; lia.
 
 Unshelve.
 auto.
@@ -863,7 +863,7 @@ apply star_emp_pimpl in H; auto.
 apply functional_extensionality; intros.
 destruct (le_dec a x);
 destruct (lt_dec x a);
-try omega; try reflexivity.
+try lia; try reflexivity.
 replace (mem_except_range m a0 (length (a :: l))) with (mem_except_range (mem_except m a0) (a0 + 1) (length l)).
 apply IHl.
 rewrite isolateN_fwd with (i:= 0) in H; simpl in H.
@@ -872,17 +872,17 @@ rewrite <- plus_n_O in H.
 apply sep_star_comm in H.
 apply sep_star_assoc in H.
 apply ptsto_mem_except in H. pred_apply; cancel.
-simpl; omega.
+simpl; lia.
 apply functional_extensionality; intros.
 unfold mem_except, mem_except_range; simpl.
-replace (S (length l)) with ( 1 + length l) by omega.
+replace (S (length l)) with ( 1 + length l) by lia.
 rewrite Nat.add_assoc.
 destruct (le_dec (a0 + 1) x);
 destruct (lt_dec x (a0 + 1 + length l));
 destruct (addr_eq_dec x a0);
 destruct (le_dec a0 x);
-try omega; try reflexivity.
-Grab Existential Variables.
+try lia; try reflexivity.
+Unshelve.
 auto.
 Qed. 
 
@@ -897,7 +897,7 @@ block_off <= length (DFData f).
 Proof.
 intros.
 apply Nat.lt_le_incl.
-eapply inlen_bfile with (j:= 0); eauto; try omega.
+eapply inlen_bfile with (j:= 0); eauto; try lia.
 apply valubytes_ge_O.
 
 2: {
@@ -905,7 +905,7 @@ pred_apply.
 rewrite <- plus_n_O.
 cancel.
 }
-rewrite valubytes_is in *; omega.
+rewrite valubytes_is in *; lia.
 Qed.
 
 Lemma bfile_gt_block_off_m1: forall f fy block_off Fd m1 old_blocks,
@@ -919,7 +919,7 @@ intros.
 apply list2nmem_arrayN_bound in H2 as H''.
 destruct H''.
 apply length_zero_iff_nil in H3.
-assert (X: forall a, a = 0 -> a > 0 -> False). intros. omega.
+assert (X: forall a, a = 0 -> a > 0 -> False). intros. lia.
 apply X in H3.  
 contradiction.
 auto.
@@ -939,14 +939,14 @@ intros.
 apply list2nmem_arrayN_bound in H2 as H''.
 destruct H''.
 apply length_zero_iff_nil in H3.
-assert (X: forall a, a = 0 -> a > 0 -> False). intros. omega.
+assert (X: forall a, a = 0 -> a > 0 -> False). intros. lia.
 apply X in H3.  
 contradiction.
 auto.
 
 eapply le_lt_weaken in H3.
 2: eauto.
-omega.
+lia.
 Qed.
 
 Lemma bytefile_ge_block_off_v: forall fy block_off Fd old_data, 
@@ -958,7 +958,7 @@ intros.
 apply list2nmem_arrayN_bound in H0 as H'.
 destruct H'.
 rewrite H1 in H; inversion H.
-omega.
+lia.
 Qed.
 
 Lemma bytefile_ge_block_off_m1_v: forall fy block_off Fd old_data m1 l_old_blocks, 
@@ -974,8 +974,8 @@ pose proof length_old_data_ge_O; eauto.
 apply length_zero_iff_nil in H2.
 eapply H3 in H; eauto.
 inversion H.
-omega.
-rewrite valubytes_is in *; omega.
+lia.
+rewrite valubytes_is in *; lia.
 Qed.
 
 Lemma bfile_bytefile_length: forall f pfy ufy fy,
@@ -1016,20 +1016,20 @@ Proof.
 	reflexivity.
 	unfold mem_except; simpl.
 	destruct (Nat.eq_dec x a).
-	omega.
+	lia.
 	reflexivity.
 	apply Nat.nle_gt in n0.
 	inversion n0.
 	destruct (lt_dec a (a + S n)).
 	rewrite mem_except_eq.
 	reflexivity.
-	omega.
-	omega.
+	lia.
+	lia.
 	destruct (le_dec (S a) x).
-	omega.
+	lia.
 	unfold mem_except.
 	destruct (Nat.eq_dec x a).
-	omega.
+	lia.
 	reflexivity.
 Qed.
 
@@ -1040,7 +1040,7 @@ Proof.
 	intros; apply functional_extensionality; intros.
 	unfold mem_except_range; simpl; subst.
 	destruct (le_dec (length l1) x);
-	destruct (lt_dec x ((length l1) + (length l2))); try reflexivity; try omega.
+	destruct (lt_dec x ((length l1) + (length l2))); try reflexivity; try lia.
 	unfold list2nmem.
 	apply Nat.nlt_ge in n.
 	repeat rewrite map_app.
@@ -1050,13 +1050,13 @@ Proof.
 	reflexivity.
 	all: repeat rewrite map_length.
 	all: subst.
-	all: try omega.
+	all: try lia.
 	apply Nat.nle_gt in n.
 	unfold list2nmem.
 	repeat rewrite map_app.
 	repeat rewrite selN_app1.
 	reflexivity.
-	all: repeat rewrite map_length; omega.
+	all: repeat rewrite map_length; lia.
 Qed.
 
 Lemma diskIs_arrayN: forall A (l: list A) a b,
@@ -1069,11 +1069,11 @@ Proof.
 	replace l with (firstn a l ++ firstn b (skipn a l) ++ skipn (a + b) l).
 	rewrite Heqx; eapply list2nmem_arrayN_middle.
 	rewrite firstn_length_l. reflexivity.
-	omega.
+	lia.
 	instantiate (1:= b).
 	rewrite firstn_length_l. reflexivity.
 	rewrite skipn_length.
-	omega.
+	lia.
 	rewrite app_assoc.
 	rewrite <- firstn_sum_split.
 	rewrite firstn_skipn.
@@ -1102,7 +1102,7 @@ Proof.
   apply functional_extensionality; intros;
   destruct (AEQ x a0); 
   destruct (le_dec a x);
-  destruct (lt_dec x (a+b)); try omega; try reflexivity.
+  destruct (lt_dec x (a+b)); try lia; try reflexivity.
 Qed.
 
 Lemma diskIs_combine_upd_range: forall V (l: list V) m a b ,
@@ -1120,14 +1120,14 @@ Proof.
   simpl.
   rewrite <- sep_star_assoc.
   erewrite diskIs_combine_upd.
-  replace (S b) with (b + 1) by omega.
+  replace (S b) with (b + 1) by lia.
   rewrite <- mem_ex_mem_ex_range_head.
   
   rewrite diskIs_combine_upd.
   rewrite upd_mem_except_range_comm.
   apply IHl.
   simpl in H; inversion H; auto.
-  left; omega.
+  left; lia.
   destruct (m a0) eqn:D.
   eapply ptsto_upd' with (v0:= v).
   apply sep_star_comm.
@@ -1138,8 +1138,8 @@ Proof.
   rewrite mem_except_none.
   apply diskIs_id.
   all: auto.
-  simpl; omega.
-  Grab Existential Variables.
+  simpl; lia.
+  Unshelve.
   trivial.
 Qed.
 
@@ -1156,7 +1156,7 @@ Proof.
     with (firstn (a0 + 1) (l ⟦ a0 := a ⟧) ++ l' ++ skipn ((a0 + 1) + length l') (l ⟦ a0 := a ⟧)).
   apply IHl'.
   rewrite length_updN.
-  simpl in H; omega.
+  simpl in H; lia.
   rewrite updN_firstn_skipn.
   rewrite app_comm_cons.
   rewrite app_assoc.
@@ -1171,7 +1171,7 @@ Proof.
   rewrite <-cons_app.
   reflexivity.
   all: try (rewrite app_length; rewrite firstn_length_l; simpl in *).
-  all: simpl in H; try omega.
+  all: simpl in H; try lia.
 Qed.
 
 
@@ -1191,7 +1191,7 @@ Proof.
   repeat rewrite app_length.
   rewrite skipn_length.
   rewrite firstn_length_l.
-  all: omega.
+  all: lia.
 Qed.
 
 Lemma bfile_length_eq: forall a f f' v,
@@ -1239,7 +1239,7 @@ rep f fy ->
 off / valubytes < length (DFData f).
 	Proof.
 		intros;
-		eapply inlen_bfile; eauto; try omega.
+		eapply inlen_bfile; eauto; try lia.
 		instantiate (1:= off mod valubytes); apply Nat.mod_upper_bound.
 		apply valubytes_ne_O.
     2: {
@@ -1248,7 +1248,7 @@ off / valubytes < length (DFData f).
   		eauto.
   		apply valubytes_ne_O.
     }
-		omega.
+		lia.
 	Qed.
 
 Lemma valu2list_sublist_v: forall f i,
@@ -1275,7 +1275,7 @@ length (ByFData fy) - off / valubytes * valubytes -
  (length_data +
   (off / valubytes * valubytes + valubytes -
    (off / valubytes * valubytes + off mod valubytes + length_data)))).
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 Lemma off_plus_mod_inlen_unified: forall ufy fy off,
 bytefile_valid ufy fy ->
@@ -1333,10 +1333,10 @@ exists l'', (F ✶ arrayN (ptsto (V:= byteset)) a l'')%pred m /\ length l' = len
 		rewrite <- arrayN_isolate_hd in H.
 		exists ((a_1, dummy)::x).
 		split; simpl; auto.
-		simpl; omega.
+		simpl; lia.
 		reflexivity.
-		simpl; omega.
-		Grab Existential Variables.
+		simpl; lia.
+		Unshelve.
 		apply byteset0.
 Qed. *)
 
@@ -1407,9 +1407,9 @@ map fst l = map fst (firstn (length l) (skipn a l')).
 		rewrite H0 in H2; simpl in H2; inversion H2.
 		rewrite <- H2 in H0.
 		simpl in H0.
-		omega.
-		simpl; omega.
-		Grab Existential Variables.
+		lia.
+		simpl; lia.
+		Unshelve.
 		apply byteset0.
 	Qed. *)
 
@@ -1429,7 +1429,7 @@ Lemma merge_bs_app: forall l1 l2 l1' l2',
 		simpl.
 		rewrite IHl1.
 		reflexivity.
-		simpl in H; omega.
+		simpl in H; lia.
 	Qed.
 	
 (* Lemma arrayN_ptsto2ptsto_subset_b: forall l1 l1' m a F,
@@ -1448,12 +1448,12 @@ length l1 = length l1' ->
 			rewrite arrayN_isolate_hd.
 			apply sep_star_assoc.
 			eapply IHl1.
-			simpl in *; omega.
+			simpl in *; lia.
 			assert (0 < length (a::l1)).
-			simpl; omega.
+			simpl; lia.
 			apply H1 in H2.
 			destruct H2; simpl in *.
-			replace (a0 + 1) with (S a0) by omega.
+			replace (a0 + 1) with (S a0) by lia.
 			unfold ptsto_subset_b; pred_apply; cancel.
 			
 			intros.
@@ -1462,8 +1462,8 @@ length l1 = length l1' ->
 			apply lt_n_S in H2.
 			apply H1 in H2.
 			auto.
-			simpl; omega.
-			Grab Existential Variables.
+			simpl; lia.
+			Unshelve.
 			apply byteset0.
 		Qed. *)
 
@@ -1478,7 +1478,7 @@ selN (merge_bs l l') i byteset0 = ((selN l i byte0),fst (selN l' i byteset0) :: 
 			simpl in H0; inversion H0.
 			destruct i; simpl.
 			reflexivity.
-			apply IHl; simpl in *; omega.
+			apply IHl; simpl in *; lia.
 	Qed.
 
 Lemma selN_eq: forall A (l l': list A) i def,
@@ -1512,7 +1512,7 @@ length l1 = length l1' ->
 	 	inversion H0.
 	 	subst.
 	 	apply H7.
-	 	simpl; omega.
+	 	simpl; lia.
 	 	eapply IHl1.
 	 	auto.
 
@@ -1533,8 +1533,8 @@ length l1 = length l1' ->
 	 	rewrite H' in H''.
 	 	inversion H''; subst.
 	 	apply H1.
-	 	simpl in H2; omega.
-	 	Grab Existential Variables.
+	 	simpl in H2; lia.
+	 	Unshelve.
 	 	all: apply byteset0.
  	Qed. *)
 
@@ -1634,7 +1634,7 @@ Proof.
   rewrite H1; rewrite H0; rewrite H.
   rewrite selN_firstn; auto.
   rewrite between_exists with (a:= a0)(b:= block_off + 1) (c:= valubytes).
-  replace (block_off + 1 - 1) with block_off by omega.
+  replace (block_off + 1 - 1) with block_off by lia.
   rewrite concat_hom_selN with (k:= valubytes).
   rewrite selN_map with (default':= valuset0).
   unfold valuset2bytesets. simpl.
@@ -1646,7 +1646,7 @@ Proof.
   erewrite selN_map.
   simpl.
   replace ( block_off * valubytes + a0 mod valubytes - block_off * valubytes )
-  with (a0 mod valubytes) by omega.
+  with (a0 mod valubytes) by lia.
   reflexivity.
   rewrite valu2list_len; apply Nat.mod_upper_bound.
   apply valubytes_ne_O.
@@ -1656,7 +1656,7 @@ Proof.
   rewrite valuset2bytesets_rec_cons_merge_bs.
   rewrite merge_bs_selN; simpl.
   replace ( block_off * valubytes + a0 mod valubytes - block_off * valubytes )
-  with (a0 mod valubytes) by omega.
+  with (a0 mod valubytes) by lia.
   reflexivity.
   rewrite valu2list_len; apply Nat.mod_upper_bound.
   apply valubytes_ne_O.
@@ -1676,8 +1676,8 @@ Proof.
   apply Nat.mod_upper_bound.
   apply valubytes_ne_O.
   replace (block_off + 1 - 1) with block_off. auto.
-  omega.
-  rewrite Nat.mul_add_distr_r; omega.
+  lia.
+  rewrite Nat.mul_add_distr_r; lia.
   apply valubytes_ne_O.
 Qed.
 
@@ -1700,7 +1700,7 @@ Proof.
   rewrite H1; rewrite H0; rewrite H.
   rewrite selN_firstn; auto.
   rewrite between_exists with (a:= a0)(b:= block_off + 1) (c:= valubytes).
-  replace (block_off + 1 - 1) with block_off by omega.
+  replace (block_off + 1 - 1) with block_off by lia.
   rewrite concat_hom_selN with (k:= valubytes).
   rewrite selN_map with (default':= valuset0).
   unfold valuset2bytesets. simpl.
@@ -1710,7 +1710,7 @@ Proof.
   rewrite valuset2bytesets_rec_cons_merge_bs.
   rewrite merge_bs_selN; simpl.
   replace ( block_off * valubytes + a0 mod valubytes - block_off * valubytes )
-  with (a0 mod valubytes) by omega.
+  with (a0 mod valubytes) by lia.
   erewrite selN_map.
   replace (snd (DFData f) ⟦ block_off ⟧) with (w::l).
   simpl.
@@ -1738,8 +1738,8 @@ Proof.
   apply Nat.mod_upper_bound.
   apply valubytes_ne_O.
   replace (block_off + 1 - 1) with block_off. auto.
-  omega.
-  rewrite Nat.mul_add_distr_r; omega.
+  lia.
+  rewrite Nat.mul_add_distr_r; lia.
   apply valubytes_ne_O.
 Qed.
 
@@ -1758,7 +1758,7 @@ Proof.
   rewrite H1; rewrite H0; rewrite H.
   rewrite selN_firstn; auto.
   rewrite between_exists with (a:= a0)(b:= block_off + 1) (c:= valubytes).
-  replace (block_off + 1 - 1) with block_off by omega.
+  replace (block_off + 1 - 1) with block_off by lia.
   rewrite concat_hom_selN with (k:= valubytes).
   erewrite selN_map with (default':= valuset0).
   unfold valuset2bytesets.
@@ -1781,8 +1781,8 @@ Proof.
   apply Nat.mod_upper_bound.
   apply valubytes_ne_O.
   replace (block_off + 1 - 1) with block_off. auto.
-  omega.
-  rewrite Nat.mul_add_distr_r; omega.
+  lia.
+  rewrite Nat.mul_add_distr_r; lia.
   Unshelve.
   apply valubytes_ne_O.
   apply nil.
@@ -2007,7 +2007,7 @@ subset_invariant_bs (arrayN ptsto_subset_b a l).
     apply ptsto_ne with (a':= x) in H0 as Hx.
     rewrite H4; rewrite Hx; reflexivity.
     unfold not; intros.
-    apply n; omega.
+    apply n; lia.
     
     
     destruct H4.
@@ -2015,7 +2015,7 @@ subset_invariant_bs (arrayN ptsto_subset_b a l).
     rewrite Hx in H4.
     destruct H4; reflexivity.
     unfold not; intros.
-    apply n; omega.
+    apply n; lia.
     auto.
     
     (* part2 *)
@@ -2046,14 +2046,14 @@ subset_invariant_bs (arrayN ptsto_subset_b a l).
    destruct H with (a:= x).
     apply ptsto_ne with (a':= x) in H0 as Hx.
     rewrite H5; rewrite Hx; reflexivity.
-    unfold not; intros; apply n; omega.
+    unfold not; intros; apply n; lia.
     
     
     destruct H5.
     apply ptsto_ne with (a':= x) in H0 as Hx.
     rewrite Hx in H5.
     destruct H5; reflexivity.
-    unfold not; intros; apply n; omega.
+    unfold not; intros; apply n; lia.
     unfold incl; intros.
     apply H3.
     repeat destruct H4.
@@ -2224,7 +2224,7 @@ subset_invariant_bs (arrayN ptsto_subset_b a l).
     apply ptsto_ne with (a':= x) in H0 as Hx.
     rewrite H4; rewrite Hx; reflexivity.
     unfold not; intros.
-    apply n; omega.
+    apply n; lia.
     
     
     destruct H4.
@@ -2232,7 +2232,7 @@ subset_invariant_bs (arrayN ptsto_subset_b a l).
     rewrite Hx in H4.
     destruct H4; reflexivity.
     unfold not; intros.
-    apply n; omega.
+    apply n; lia.
     auto.
     
     (* part2 *)
@@ -2263,14 +2263,14 @@ subset_invariant_bs (arrayN ptsto_subset_b a l).
    destruct H with (a:= x).
     apply ptsto_ne with (a':= x) in H0 as Hx.
     rewrite H5; rewrite Hx; reflexivity.
-    unfold not; intros; apply n; omega.
+    unfold not; intros; apply n; lia.
     
     
     destruct H5.
     apply ptsto_ne with (a':= x) in H0 as Hx.
     rewrite Hx in H5.
     destruct H5; reflexivity.
-    unfold not; intros; apply n; omega.
+    unfold not; intros; apply n; lia.
     unfold incl; intros.
     apply H3.
     repeat destruct H4.
@@ -2293,8 +2293,8 @@ off < length (ByFData fy).
     apply list2nmem_arrayN_bound in H0.
     destruct H0.
     rewrite H0 in H1; simpl in H1.
-    omega.
-    omega.
+    lia.
+    lia.
   Qed. *)
 
 
@@ -2357,10 +2357,10 @@ Proof.
   reflexivity.
   auto.
   rewrite firstn_length_l; auto.
-  omega.
+  lia.
   rewrite app_length.
   rewrite firstn_length_l.
-  omega.
+  lia.
   auto.
   
   destruct (lt_dec a0 (length l)).
@@ -2383,35 +2383,35 @@ Proof.
   all: try rewrite firstn_length_l.
   all: try rewrite map_length.
   all: try rewrite skipn_length.
-  all: try omega.
+  all: try lia.
   rewrite app_length.
   rewrite merge_bs_length.
   rewrite map_length.
   rewrite skipn_length.
   rewrite firstn_length_l.
-  omega.
+  lia.
   auto.
   left.
   unfold list2nmem.
   repeat rewrite selN_oob.
   reflexivity.
-  rewrite map_length; omega.
+  rewrite map_length; lia.
   rewrite map_length.
   rewrite app_length.
   rewrite merge_bs_length.
   rewrite map_length.
   rewrite skipn_length.
   rewrite firstn_length_l.
-  omega.
-  omega.
+  lia.
+  lia.
   rewrite skipn_oob.
   rewrite firstn_oob.
   simpl.
   rewrite app_nil_r.
   left.
   reflexivity.
-  all: omega.
-  Grab Existential Variables.
+  all: lia.
+  Unshelve.
   all: apply byteset0.
 Qed.
  *)
@@ -2439,7 +2439,7 @@ Lemma unified_bytefile_minus: forall f pfy ufy fy a,
 		 	intros.
 		 	eapply le_trans.
 		 	instantiate (1:= length (UByFData ufy) - valubytes).
-		 	omega.
+		 	lia.
 		 	rewrite H1.
 		 	rewrite H0.
 		 	rewrite H.
@@ -2476,7 +2476,7 @@ Lemma unified_bytefile_minus: forall f pfy ufy fy a,
 		apply lt_mult_weaken in H3.
 		apply le_mult_weaken in H4.
 		apply eq_rect_word_mult_helper.
-		omega.
+		lia.
 		apply valubytes_ge_O.
 		apply valubytes_ne_O.
 	Qed.
@@ -2492,7 +2492,7 @@ Proof.
 	unfold get_sublist.
 	rewrite H0.
 	rewrite concat_hom_skipn.
-	replace valubytes with (1* valubytes) by omega.
+	replace valubytes with (1* valubytes) by lia.
 	rewrite concat_hom_firstn.
 	rewrite firstn1.
 	rewrite skipn_selN.
@@ -2515,7 +2515,7 @@ Qed.
 		erewrite bfile_protobyte_len_eq; eauto.
 		eapply bfile_bytefile_length_eq; eauto.
 		instantiate (1:= length (ByFData fy)).
-		omega.
+		lia.
 		eapply proto_len; eauto.
 	Qed.
 
@@ -2537,13 +2537,13 @@ Qed.
 	  pose proof mod_minus_lt_0.
 	  pose proof valubytes_ne_O.
 	  apply H4 with (a:= length (ByFData fy')) in H5 as H'.
-	  omega.
+	  lia.
 
 	  eapply goodSize_trans.
 	  2: apply H2.
 	  apply plus_le_compat_l.
 	  apply mod_ne_0 in H3; auto.
-	  omega.
+	  lia.
 	  apply valubytes_ne_O.
   Qed.
   
@@ -2571,7 +2571,7 @@ Qed.
 		  with ((length (ByFData fy') / valubytes + 1) * valubytes).
 	  apply Nat.mod_mul; auto.
 	  rewrite Nat.mul_add_distr_r.
-	  omega.
+	  lia.
 	  auto.
 	  apply Nat.mod_le; auto.
 	  apply mod_upper_bound_le'; auto.
@@ -2579,7 +2579,7 @@ Qed.
 	  2: apply H1.
 	  apply plus_le_compat_l.
 	  apply mod_ne_0 in H2; auto.
-	  omega.
+	  lia.
   Qed.
   
   	Lemma Forall_map_v_app: forall n fy,
@@ -2607,7 +2607,7 @@ Qed.
   Proof.
     intros.
     apply mod_ne_0 in H0; auto.
-    omega.
+    lia.
   Qed.
   
     
@@ -2633,7 +2633,7 @@ Qed.
 	
 Lemma pm_2_3_cancel: forall a b,
 	a + b - b = a.
-	Proof. intros; omega. Qed.
+	Proof. intros; lia. Qed.
 	
 		Lemma list2nmem_arrayN_app_general: forall A (F: pred) a (l l' l'': list A),
 	F (list2nmem l) ->
@@ -2795,7 +2795,7 @@ Qed.
 
 
 Lemma ge_1_gt_0: forall a, a > 0 -> a >= 1.
-Proof. intros; omega. Qed.
+Proof. intros; lia. Qed.
 
 Lemma mod_ge_0: forall a b c,
 a mod b > 0 ->
@@ -2803,7 +2803,7 @@ b <> 0 ->
 a + c > 0.
 Proof.
   intros.
-  apply mod_ne_0 in H; omega.
+  apply mod_ne_0 in H; lia.
 Qed.
 
 Lemma mod_plus_minus_0: forall c b a,
@@ -2818,7 +2818,7 @@ Proof.
   apply mod_minus_mod.
   all: auto.
   apply Nat.mod_le; auto.
-  destruct c; try omega.
+  destruct c; try lia.
   simpl.
   eapply le_trans.
   apply mod_upper_bound_le'; eauto.
@@ -2833,7 +2833,7 @@ Proof.
   intros.
   destruct a.
   rewrite Nat.div_0_l in H0; auto.
-  omega.
+  lia.
 Qed.
 
 Lemma div_minus_ge_0: forall a b c,
@@ -2843,12 +2843,12 @@ a > c.
 Proof.
   intros.
   apply div_ge_0 in H0; auto.
-  omega.
+  lia.
 Qed.
 
 
 Lemma gt_0_ge_1: forall a, a > 0 <-> a >= 1.
-Proof. intros; split; omega. Qed.
+Proof. intros; split; lia. Qed.
 
 Lemma div_mod_0: forall a b,
 b<>0 -> a/b = 0 -> a mod b = 0 -> a = 0.
@@ -2865,7 +2865,7 @@ b<>0 ->
 (a + (b - a mod b)) mod b = 0.
 Proof.
 	intros.
-	replace (b - a mod b) with (1 * b - a mod b) by omega.
+	replace (b - a mod b) with (1 * b - a mod b) by lia.
 	apply mod_plus_minus_0; eauto.
 Qed.
 

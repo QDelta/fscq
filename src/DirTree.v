@@ -434,7 +434,7 @@ Module DIRTREE.
     denote (find_subtree (fndone ++ _) _ = _) as Hx.
     unfold find_name; rewrite Hx; eauto.
 
-    Grab Existential Variables.
+    Unshelve.
     all: try exact unit.
     all: try exact None.
     all: intros; try exact tt.
@@ -1559,7 +1559,7 @@ Module DIRTREE.
     erewrite find_subtree_app by eauto; intuition eauto.
     intuition congruence.
 
-  Grab Existential Variables.
+  Unshelve.
     all: try exact unit.
     all: intros; eauto using BFILE.MSIAlloc.
     all: try solve [do 5 econstructor].

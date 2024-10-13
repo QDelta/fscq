@@ -1,4 +1,4 @@
-Require Import Arith Rounding Psatz Omega Eqdep_dec List ListUtils Word Prog.
+Require Import Arith Rounding Psatz Lia Eqdep_dec List ListUtils Word Prog.
 Require Import AsyncDisk Rec Array.
 Import ListNotations.
 
@@ -115,12 +115,12 @@ Module RADefs (RA : RASig).
 
   Lemma items_per_val_gt_0 : items_per_val > 0.
   Proof.
-    pose proof items_per_val_not_0; omega.
+    pose proof items_per_val_not_0; lia.
   Qed.
 
   Lemma items_per_val_gt_0' : 0 < items_per_val.
   Proof.
-    pose proof items_per_val_not_0; omega.
+    pose proof items_per_val_not_0; lia.
   Qed.
 
   Local Hint Resolve items_per_val_not_0 items_per_val_gt_0 items_per_val_gt_0'.
@@ -291,7 +291,7 @@ Module RADefs (RA : RASig).
     destruct i. small_t.
     erewrite IHnr by small_t.
     rewrite skipn_skipn; simpl.
-    f_equal; f_equal; omega.
+    f_equal; f_equal; lia.
   Qed.
 
   Lemma list_chunk_spec' : forall A l i n (e0 : A) b0,
@@ -318,9 +318,9 @@ Module RADefs (RA : RASig).
     selN (nopad_list_chunk' l sz nr) i b0 = firstn sz (skipn (i * sz) l).
   Proof.
     induction nr; cbn; intros.
-    omega.
+    lia.
     destruct i; cbn; auto.
-    rewrite IHnr by omega.
+    rewrite IHnr by lia.
     rewrite plus_comm.
     rewrite skipn_skipn.
     reflexivity.
@@ -350,15 +350,15 @@ Module RADefs (RA : RASig).
     destruct (Nat.eq_dec n 0).
     subst; simpl; auto.
     destruct (lt_dec (length l) n).
-    replace (length l - n) with 0 by omega.
+    replace (length l - n) with 0 by lia.
     rewrite divup_0.
     apply Nat.lt_le_incl in l0; apply divup_le_1 in l0.
     destruct (Nat.eq_dec (divup (length l) n) 1).
     rewrite e.
     setoid_rewrite skipn_oob at 2; simpl; auto.
-    replace (divup (length l) n) with 0 by omega.
+    replace (divup (length l) n) with 0 by lia.
     simpl; auto.
-    rewrite divup_sub_1 by omega.
+    rewrite divup_sub_1 by lia.
     apply list_chunk'_skipn_1.
   Qed.
 
@@ -372,7 +372,7 @@ Module RADefs (RA : RASig).
     rewrite <- IHi; auto.
     rewrite list_chunk_skipn_1.
     rewrite skipn_skipn.
-    replace (S i) with (i + 1) by omega; auto.
+    replace (S i) with (i + 1) by lia; auto.
   Qed.
 
   Local Hint Resolve divup_le divup_mul_ge.
@@ -482,7 +482,7 @@ Module RADefs (RA : RASig).
   Proof.
     induction na; small_t.
     replace (a ++ b) with b; auto.
-    rewrite length_nil with (l := a); auto; omega.
+    rewrite length_nil with (l := a); auto; lia.
     repeat rewrite setlen_inbound by (autorewrite with lists; nia).
     rewrite firstn_app_l by nia.
     f_equal.
@@ -503,7 +503,7 @@ Module RADefs (RA : RASig).
     rewrite <- list_chunk'_app; auto.
     f_equal.
     replace (na * sz + length b) with (length b + sz * na) by lia.
-    rewrite divup_add by auto; omega.
+    rewrite divup_add by auto; lia.
   Qed.
 
 
@@ -571,8 +571,8 @@ Module RADefs (RA : RASig).
     unfold ipack, list_chunk; intros.
     rewrite H.
     rewrite divup_same by auto; simpl.
-    rewrite setlen_inbound by omega.
-    rewrite firstn_oob by omega; auto.
+    rewrite setlen_inbound by lia.
+    rewrite firstn_oob by lia; auto.
   Qed.
 
   Lemma iunpack_ipack_one : forall l init,
@@ -590,21 +590,21 @@ Module RADefs (RA : RASig).
   Proof.
     induction n; intros; simpl; auto.
     destruct (le_gt_dec k (length l)).
-    repeat rewrite setlen_inbound by (auto; rewrite app_length; omega).
+    repeat rewrite setlen_inbound by (auto; rewrite app_length; lia).
     rewrite firstn_app_l, skipn_app_l by auto.
     rewrite IHn; auto.
 
-    rewrite setlen_app_r by omega.
-    unfold setlen at 2; rewrite firstn_oob by omega.
+    rewrite setlen_app_r by lia.
+    unfold setlen at 2; rewrite firstn_oob by lia.
     rewrite setlen_repeat.
     f_equal.
-    rewrite skipn_app_r_ge by omega.
-    setoid_rewrite skipn_oob at 2; try omega.
+    rewrite skipn_app_r_ge by lia.
+    setoid_rewrite skipn_oob at 2; try lia.
     destruct (le_gt_dec (k - length l) z).
     rewrite skipn_repeat.
     setoid_rewrite <- app_nil_l at 2.
     apply IHn.
-    rewrite skipn_oob by (rewrite repeat_length; omega); auto.
+    rewrite skipn_oob by (rewrite repeat_length; lia); auto.
   Qed.
 
   Lemma ipack_app_item0 : forall l n,
@@ -642,7 +642,7 @@ Module RADefs (RA : RASig).
     @Rec.to_word (Rec.ArrayF itemtype n) (setlen l n (Rec.of_word $0)) = Rec.to_word l.
   Proof.
     cbn; intros.
-    rewrite setlen_oob by omega.
+    rewrite setlen_oob by lia.
     generalize dependent itemtype.
     induction n; cbn; intros.
     f_equal. auto using app_nil_r.
@@ -659,7 +659,7 @@ Module RADefs (RA : RASig).
     rewrite combine_wzero.
     reflexivity.
     f_equal.
-    apply IHn. omega.
+    apply IHn. lia.
   Qed.
 
   Local Hint Resolve Forall_append well_formed_firstn well_formed_skipn.
@@ -721,13 +721,13 @@ Module RADefs (RA : RASig).
     rewrite divup_mul in l by auto.
     apply lt_le_S in l; eapply mult_le_compat_r in l; eauto.
 
-    repeat rewrite firstn_oob; try omega.
+    repeat rewrite firstn_oob; try lia.
     eapply iunpack_ipack; eauto.
     rewrite ipack_length in n0.
     rewrite H0 in *.
     rewrite divup_mul in n0 by auto.
     apply Nat.nlt_ge in n0.
-    apply mult_le_compat; omega.
+    apply mult_le_compat; lia.
   Qed.
 
   Lemma ipack_iunpack_one : forall (a : valu),
@@ -759,10 +759,10 @@ Module RADefs (RA : RASig).
     length (fold_left iunpack l init) = nr + (length l) * items_per_val.
   Proof.
     induction l; simpl; intros.
-    omega.
+    lia.
 
     erewrite IHl.
-    instantiate (1 := nr + items_per_val). omega.
+    instantiate (1 := nr + items_per_val). lia.
     apply iunpack_length; auto.
   Qed.
 
@@ -771,7 +771,7 @@ Module RADefs (RA : RASig).
   Proof.
     intros.
     erewrite fold_left_iunpack_length'; eauto.
-    omega.
+    lia.
 
     Unshelve.
     constructor.
@@ -795,7 +795,7 @@ Module RADefs (RA : RASig).
     rewrite app_nil_l.
     unfold val2block, blocktype.
     rewrite Rec.array_of_word_length.
-    instantiate (1:=1); omega.
+    instantiate (1:=1); lia.
     auto.
     instantiate (1:=length l).
     apply fold_left_iunpack_length.
@@ -816,9 +816,9 @@ Module RADefs (RA : RASig).
       rewrite to_word_setlen.
       rewrite firstn_oob; auto.
       all: rewrite ?skipn_length; auto.
-      cbv in *; omega.
+      cbv in *; lia.
       rewrite setlen_inbound; auto.
-      rewrite skipn_length; omega.
+      rewrite skipn_length; lia.
     - repeat rewrite selN_oob by (autorewrite with core; apply Nat.le_ngt; eauto).
       reflexivity.
     - autorewrite with core. auto.
@@ -834,7 +834,7 @@ Module RADefs (RA : RASig).
     apply Nat.mod_upper_bound; auto.
     rewrite Nat.mod_eq, Nat.mul_comm by auto.
     enough (ix >= ix / items_per_val * items_per_val).
-    omega.
+    lia.
     rewrite Nat.mul_comm.
     apply Nat.mul_div_le; auto.
   Qed.
@@ -920,7 +920,7 @@ Module RADefs (RA : RASig).
     induction n; simpl; intros.
     rewrite ipack_nil; auto.
     rewrite <- repeat_app.
-    erewrite ipack_app with (na := 1) by (rewrite repeat_length; omega).
+    erewrite ipack_app with (na := 1) by (rewrite repeat_length; lia).
     rewrite cons_app, IHn; f_equal.
     rewrite ipack_one by (rewrite repeat_length; auto); f_equal.
     rewrite block2val_repeat_item0; auto.
@@ -981,7 +981,7 @@ Module RADefs (RA : RASig).
     eapply lt_le_trans; eauto.
     setoid_rewrite <- Nat.mul_1_l at 5.
     rewrite <- Nat.mul_add_distr_r.
-    apply Nat.mul_le_mono_r; omega.
+    apply Nat.mul_le_mono_r; lia.
   Qed.
 
   Lemma ifind_result_item_ok : forall len bn items cond r,
@@ -1001,14 +1001,14 @@ Module RADefs (RA : RASig).
     unfold ipack in *; rewrite val2block2val_selN_id in * by auto.
     rewrite list_chunk_spec, setlen_length in *.
     unfold setlen; rewrite selN_app1.
-    rewrite selN_firstn, skipn_selN, le_plus_minus_r by omega; auto.
+    rewrite selN_firstn, skipn_selN, le_plus_minus_r by lia; auto.
     rewrite firstn_length, skipn_length.
-    apply Nat.min_glb_lt; try omega.
+    apply Nat.min_glb_lt; try lia.
     setoid_rewrite H2.
     apply lt_add_lt_sub in Hb; auto.
     eapply lt_le_trans; eauto.
     rewrite <- Nat.mul_sub_distr_r, <- Nat.mul_1_l at 1.
-    apply Nat.mul_le_mono_r; omega.
+    apply Nat.mul_le_mono_r; lia.
   Qed.
 
   Lemma ifind_block_none_progress : forall i ix items v cond len,
@@ -1041,7 +1041,7 @@ Module RADefs (RA : RASig).
 
     destruct (lt_eq_lt_dec i (ix / items_per_val)).
     destruct s; auto.
-    apply lt_div_mul_add_le in l; auto; omega.
+    apply lt_div_mul_add_le in l; auto; lia.
     contradict n.
     apply div_lt_mul_lt; auto.
 

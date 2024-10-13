@@ -294,7 +294,7 @@ Proof.
   simpl.
   eapply IHi.
   inversion H; subst. eauto.
-  simpl in *. omega.
+  simpl in *. lia.
 Qed.*)
 
 

@@ -6,7 +6,7 @@ Require Import Pred.
 Require Import FunctionalExtensionality.
 Require Import Word.
 Require Import WordAuto.
-Require Import Omega.
+Require Import Lia.
 Require Import Ring.
 Require Import SepAuto.
 Require Import ListPred.
@@ -40,7 +40,7 @@ Proof.
   apply ptsto_valid' in H.
   destruct (lt_dec (wordToNat i) (length l)); auto.
   unfold sel in H. rewrite nth_selN_eq in H.
-  rewrite nth_overflow in H by (rewrite map_length; omega); discriminate.
+  rewrite nth_overflow in H by (rewrite map_length; lia); discriminate.
 Qed.
 
 
@@ -95,7 +95,7 @@ Proof.
   subst; erewrite selN_updN_eq; auto.
   rewrite map_length; auto.
   erewrite selN_updN_ne; auto.
-  word2nat_simpl; omega.
+  word2nat_simpl; lia.
 Qed.
 
 Theorem list2mem_upd: forall A F (l: list A) i x y,
@@ -128,13 +128,13 @@ Proof.
       rewrite selN_last; auto.
     + rewrite selN_map with (default' := a); auto.
       rewrite selN_app; auto.
-    + rewrite app_length; simpl; omega.
+    + rewrite app_length; simpl; lia.
   - destruct (weq x $ (length l)).
     + subst; erewrite selN_map with (default' := a).
       rewrite selN_last; auto.
       eapply wordToNat_natToWord_bound; eauto.
       erewrite wordToNat_natToWord_bound; eauto.
-      rewrite app_length; simpl; omega.
+      rewrite app_length; simpl; lia.
     + apply wle_le in n.
       erewrite wordToNat_natToWord_bound in n; eauto.
       repeat erewrite selN_oob with (def := None); try rewrite map_length; auto.
@@ -170,15 +170,15 @@ Proof.
   intros; apply functional_extensionality; intros.
   destruct (wlt_dec x $ (length l - 1)); unfold list2mem, sel.
   - assert (wordToNat x < length l - 1); apply wlt_lt in w.
-    erewrite wordToNat_natToWord_bound with (bound:=b) in w by omega; auto.
+    erewrite wordToNat_natToWord_bound with (bound:=b) in w by lia; auto.
     rewrite selN_map with (default' := def).
-    rewrite selN_removelast by omega; auto.
-    rewrite length_removelast by auto; omega.
+    rewrite selN_removelast by lia; auto.
+    rewrite length_removelast by auto; lia.
   - rewrite selN_oob; auto.
     rewrite map_length.
     rewrite length_removelast by auto.
     apply wle_le in n.
-    rewrite wordToNat_natToWord_bound with (bound:=b) in n by omega; auto.
+    rewrite wordToNat_natToWord_bound with (bound:=b) in n by lia; auto.
 Qed.
 
 
@@ -197,14 +197,14 @@ Proof.
   unfold list2mem, sel.
   destruct (wlt_dec x $ (length l - 1));
   destruct (weq x $ (length l - 1)); subst; intuition.
-  apply wlt_lt in w; omega.
+  apply wlt_lt in w; lia.
   erewrite selN_map with (default' := def); auto.
-  apply wlt_lt in w; rewrite wordToNat_natToWord_bound with (bound:=b) in w by omega; omega.
+  apply wlt_lt in w; rewrite wordToNat_natToWord_bound with (bound:=b) in w by lia; lia.
   erewrite selN_oob; auto.
   rewrite map_length.
   assert ($ (length l - 1) < x)%word.
   destruct (weq $ (length l - 1) x); intuition.
-  apply wlt_lt in H1; rewrite wordToNat_natToWord_bound with (bound:=b) in H1 by omega; omega.
+  apply wlt_lt in H1; rewrite wordToNat_natToWord_bound with (bound:=b) in H1 by lia; lia.
 Qed.
 
 
@@ -234,9 +234,9 @@ Theorem list2mem_array: forall  A (l : list A) (b : addr),
 Proof.
   induction l using rev_ind; intros; firstorder; simpl.
   rewrite app_length in H; simpl in H.
-  erewrite listapp_memupd with (b := b); try omega.
-  eapply array_app_memupd with (b := b); try omega.
-  apply IHl with (b := b); omega.
+  erewrite listapp_memupd with (b := b); try lia.
+  eapply array_app_memupd with (b := b); try lia.
+  apply IHl with (b := b); lia.
 Qed.
 
 
@@ -263,8 +263,8 @@ Lemma list2mem_fix_below : forall (A : Type) (l : list A) start a,
   wordToNat a < start -> list2mem_fix start l a = None.
 Proof.
   induction l; auto; simpl; intros.
-  destruct (eq_nat_dec (wordToNat a0) start); [omega |].
-  apply IHl; omega.
+  destruct (eq_nat_dec (wordToNat a0) start); [lia |].
+  apply IHl; lia.
 Qed.
 
 Theorem list2mem_fix_off_eq : forall A (l : list A) n (b : addr),
@@ -276,21 +276,21 @@ Proof.
   unfold list2mem_off; simpl in *.
 
   destruct (lt_dec (wordToNat x) n).
-  destruct (eq_nat_dec (wordToNat x) n); [omega |].
-  rewrite list2mem_fix_below by omega.
+  destruct (eq_nat_dec (wordToNat x) n); [lia |].
+  rewrite list2mem_fix_below by lia.
   auto.
 
   destruct (eq_nat_dec (wordToNat x) n).
-  rewrite e; replace (n-n) with (0) by omega; auto.
+  rewrite e; replace (n-n) with (0) by lia; auto.
 
-  assert (wordToNat x - n <> 0) by omega.
+  assert (wordToNat x - n <> 0) by lia.
   destruct (wordToNat x - n) eqn:Hxn; try congruence.
 
-  rewrite <- IHl with (b:=b) by omega.
+  rewrite <- IHl with (b:=b) by lia.
   unfold list2mem_off.
 
-  destruct (lt_dec (wordToNat x) (S n)); [omega |].
-  f_equal; omega.
+  destruct (lt_dec (wordToNat x) (S n)); [lia |].
+  f_equal; lia.
 Qed.
 
 Theorem list2mem_fix_eq : forall A (l : list A) (b : addr),
@@ -314,21 +314,21 @@ Proof.
   unfold list2mem_off; simpl in *.
 
   destruct (lt_dec (wordToNat x) n).
-  destruct (eq_nat_dec (wordToNat x) n); [omega |].
-  rewrite list2mem_fix_below by omega.
+  destruct (eq_nat_dec (wordToNat x) n); [lia |].
+  rewrite list2mem_fix_below by lia.
   auto.
 
   destruct (eq_nat_dec (wordToNat x) n).
-  rewrite e; replace (n-n) with (0) by omega; auto.
+  rewrite e; replace (n-n) with (0) by lia; auto.
 
-  assert (wordToNat x - n <> 0) by omega.
+  assert (wordToNat x - n <> 0) by lia.
   destruct (wordToNat x - n) eqn:Hxn; try congruence.
 
-  rewrite <- IHl with (sz:=addrlen) by omega.
+  rewrite <- IHl with (sz:=addrlen) by lia.
   unfold list2mem_off.
 
-  destruct (lt_dec (wordToNat x) (S n)); [omega |].
-  f_equal; omega.
+  destruct (lt_dec (wordToNat x) (S n)); [lia |].
+  f_equal; lia.
 Qed.
 
 Theorem list2mem_fix_eq' : forall A (l : list A) sz,
@@ -374,7 +374,7 @@ Proof.
   - erewrite list2mem_nil_array; eauto.
   - destruct l.
     + eapply list2mem_array_nil with (start:=start) (b:=b).
-      omega.
+      lia.
       auto.
     + simpl in *.
       unfold sep_star in H; rewrite sep_star_is in H; unfold sep_star_impl in H.
@@ -382,12 +382,12 @@ Proof.
       unfold ptsto in H3; destruct H3.
       f_equal.
       * eapply equal_f with ($ start) in H2 as H2'.
-        erewrite wordToNat_natToWord_bound with (bound:=b) in H2' by omega.
+        erewrite wordToNat_natToWord_bound with (bound:=b) in H2' by lia.
 
         unfold mem_union in H2'.
         rewrite H3 in H2'.
         destruct (eq_nat_dec start start); congruence.
-      * apply IHl' with (b:=b) (start:=S start); eauto; try omega.
+      * apply IHl' with (b:=b) (start:=S start); eauto; try lia.
         replace ($ start ^+ $1) with (natToWord addrlen (S start)) in H5 by words.
         assert (m2 = list2mem_fix (S start) l'); subst; auto.
 
@@ -396,7 +396,7 @@ Proof.
         apply equal_f with x in H2.
         destruct (eq_nat_dec (wordToNat x) start).
 
-        rewrite list2mem_fix_below by omega.
+        rewrite list2mem_fix_below by lia.
         eapply mem_disjoint_either.
         eauto.
         rewrite <- e in H3.
@@ -408,7 +408,7 @@ Proof.
         intro; apply n.
         rewrite <- H6.
         rewrite wordToNat_natToWord_bound with (bound:=b); auto.
-        omega.
+        lia.
 Qed.
 
 Theorem list2mem_array_eq: forall A (l' l : list A) (b : addr),
@@ -430,16 +430,16 @@ Theorem list2mem_array_app_eq: forall A V (F : @pred addr (@weq addrlen) V) (l l
 Proof.
   intros.
   rewrite list2mem_array_eq with (l':=l') (l:=l++a::nil) (b:=b); eauto;
-    [ | rewrite app_length; simpl; omega ].
+    [ | rewrite app_length; simpl; lia ].
   pred_apply.
   rewrite <- isolate_bwd with (vs:=l++a::nil) (i:=$ (length l)) by
-    ( rewrite wordToNat_natToWord_bound with (bound:=b) by omega;
-      rewrite app_length; simpl; omega ).
+    ( rewrite wordToNat_natToWord_bound with (bound:=b) by lia;
+      rewrite app_length; simpl; lia ).
   unfold sel.
-  erewrite wordToNat_natToWord_bound with (bound:=b) by omega.
+  erewrite wordToNat_natToWord_bound with (bound:=b) by lia.
   rewrite firstn_app2 by auto.
-  replace (S (length l)) with (length (l ++ a :: nil)) by (rewrite app_length; simpl; omega).
-  rewrite skipn_oob by omega; simpl.
+  replace (S (length l)) with (length (l ++ a :: nil)) by (rewrite app_length; simpl; lia).
+  rewrite skipn_oob by lia; simpl.
   instantiate (y:=a).
   rewrite selN_last by auto.
   cancel.
@@ -523,15 +523,15 @@ Proof.
 
   eapply list2mem_array_eq with (l' := nl); eauto.
   pred_apply.
-  erewrite wordToNat_natToWord_bound with (bound:=b) by omega.
+  erewrite wordToNat_natToWord_bound with (bound:=b) by lia.
   rewrite firstn_removelast_eq; auto.
-  rewrite skipn_oob by omega.
+  rewrite skipn_oob by lia.
   unfold array at 2.
   clear H; cancel.
   rewrite length_removelast.
-  omega.
+  lia.
   contradict H2; rewrite H2.
-  unfold length; omega.
+  unfold length; lia.
 Qed.
 
 
@@ -553,14 +553,14 @@ Proof.
   - destruct b; auto; simpl in *.
     apply equal_f with (x:=$ off) in H2.
     destruct (eq_nat_dec off (pow2 addrlen)).
-    subst; omega.
+    subst; lia.
     erewrite wordToNat_natToWord_idempotent' in H2.
     destruct (eq_nat_dec off off); congruence.
-    unfold goodSize. omega.
-  - destruct (eq_nat_dec off (pow2 addrlen)). subst; simpl in *; omega.
-    assert (off < pow2 addrlen) by omega.
+    unfold goodSize. lia.
+  - destruct (eq_nat_dec off (pow2 addrlen)). subst; simpl in *; lia.
+    assert (off < pow2 addrlen) by lia.
     destruct b; simpl in *.
-    replace (S (length a0 + off)) with (S (length a0) + off) in * by omega.
+    replace (S (length a0 + off)) with (S (length a0) + off) in * by lia.
     + apply equal_f with (x:=$ off) in H2.
       erewrite wordToNat_natToWord_idempotent' in H2 by auto.
       destruct (eq_nat_dec off off); congruence.
@@ -568,12 +568,12 @@ Proof.
       erewrite wordToNat_natToWord_idempotent' in H2' by auto.
       destruct (eq_nat_dec off off); try congruence.
       inversion H2'. f_equal.
-      eapply IHa with (off:=S off) (sz:=addrlen); try omega.
+      eapply IHa with (off:=S off) (sz:=addrlen); try lia.
       apply functional_extensionality; intro x'.
       apply equal_f with (x:=x') in H2.
       destruct (eq_nat_dec (# x') off); auto.
-      rewrite list2mem_fix_below by omega.
-      rewrite list2mem_fix_below by omega.
+      rewrite list2mem_fix_below by lia.
+      rewrite list2mem_fix_below by lia.
       auto.
 Qed.
 
@@ -586,7 +586,7 @@ Proof.
   unfold goodSizeEq; intros; subst.
   erewrite list2mem_fix_eq' in H1; eauto.
   erewrite list2mem_fix_eq' in H1; eauto.
-  eapply list2mem_inj' with (sz:=addrlen); eauto; omega.
+  eapply list2mem_inj' with (sz:=addrlen); eauto; lia.
 Qed.
 
 
@@ -625,7 +625,7 @@ Ltac list2mem_ptsto_cancel :=
   | [ |- (_ * ?p |-> ?a)%pred (list2mem ?l) ] =>
     let Hx := fresh in
     assert (array $0 l $1 (list2mem l)) as Hx;
-      [ eapply list2mem_array; eauto; try omega |
+      [ eapply list2mem_array; eauto; try lia |
         pred_apply; erewrite array_except; unfold sel; clear Hx;
         try autorewrite with defaults; eauto ]
   end.
@@ -655,5 +655,5 @@ Ltac list2mem_bound :=
     | [ H : ( _ * ?p |-> ?i)%pred (list2mem ?l) |- wordToNat ?p < length ?l' ] =>
           let Ha := fresh in assert (length l = length l') by solve_length_eq;
           let Hb := fresh in apply list2mem_inbound in H as Hb;
-          eauto; (omega || setoid_rewrite <- Ha; omega); clear Hb Ha
+          eauto; (lia || setoid_rewrite <- Ha; lia); clear Hb Ha
   end.

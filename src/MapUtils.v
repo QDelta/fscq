@@ -1,6 +1,6 @@
 Require Import List.
 Require Import FMapFacts.
-Require Import Omega.
+Require Import Lia.
 Require Import ListUtils.
 Require Import OrderedTypeEx.
 Require Import Arith.
@@ -46,7 +46,7 @@ Module MapDefs (OT : UsualOrderedType) (M : S with Module E := OT).
   Proof.
     intros. destruct H as [v].
     erewrite MapProperties.cardinal_2 with (m:=Map.remove k m) (m':=m) (x:=k) (e:=v).
-    omega.
+    lia.
     apply Map.remove_1; hnf; auto.
     intro.
     destruct (OT.eq_dec k y); unfold OT.eq in *; subst.
@@ -61,7 +61,7 @@ Module MapDefs (OT : UsualOrderedType) (M : S with Module E := OT).
   Proof.
     intros.
     erewrite MapProperties.cardinal_2 with (m:=m).
-    omega.
+    lia.
     eauto.
     intro.
     reflexivity.
@@ -73,14 +73,14 @@ Module MapDefs (OT : UsualOrderedType) (M : S with Module E := OT).
   Proof.
     intros. destruct H.
     erewrite MapProperties.cardinal_2 with (m:=Map.remove k m).
-    omega.
+    lia.
     apply Map.remove_1; hnf; auto.
     intro.
     destruct (OT.eq_dec k y); unfold OT.eq in *; subst.
     - rewrite MapFacts.add_eq_o; auto.
       rewrite MapFacts.add_eq_o; auto.
     - rewrite MapFacts.add_neq_o; auto.
-      rewrite MapFacts.add_neq_o; try omega; auto.
+      rewrite MapFacts.add_neq_o; try lia; auto.
       rewrite MapFacts.remove_neq_o; auto.
   Qed.
 
@@ -92,9 +92,9 @@ Module MapDefs (OT : UsualOrderedType) (M : S with Module E := OT).
     erewrite <- map_remove_cardinal; eauto.
     apply map_add_dup_cardinal'; auto.
     destruct H.
-    assert (Map.cardinal m <> 0); try omega.
+    assert (Map.cardinal m <> 0); try lia.
     erewrite MapProperties.cardinal_2 with (m:=Map.remove k m).
-    omega.
+    lia.
     apply Map.remove_1; reflexivity.
     intro.
     destruct (OT.eq_dec k y); unfold OT.eq in *; subst.
@@ -474,7 +474,7 @@ Module MapDefs (OT : UsualOrderedType) (M : S with Module E := OT).
     intros.
     destruct (Map.find a m) eqn: Heq.
     rewrite map_remove_cardinal.
-    omega.
+    lia.
     eexists; eapply Map.find_2; eauto.
     erewrite MapProperties.cardinal_m; eauto.
     apply map_remove_not_in_equal.

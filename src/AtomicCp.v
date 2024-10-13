@@ -2,7 +2,7 @@ Require Import Prog.
 Require Import Log.
 Require Import BFile.
 Require Import Word.
-Require Import Omega.
+Require Import Lia.
 Require Import Hashmap.   (* must go before basicprog, because notation using hashmap *)
 Require Import BasicProg.
 Require Import Bool.
@@ -483,7 +483,7 @@ Module ATOMICCP.
     intros.
     rewrite synced_list_length. rewrite map_length.
     eapply ptsto_a_list2nmem_mem_eq in H. rewrite H.
-    simpl; omega.
+    simpl; lia.
   Qed.
 
   Hint Resolve length_synced_tmpfile.
@@ -619,7 +619,7 @@ Module ATOMICCP.
 
     xcrash; eauto.
 
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
     all: intros; exact True.
   Qed.
@@ -689,7 +689,7 @@ Module ATOMICCP.
     2: apply list2nmem_array.
     rewrite arrayN_ptsto_selN_0.
     unfold Off0; cancel.
-    rewrite setlen_length; omega.
+    rewrite setlen_length; lia.
 
     step.
     or_l. unfold tree_with_tmp in *; cancel.
@@ -708,7 +708,7 @@ Module ATOMICCP.
     left; unfold tree_with_tmp; simpl.
     pred_apply. cancel.
 
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
   Qed.
 
@@ -867,7 +867,7 @@ Module ATOMICCP.
     xcrash.
     eassumption. eauto.
 
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
   Qed.
 
@@ -1455,7 +1455,7 @@ Proof.
   simpl; auto.
   pred_apply; cancel.
   rewrite pushd_latest; simpl; auto.
-  unfold dirfile0; simpl; omega.
+  unfold dirfile0; simpl; lia.
   
   safestep.
   or_l; cancel.
@@ -1924,7 +1924,7 @@ Qed.
     rewrite LOG.before_crash_idempred.
     cancel; auto.
     
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
     exact Mem.empty_mem.
   Qed.
@@ -2827,7 +2827,7 @@ Qed.
     rewrite LOG.before_crash_idempred.
     cancel; auto.
     
-  Grab Existential Variables.
+  Unshelve.
     all: eauto.
     exact Mem.empty_mem.
 Qed.

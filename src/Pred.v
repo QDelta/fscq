@@ -1,5 +1,5 @@
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import FunctionalExtensionality.
 Require Import Mem.
 Require Import RelationClasses.
@@ -199,7 +199,7 @@ Ltac pred_unfold :=
   unfold impl, and, or, foral_, exis, uniqpred, lift in *.
 Ltac pred := pred_unfold;
   repeat (repeat deex; simpl in *;
-    intuition (try (congruence || omega);
+    intuition (try (congruence || lia);
       try autorewrite with core in *; eauto); try subst).
 Ltac unfold_sep_star :=
   unfold sep_star; rewrite sep_star_is; unfold sep_star_impl.
@@ -1317,7 +1317,7 @@ Proof.
   intros; intuition; repeat deex.
   assert (m2 = m3).
   apply functional_extensionality; intros.
-  apply equal_f with (x0 := x) in H1.
+  apply equal_f with (x := x) in H1.
   rewrite H5, H8 in H1; auto.
   subst; do 2 eexists; intuition.
 Qed.
@@ -1329,7 +1329,7 @@ Proof.
   intros; intuition; repeat deex.
   assert (m0 = m1).
   apply functional_extensionality; intros.
-  apply equal_f with (x0 := x) in H1.
+  apply equal_f with (x := x) in H1.
   destruct (m1 x); destruct (m0 x); try congruence.
   subst; do 2 eexists; intuition.
 Qed.
@@ -1395,14 +1395,14 @@ Proof.
 
   unfold mem_union, empty_mem in *.
   apply functional_extensionality; intro fa.
-  apply equal_f with (x1:=fa) in H.
+  apply equal_f with (x:=fa) in H.
   destruct (x0 fa); auto.
   destruct (x fa); auto.
   inversion H.
 
   unfold mem_union, empty_mem in *.
   apply functional_extensionality; intro fa.
-  apply equal_f with (x1:=fa) in H.
+  apply equal_f with (x:=fa) in H.
   destruct (x fa); auto.
 Qed.
 
@@ -1443,11 +1443,11 @@ Proof.
   split.
 
   apply functional_extensionality; intros.
-  apply equal_f with (x0 := x) in H.
+  apply equal_f with (x := x) in H.
   destruct (m1 x); auto.
 
   apply functional_extensionality; intros.
-  apply equal_f with (x0 := x) in H.
+  apply equal_f with (x := x) in H.
   destruct (m1 x); auto.
   congruence.
 Qed.
@@ -2467,7 +2467,7 @@ Proof.
     intuition.
 
     + apply functional_extensionality; intros.
-      apply equal_f with (x0 := x) in H2.
+      apply equal_f with (x := x) in H2.
       destruct (AEQ a x); subst.
       * rewrite H1. unfold mem_union, mem_except. destruct (AEQ x x); try congruence.
         unfold ptsto in H5. intuition. rewrite H6; auto.
@@ -2531,7 +2531,7 @@ Proof.
     apply H.
     exists a. do 2 eexists. intuition eauto.
     unfold ptsto in H4; intuition eauto.
-  - apply equal_f with (x0 := x) in H1.
+  - apply equal_f with (x := x) in H1.
     rewrite insert_ne in H1 by auto.
     rewrite H1.
     unfold mem_union.
@@ -2597,7 +2597,7 @@ Proof.
     exists off. do 2 eexists.
     intuition eauto.
     unfold ptsto in H4; intuition eauto.
-  - eapply equal_f with (x0 := x) in H0.
+  - eapply equal_f with (x := x) in H0.
     rewrite insert_ne in H0 by auto.
     rewrite H0.
     unfold mem_union.
@@ -2648,7 +2648,7 @@ Proof.
   exists m2.
   intuition.
   apply functional_extensionality; intros.
-  - apply equal_f with (x0 := x) in H2.
+  - apply equal_f with (x := x) in H2.
     destruct (AEQ x a'); subst.
     rewrite H0 in *.
     rewrite mem_union_sel_none; auto.
@@ -2666,7 +2666,7 @@ Proof.
   - apply mem_except_is_none.
   - assert (m1 = insert (mem_except m1 a') a' v').
     apply functional_extensionality; intros.
-    apply equal_f with (x0 := x) in H2.
+    apply equal_f with (x := x) in H2.
     destruct (AEQ x a'); subst.
     rewrite insert_eq in *; auto.
     rewrite H2.

@@ -3,7 +3,7 @@ Require Import Bool.
 Require Import List.
 Require Import Classes.SetoidTactics.
 Require Import FunctionalExtensionality.
-Require Import Omega.
+Require Import Lia.
 Require Import Eqdep_dec.
 Require Import ListUtils.
 Require Import AsyncDisk.
@@ -553,7 +553,7 @@ Module LogReplay.
     rewrite selN_updN_eq; auto.
     rewrite replay_disk_length; auto.
     rewrite selN_oob; auto.
-    rewrite length_updN, replay_disk_length; omega.
+    rewrite length_updN, replay_disk_length; lia.
   Qed.
 
   Lemma replay_disk_vssync_comm_list : forall l d a,
@@ -566,7 +566,7 @@ Module LogReplay.
     - repeat rewrite updN_twice.
       destruct (lt_dec n (length d)).
       repeat rewrite selN_updN_eq; auto.
-      rewrite selN_oob; repeat rewrite updN_oob; auto; try omega.
+      rewrite selN_oob; repeat rewrite updN_oob; auto; try lia.
     - repeat rewrite selN_updN_ne by auto.
       rewrite updN_comm; auto.
   Qed.
@@ -830,7 +830,7 @@ Module LogReplay.
     map_valid m a -> length b = length a -> map_valid m b.
   Proof.
     unfold map_valid. intros * Hv Hlen * Hm. split; firstorder.
-    specialize (Hv _ _ Hm) as [? ?]. omega.
+    specialize (Hv _ _ Hm) as [? ?]. lia.
   Qed.
 
   Lemma map_valid_vsupd_vecs : forall l d m,

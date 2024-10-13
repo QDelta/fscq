@@ -9,7 +9,7 @@ Require Import Prog.
 Require Import Hoare.
 Require Import BasicProg.
 Require Import FunctionalExtensionality.
-Require Import Omega.
+Require Import Lia.
 Require Import Word.
 Require Import Rec.
 Require Import Array.
@@ -531,7 +531,7 @@ Module MLog.
     unfold init, rep.
     step.
     step.
-    eapply goodSize_trans; [ | eauto ]; omega.
+    eapply goodSize_trans; [ | eauto ]; lia.
     apply map_valid_map0.
   Qed.
 
@@ -1056,11 +1056,11 @@ Module MLog.
     | [H : @length ?T ?l = 0 |- context [?l] ] => replace l with (@nil T) by eauto
     | [H : equal_unless_in _ _ _ |- _ ] => apply equal_unless_in_length_eq in H
     | [H : possible_crash_list _ _ |- _ ] => apply possible_crash_list_length in H
-    | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try omega ]
+    | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try lia ]
     end.
 
   Ltac simplen :=  auto; repeat (try subst; simpl;
-    auto; simplen'; autorewrite with lists); simpl; eauto; try omega.
+    auto; simplen'; autorewrite with lists); simpl; eauto; try lia.
 
   Ltac map_rewrites :=
     match goal with

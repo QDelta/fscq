@@ -53,6 +53,6 @@ Proof.
   rewrite <- H8 in H11.
   eapply hash_safe_eq; eauto.
 
-  Grab Existential Variables.
+  Unshelve.
   all: eauto.
 Qed.

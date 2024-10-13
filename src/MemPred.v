@@ -5,7 +5,7 @@ Require Import ListPred.
 Require Import List.
 Require Import SepAuto.
 Require Import Array.
-Require Import Omega.
+Require Import Lia.
 Require Import AsyncDisk PredCrash.
 Require Import FunctionalExtensionality.
 
@@ -496,11 +496,11 @@ Section MEM_REGION.
     region_filled (listupd m a l) a (length l).
   Proof.
     unfold region_filled; destruct l; simpl; intros.
-    omega.
+    lia.
     destruct (addr_eq_dec a a0); subst.
-    rewrite listupd_sel_oob by omega.
+    rewrite listupd_sel_oob by lia.
     rewrite upd_eq; congruence.
-    erewrite listupd_sel_inb with (def := v) by omega.
+    erewrite listupd_sel_inb with (def := v) by lia.
     congruence.
   Qed.
 
@@ -510,12 +510,12 @@ Section MEM_REGION.
     region_filled m a (length l).
   Proof.
     unfold region_filled; induction l; simpl; intros.
-    omega.
+    lia.
     destruct (addr_eq_dec a1 a0); subst.
     apply sep_star_comm in H; apply sep_star_assoc in H.
     apply ptsto_valid in H; congruence.
     apply sep_star_assoc in H.
-    eapply IHl; eauto; omega.
+    eapply IHl; eauto; lia.
   Qed.
 *)
 
@@ -529,9 +529,9 @@ Section MEM_REGION.
     eapply region_filled_sel in H0; eauto.
     destruct H0.
     eapply mem_match_upd_l; eauto.
-    omega.
+    lia.
     unfold region_filled in *; intuition.
-    eapply H0 with (a := a1); try omega; auto.
+    eapply H0 with (a := a1); try lia; auto.
   Qed.
 
 End MEM_REGION.

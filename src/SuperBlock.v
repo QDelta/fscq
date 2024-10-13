@@ -10,7 +10,7 @@ Require Import Hoare.
 Require Import SepAuto.
 Require Import Cache.
 Require Import AsyncDisk.
-Require Import Omega.
+Require Import Lia.
 Require Import FSLayout.
 Require HexString.
 

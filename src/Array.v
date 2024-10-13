@@ -1,12 +1,12 @@
 Require Import Mem.
 Require Import ListUtils.
-Require Import List Omega Ring Word Pred PredCrash.
+Require Import List Lia Ring Word Pred PredCrash.
 Require Import Prog Hoare SepAuto BasicProg.
 Require Import FunctionalExtensionality.
 Require Import WordAuto.
 Require Import AsyncDisk.
 
-Import ListNotations.
+Import PeanoNat ListNotations.
 
 Set Implicit Arguments.
 Set Default Proof Using "Type".
@@ -51,15 +51,15 @@ Section GenArray.
 
     destruct i; simpl.
 
-    replace (a0 + 0) with (a0) by omega.
-    replace (a0 + 1) with (S a0) by omega.
+    replace (a0 + 0) with (a0) by lia.
+    replace (a0 + 1) with (S a0) by lia.
     cancel.
 
     eapply pimpl_trans; [ apply pimpl_sep_star; [ apply pimpl_refl | apply IHvs ] | ]; clear IHvs.
-    instantiate (1 := i); omega.
+    instantiate (1 := i); lia.
     simpl.
-    replace (S (a0 + i)) with (a0 + S i) by omega.
-    replace (S (a0 + i + 1)) with (a0 + S i + 1) by omega.
+    replace (S (a0 + i)) with (a0 + S i) by lia.
+    replace (S (a0 + i + 1)) with (a0 + S i + 1) by lia.
     cancel.
   Qed.
 
@@ -88,14 +88,14 @@ Section GenArray.
 
     destruct i; simpl.
 
-    replace (a0 + 0) with (a0) by omega.
-    replace (a0 + 1) with (S a0) by omega.
+    replace (a0 + 0) with (a0) by lia.
+    replace (a0 + 1) with (S a0) by lia.
     cancel.
 
     eapply pimpl_trans; [ | apply pimpl_sep_star; [ apply pimpl_refl | apply IHvs ] ]; clear IHvs.
-    2: instantiate (1 := i); omega.
+    2: instantiate (1 := i); lia.
     simpl.
-    replace (a0 + S i) with (S (a0 + i)) by omega.
+    replace (a0 + S i) with (S (a0 + i)) by lia.
     cancel.
   Qed.
 
@@ -164,10 +164,10 @@ Section GenArray.
     rewrite Nat.add_0_r; cancel.
     rewrite Nat.add_0_r; cancel.
     rewrite IHa.
-    replace (S st + length a0) with (st + S (length a0)) by omega.
+    replace (S st + length a0) with (st + S (length a0)) by lia.
     cancel.
     rewrite IHa.
-    replace (S st + length a0) with (st + S (length a0)) by omega.
+    replace (S st + length a0) with (st + S (length a0)) by lia.
     cancel.
   Qed.
 
@@ -176,21 +176,21 @@ Section GenArray.
     arrayN st (firstn i a) * arrayN (st + i) (skipn i a).
   Proof.
     intros.
-    destruct (lt_dec i (length a)).
+    destruct (Compare_dec.lt_dec i (length a)).
     erewrite arrayN_isolate; eauto.
     setoid_rewrite arrayN_isolate with (i := 0) at 4.
     rewrite skipn_skipn, skipn_selN.
-    replace (st + i + 0) with (st+i) by omega.
-    replace (1 + i) with (S i) by omega.
-    replace (i + 0) with i by omega.
+    replace (st + i + 0) with (st+i) by lia.
+    replace (1 + i) with (S i) by lia.
+    replace (i + 0) with i by lia.
     split; cancel.
     rewrite skipn_length.
-    omega.
-    rewrite firstn_oob, skipn_oob by omega.
+    lia.
+    rewrite firstn_oob, skipn_oob by lia.
     split; cancel.
-    Grab Existential Variables.
+    Unshelve.
     destruct a.
-    contradict l; simpl; omega.
+    contradict l; simpl; lia.
     exact v.
   Qed.
 
@@ -200,7 +200,7 @@ Section GenArray.
     arrayN a l <=p=> (a |-?-> selN l 0 def)%pred.
   Proof.
     destruct l; simpl; intros; try congruence.
-    assert (length l = 0) by omega.
+    assert (length l = 0) by lia.
     apply length_nil in H0; subst; simpl; split; cancel.
   Qed.
 
@@ -208,8 +208,8 @@ Section GenArray.
     length l >= 1 ->
     arrayN a l <=p=> (a |-?-> selN l 0 def * arrayN (a + 1) (skipn 1 l) )%pred.
   Proof.
-    destruct l; simpl; intros; try omega.
-    replace (a + 1) with (S a) by omega; auto.
+    destruct l; simpl; intros; try lia.
+    replace (a + 1) with (S a) by lia; auto.
   Qed.
 
 
@@ -228,19 +228,19 @@ Section PtstoArray.
     -> m (a + i) = None.
   Proof.
     induction l; intros; auto; simpl in *.
-    destruct (eq_nat_dec i 0); auto.
-    subst; simpl in *; omega.
+    destruct (Peano_dec.eq_nat_dec i 0); auto.
+    subst; simpl in *; lia.
 
     unfold sep_star in H0; rewrite sep_star_is in H0; unfold sep_star_impl in H0.
     repeat deex.
     unfold mem_union.
     unfold ptsto in H2; destruct H2; rewrite H2.
     pose proof (IHl (S a0) (i - 1)).
-    replace (S a0 + (i - 1)) with (a0 + i) in H3 by omega.
-    apply H3; try omega.
+    replace (S a0 + (i - 1)) with (a0 + i) in H3 by lia.
+    apply H3; try lia.
 
     auto.
-    omega.
+    lia.
   Qed.
 
   Lemma arrayN_oob: forall (l : list V) i m,
@@ -249,7 +249,7 @@ Section PtstoArray.
     -> m i = None.
   Proof.
     intros.
-    replace i with (0 + i) by omega.
+    replace i with (0 + i) by lia.
     eapply arrayN_oob'; eauto.
   Qed.
 
@@ -264,7 +264,7 @@ Section PtstoArray.
     unfold mem_union.
     unfold ptsto in H2; destruct H2; rewrite H2.
     eapply IHl; eauto.
-    omega.
+    lia.
   Qed.
 
   Lemma arrayN_updN_memupd : forall F l a i (v : V) m,
@@ -283,7 +283,7 @@ Section PtstoArray.
     rewrite arrayN_isolate by eauto.
     cancel.
     rewrite length_updN; auto.
-    Grab Existential Variables. all: eauto.
+    Unshelve. all: eauto.
   Qed.
 
   Lemma arrayN_app_memupd : forall l (v : V) m,
@@ -293,11 +293,11 @@ Section PtstoArray.
     intros.
 
     eapply isolateN_bwd with (i := (length l)) (default := v).
-    rewrite app_length; simpl; omega.
+    rewrite app_length; simpl; lia.
 
     rewrite firstn_app2; auto.
     rewrite selN_last; auto.
-    rewrite skipn_oob; [ | rewrite app_length; simpl; omega ].
+    rewrite skipn_oob; [ | rewrite app_length; simpl; lia ].
     unfold arrayN at 2; auto; apply emp_star_r.
     simpl.
 
@@ -338,8 +338,8 @@ Section PtstoArray.
   Proof.
     intros.
     eapply ptsto_valid; pred_apply.
-    rewrite arrayN_isolate with (i := a - st) by omega.
-    replace (st + (a - st)) with a by omega.
+    rewrite arrayN_isolate with (i := a - st) by lia.
+    replace (st + (a - st)) with a by lia.
     clear H; cancel.
   Qed.
 
@@ -350,8 +350,8 @@ Section PtstoArray.
     exists v, m a = Some v.
   Proof.
     intros; destruct l.
-    simpl in *; try omega.
-    eexists; eapply arrayN_selN with (def := v); eauto; try omega.
+    simpl in *; try lia.
+    eexists; eapply arrayN_selN with (def := v); eauto; try lia.
   Qed.
 
   Lemma arrayN_unify' : forall a b s m (F1 F2 : pred), length a = length b ->
@@ -384,12 +384,12 @@ Lemma arrayN_piff_replace: forall T V (l : list T) n (p q : _ -> _ -> @pred _ _ 
   arrayN p n l <=p=> arrayN q n l.
 Proof.
   induction l; cbn; intros; auto.
-  rewrite H with (i := 0) by (auto; omega).
+  rewrite H with (i := 0) by (auto; lia).
   rewrite IHl.
   split; cancel.
   intros.
-  rewrite <- plus_Snm_nSm.
-  rewrite H; (eauto; omega).
+  rewrite <- Plus.plus_Snm_nSm.
+  rewrite H; (eauto; lia).
 Qed.
 
 Lemma arrayN_map: forall V T T' (l : list T) n (p : addr -> T' -> @pred _ _ V) (f : T -> T'),
@@ -429,7 +429,7 @@ Proof.
   rewrite combine_length.
   rewrite Nat.min_l.
   rewrite skipn_length.
-  omega.
+  lia.
   rewrite map_length.
   rewrite firstn_length_l; auto.
 Qed.
@@ -450,25 +450,25 @@ Proof.
   unfold vsupd_range.
   autorewrite with lists; simpl.
   repeat replace (length (firstn i l)) with i
-    by (rewrite firstn_length_l by omega; auto).
+    by (rewrite firstn_length_l by lia; auto).
   rewrite updN_app2.
-  erewrite firstn_plusone_selN by omega.
+  erewrite firstn_plusone_selN by lia.
   rewrite map_app.
   rewrite combine_app
-    by (rewrite map_length; repeat rewrite firstn_length_l; omega).
+    by (rewrite map_length; repeat rewrite firstn_length_l; lia).
   rewrite <- app_assoc; f_equal; simpl.
   rewrite combine_length; autorewrite with lists.
-  rewrite Nat.min_l; repeat rewrite firstn_length_l; try omega.
-  replace (i - i) with 0 by omega.
-  rewrite updN_0_skip_1 by (rewrite skipn_length; omega).
+  rewrite Nat.min_l; repeat rewrite firstn_length_l; try lia.
+  replace (i - i) with 0 by lia.
+  rewrite updN_0_skip_1 by (rewrite skipn_length; lia).
   rewrite skipn_skipn'; f_equal; f_equal.
   rewrite selN_app2.
   rewrite combine_length; rewrite Nat.min_l;
-     autorewrite with lists; repeat rewrite firstn_length_l; try omega.
-  replace (i + (i - i)) with i by omega.
+     autorewrite with lists; repeat rewrite firstn_length_l; try lia.
+  replace (i + (i - i)) with i by lia.
   unfold vsmerge; auto.
   all: rewrite combine_length_eq2; autorewrite with lists;
-    repeat rewrite firstn_length_l; omega.
+    repeat rewrite firstn_length_l; lia.
 Qed.
 
 Lemma forall_incl_refl : forall vs,
@@ -494,7 +494,7 @@ Proof.
   constructor.
   apply incl_tl; apply incl_refl.
   apply IHl.
-  simpl in *; omega.
+  simpl in *; lia.
 Qed.
 
 
@@ -507,10 +507,10 @@ Proof.
   rewrite selN_app2.
   rewrite combine_length_eq.
   rewrite skipn_selN.
-  f_equal; omega.
-  rewrite map_length, firstn_length_l; omega.
+  f_equal; lia.
+  rewrite map_length, firstn_length_l; lia.
   rewrite combine_length_eq; auto.
-  rewrite map_length, firstn_length_l; omega.
+  rewrite map_length, firstn_length_l; lia.
 Qed.
 
 Lemma vsupd_range_selN_inb : forall vs n l,
@@ -523,10 +523,10 @@ Proof.
   rewrite selN_combine.
   erewrite selN_map.
   rewrite selN_firstn; auto.
-  rewrite firstn_length_l; omega.
-  rewrite map_length, firstn_length_l; omega.
+  rewrite firstn_length_l; lia.
+  rewrite map_length, firstn_length_l; lia.
   rewrite combine_length_eq; auto.
-  rewrite map_length, firstn_length_l; omega.
+  rewrite map_length, firstn_length_l; lia.
 Qed.
 
 
@@ -537,19 +537,19 @@ Lemma vsupd_range_firstn_incl : forall n l vs,
 Proof.
   induction n; intros.
   apply vsupd_range_incl; auto.
-  destruct (lt_dec n (length l)).
+  destruct (Compare_dec.lt_dec n (length l)).
 
   erewrite firstn_S_selN by auto.
-  rewrite <- vsupd_range_progress by omega.
+  rewrite <- vsupd_range_progress by lia.
   erewrite <- updN_selN_eq with (l := (vsupd_range vs l)) (ix := n).
   apply forall2_updN; eauto.
   rewrite vsupd_range_selN_oob.
-  rewrite vsupd_range_selN_inb; auto; try omega.
+  rewrite vsupd_range_selN_inb; auto; try lia.
   apply incl_refl.
-  rewrite firstn_length_l; omega.
-  rewrite firstn_length_l; omega.
+  rewrite firstn_length_l; lia.
+  rewrite firstn_length_l; lia.
 
-  rewrite firstn_oob by omega.
+  rewrite firstn_oob by lia.
   apply forall_incl_refl.
 Qed.
 
@@ -568,9 +568,9 @@ Proof.
   rewrite Nat.min_l.
   rewrite skipn_length.
   autorewrite with lists.
-  rewrite firstn_length_l; omega.
+  rewrite firstn_length_l; lia.
   autorewrite with lists.
-  rewrite firstn_length_l; omega.
+  rewrite firstn_length_l; lia.
 Qed.
 
 Lemma vssync_range_progress : forall vs m,
@@ -583,21 +583,21 @@ Proof.
   rewrite map_app.
   rewrite repeat_app_tail.
   rewrite combine_app
-    by (autorewrite with lists; rewrite firstn_length_l; omega).
+    by (autorewrite with lists; rewrite firstn_length_l; lia).
   rewrite <- app_assoc; f_equal.
   rewrite combine_length; autorewrite with lists.
-  rewrite Nat.min_l; repeat rewrite firstn_length_l; try omega.
-  replace (m - m) with 0 by omega.
-  rewrite updN_0_skip_1 by (rewrite skipn_length; omega).
+  rewrite Nat.min_l; repeat rewrite firstn_length_l; try lia.
+  replace (m - m) with 0 by lia.
+  rewrite updN_0_skip_1 by (rewrite skipn_length; lia).
   rewrite skipn_skipn; simpl.
   f_equal; f_equal.
   rewrite selN_app2.
   rewrite combine_length; rewrite Nat.min_l;
-     autorewrite with lists; repeat rewrite firstn_length_l; try omega.
-  replace (m + (m - m)) with m by omega.
+     autorewrite with lists; repeat rewrite firstn_length_l; try lia.
+  replace (m + (m - m)) with m by lia.
   unfold vsmerge; auto.
   all: rewrite combine_length_eq2; autorewrite with lists;
-    repeat rewrite firstn_length_l; omega.
+    repeat rewrite firstn_length_l; lia.
 Qed.
 
 
@@ -608,10 +608,10 @@ Proof.
   induction n; simpl; intros.
   cbn.
   apply forall_incl_refl.
-  rewrite <- vssync_range_progress by omega.
+  rewrite <- vssync_range_progress by lia.
   rewrite <- updN_selN_eq with (ix := n) (l := vs) (default := ($0, nil)) at 2.
   apply forall2_updN.
-  apply IHn; omega.
+  apply IHn; lia.
 
   unfold vsmerge; simpl.
   unfold vssync_range.
@@ -619,10 +619,10 @@ Proof.
   rewrite combine_length_eq, map_length, firstn_length_l.
   rewrite Nat.sub_diag, Nat.add_0_r.
   apply incl_cons2; apply incl_nil.
-  omega.
-  rewrite map_length, firstn_length_l, repeat_length; omega.
-  rewrite combine_length_eq, map_length, firstn_length_l; try omega.
-  rewrite map_length, firstn_length_l, repeat_length; omega.
+  lia.
+  rewrite map_length, firstn_length_l, repeat_length; lia.
+  rewrite combine_length_eq, map_length, firstn_length_l; try lia.
+  rewrite map_length, firstn_length_l, repeat_length; lia.
 Qed.
 
 
@@ -639,7 +639,7 @@ Proof.
   rewrite combine_length.
   rewrite Nat.min_l.
   rewrite skipn_length.
-  omega.
+  lia.
   rewrite repeat_length; auto.
 Qed.
 
@@ -663,7 +663,7 @@ Proof.
   rewrite selN_app2.
   rewrite skipn_selN.
   rewrite combine_length_eq.
-  rewrite le_plus_minus_r; auto.
+  rewrite Minus.le_plus_minus_r; auto.
   rewrite repeat_length; auto.
   rewrite combine_length_eq; auto.
   rewrite repeat_length; auto.
@@ -675,11 +675,11 @@ Lemma vsupd_range_app_tl : forall l vs v,
 Proof.
   unfold vsupd_range, vsupd; intros.
   rewrite updN_app2, selN_app2; rewrite combine_length, map_length, firstn_length, Nat.min_l; auto;
-  try apply Nat.min_case_strong; intros; try omega.
+  try apply Nat.min_case_strong; intros; try lia.
   rewrite Nat.sub_diag, app_length; simpl.
-  erewrite firstn_plusone_selN, map_app by omega.
-  rewrite combine_app by (rewrite map_length, firstn_length_l by omega; auto); simpl.
-  rewrite app_assoc_reverse, updN_0_skip_1, <- cons_app by (rewrite skipn_length; omega).
+  erewrite firstn_plusone_selN, map_app by lia.
+  rewrite combine_app by (rewrite map_length, firstn_length_l by lia; auto); simpl.
+  rewrite app_assoc_reverse, updN_0_skip_1, <- cons_app by (rewrite skipn_length; lia).
   rewrite skipn_skipn', skipn_selN, Nat.add_0_r.
   reflexivity.
 Qed.
@@ -723,7 +723,7 @@ Proof.
   simpl.
   rewrite IHl; auto.
   simpl in H.
-  omega.
+  lia.
 Qed.
 
 
@@ -810,10 +810,10 @@ Lemma vsupd_vecs_selN_vsmerge_in : forall a v avl l,
   In v (vsmerge (selN (vsupd_vecs l avl) a ($0, nil))).
 Proof.
   intros.
-  destruct (lt_dec a (length l)).
+  destruct (Compare_dec.lt_dec a (length l)).
   apply vsupd_vecs_selN_vsmerge_in'; auto.
-  rewrite selN_oob in *; auto; try omega.
-  rewrite vsupd_vecs_length; omega.
+  rewrite selN_oob in *; auto; try lia.
+  rewrite vsupd_vecs_length; lia.
 Qed.
 
 Lemma vsupd_vecs_incl : forall l vs,
@@ -915,7 +915,7 @@ Proof.
   simpl.
   rewrite IHl; auto.
   simpl in H.
-  omega.
+  lia.
 Qed.
 
 Lemma vssync_vecs_cons: forall a d x,
@@ -982,10 +982,10 @@ Proof.
   unfold vs_synced, vssync.
   intros.
   rewrite <- H.
-  destruct (lt_dec a (length l)).
+  destruct (Compare_dec.lt_dec a (length l)).
   erewrite selN_inb, <- surjective_pairing by auto.
   rewrite updN_selN_eq; auto.
-  rewrite updN_oob by omega.
+  rewrite updN_oob by lia.
   auto.
 Qed.
 
@@ -1034,11 +1034,11 @@ Lemma vssync_vsupd_eq : forall l a v,
 Proof.
   unfold vsupd, vssync, vsmerge; intros.
   rewrite updN_twice.
-  destruct (lt_dec a (length l)).
+  destruct (Compare_dec.lt_dec a (length l)).
   rewrite selN_updN_eq; simpl; auto.
   rewrite selN_oob.
-  repeat rewrite updN_oob by omega; auto.
-  autorewrite with lists; omega.
+  repeat rewrite updN_oob by lia; auto.
+  autorewrite with lists; lia.
 Qed.
 
 Lemma updN_vsupd_vecs_notin : forall av l a v,
@@ -1125,11 +1125,11 @@ Lemma synced_list_selN : forall l i def,
 Proof.
   unfold synced_list; intros.
   rewrite selN_combine.
-  destruct (lt_dec i (length l)).
+  destruct (Compare_dec.lt_dec i (length l)).
   rewrite repeat_selN; auto.
   setoid_rewrite selN_oob; auto.
-  omega. rewrite repeat_length; omega. omega.
-  rewrite repeat_length; omega.
+  lia. rewrite repeat_length; lia. lia.
+  rewrite repeat_length; lia.
 Qed.
 
 Lemma synced_list_map_fst : forall l,
@@ -1152,7 +1152,7 @@ Lemma vsupsyn_range_synced_list : forall a b,
   vsupsyn_range a b = synced_list b.
 Proof.
   unfold vsupsyn_range, synced_list; intros.
-  rewrite skipn_oob by omega.
+  rewrite skipn_oob by lia.
   rewrite app_nil_r; auto.
 Qed.
 
@@ -1240,7 +1240,7 @@ Proof.
   unfold possible_crash_list; simpl; intuition;
   autorewrite with lists in *; auto.
   destruct (Nat.eq_dec a i); subst.
-  repeat rewrite selN_updN_eq; auto; omega.
+  repeat rewrite selN_updN_eq; auto; lia.
   repeat rewrite selN_updN_ne; eauto.
 Qed.
 
@@ -1298,7 +1298,7 @@ Lemma possible_crash_list_cons : forall vsl vl v vs,
   possible_crash_list (vs :: vsl) (v :: vl).
 Proof.
   unfold possible_crash_list; intuition.
-  simpl; omega.
+  simpl; lia.
   destruct i, vs, vsl; try now firstorder; eauto with arith.
 Qed.
 
@@ -1334,7 +1334,7 @@ Section ArrayCrashXform.
     rewrite IHl.
     cancel; [ instantiate (1 := v' :: l') | .. ]; simpl; auto; try cancel;
     destruct i; simpl; auto;
-    destruct (H4 i); try omega; simpl; auto.
+    destruct (H4 i); try lia; simpl; auto.
   Qed.
 
   Lemma crash_xform_arrayN_r: forall l l' st,
@@ -1349,10 +1349,10 @@ Section ArrayCrashXform.
       pose proof (H1 0) as H1'. simpl in H1'.
       rewrite IHl.
       rewrite crash_xform_sep_star_dist.
-      rewrite <- crash_xform_ptsto_r with (v := a) by (apply H1'; omega).
+      rewrite <- crash_xform_ptsto_r with (v := a) by (apply H1'; lia).
       apply pimpl_refl.
       intuition.
-      specialize (H1 (S i)). simpl in H1. apply H1. omega.
+      specialize (H1 (S i)). simpl in H1. apply H1. lia.
   Qed.
 
   Lemma crash_xform_synced_arrayN: forall l st,
@@ -1411,8 +1411,8 @@ Section SubsetArray.
     -> m (a + i) = None.
   Proof.
     induction l; intros; auto; simpl in *.
-    destruct (eq_nat_dec i 0); auto.
-    subst; simpl in *; omega.
+    destruct (Peano_dec.eq_nat_dec i 0); auto.
+    subst; simpl in *; lia.
 
     unfold sep_star in H0; rewrite sep_star_is in H0; unfold sep_star_impl in H0.
     repeat deex.
@@ -1421,13 +1421,13 @@ Section SubsetArray.
     destruct_lift H2.
     unfold ptsto in H1; destruct H1.
     pose proof (IHl (S a0) (i - 1)).
-    replace (S a0 + (i - 1)) with (a0 + i) in H3 by omega.
+    replace (S a0 + (i - 1)) with (a0 + i) in H3 by lia.
     destruct (m1 (a0 + i)) eqn:?.
     contradict Heqo.
     rewrite H2; try congruence.
-    omega.
+    lia.
     apply H3.
-    omega.
+    lia.
     auto.
   Qed.
 
@@ -1437,7 +1437,7 @@ Section SubsetArray.
     -> m i = None.
   Proof.
     intros.
-    replace i with (0 + i) by omega.
+    replace i with (0 + i) by lia.
     eapply arrayN_subset_oob'; eauto.
   Qed.
 
@@ -1449,11 +1449,11 @@ Section SubsetArray.
     exists vs, m a = Some vs /\ fst vs = fst vs0 /\ incl (snd vs) (snd vs0).
   Proof.
     cbn; intros.
-    rewrite arrayN_isolate with (i := a - st) in H by omega.
+    rewrite arrayN_isolate with (i := a - st) in H by lia.
     unfold ptsto_subset at 2 in H; destruct_lift H; simpl in *.
     eexists; split; try split.
     eapply ptsto_valid.
-    pred_apply; replace (st + (a - st)) with a by omega; cancel.
+    pred_apply; replace (st + (a - st)) with a by lia; cancel.
     simpl; auto.
     auto.
   Qed.
@@ -1479,7 +1479,7 @@ Section SubsetArray.
     rewrite skipn_updN by auto.
     cancel.
     rewrite length_updN; auto.
-    Grab Existential Variables. all: eauto.
+    Unshelve. all: eauto.
   Qed.
 
   Lemma crash_xform_arrayN_subset: forall l st,
@@ -1498,7 +1498,7 @@ Section SubsetArray.
     rewrite crash_xform_ptsto_subset; unfold ptsto_subset, synced_list.
     cancel; [ instantiate (1 := v' :: l') | .. ]; simpl; auto; try cancel;
     destruct i; simpl; auto;
-    destruct (H4 i); try omega; simpl; auto.
+    destruct (H4 i); try lia; simpl; auto.
   Qed.
 
   Lemma crash_xform_arrayN_subset_r: forall l l' st,
@@ -1514,11 +1514,11 @@ Section SubsetArray.
       pose proof (H1 0) as H1'. simpl in H1'.
       rewrite IHl.
       rewrite crash_xform_sep_star_dist.
-      rewrite <- crash_xform_ptsto_subset_r with (v := a) by (apply H1'; omega).
+      rewrite <- crash_xform_ptsto_subset_r with (v := a) by (apply H1'; lia).
       rewrite ptsto_subset_pimpl_ptsto.
       apply pimpl_refl.
       intuition.
-      specialize (H1 (S i)). simpl in H1. apply H1. omega.
+      specialize (H1 (S i)). simpl in H1. apply H1. lia.
   Qed.
 
   Hint Resolve incl_refl.
@@ -1586,7 +1586,7 @@ Section ListUpd.
     length l0 = length l ->
     (F * arrayN pts base l)%pred (listupd m base l).
   Proof.
-    induction l; intros; destruct l0; simpl in *; auto; try omega.
+    induction l; intros; destruct l0; simpl in *; auto; try lia.
     apply sep_star_assoc.
     eapply IHl with (l0 := l0); eauto.
     setoid_rewrite sep_star_comm at 1.
@@ -1615,7 +1615,7 @@ Section ListUpd.
     listupd m off l a = m a.
   Proof.
     induction l; simpl; intros; auto.
-    rewrite IHl by (intuition omega).
+    rewrite IHl by (intuition lia).
     destruct (addr_eq_dec off a0); subst.
     exfalso; intuition.
     rewrite Mem.upd_ne; auto.
@@ -1626,14 +1626,14 @@ Section ListUpd.
     a < off + (length l) ->
     listupd m off l a = Some (selN l (a - off) def).
   Proof.
-    induction l; simpl; intros; try omega.
+    induction l; simpl; intros; try lia.
     case_eq (a0 - off); intros.
-    replace off with a0 in * by omega.
+    replace off with a0 in * by lia.
     rewrite listupd_sel_oob; intuition.
     apply Mem.upd_eq; auto.
 
-    erewrite IHl; try omega.
-    replace (a0 - S off) with n by omega; auto.
+    erewrite IHl; try lia.
+    replace (a0 - S off) with n by lia; auto.
   Qed.
 
   Lemma listupd_sel_cases : forall (l : list V) a off m def,
@@ -1641,11 +1641,11 @@ Section ListUpd.
     (a >= off /\ a < off + (length l) /\ listupd m off l a = Some (selN l (a - off) def) ).
   Proof.
     intros.
-    destruct (lt_dec a off);
-    destruct (ge_dec a (off + (length l)));
+    destruct (Compare_dec.lt_dec a off);
+    destruct (Compare_dec.ge_dec a (off + (length l)));
     try ( left; intuition; apply listupd_sel_oob; auto ).
     right; intuition.
-    apply listupd_sel_inb; omega.
+    apply listupd_sel_inb; lia.
   Qed.
 
 End ListUpd.
@@ -1658,7 +1658,7 @@ Section ListUpdSubset.
     length l0 = length l ->
     (F * arrayN ptsto_subset base l)%pred (listupd m base l).
   Proof.
-    induction l; intros; destruct l0; simpl in *; auto; try omega.
+    induction l; intros; destruct l0; simpl in *; auto; try lia.
     apply sep_star_assoc.
     eapply IHl with (l0 := l0); eauto.
     setoid_rewrite sep_star_comm at 1.
