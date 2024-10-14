@@ -19,6 +19,7 @@ Require Import ListUtils.
 Require Import AsyncDisk.
 Require Import Errno.
 Require List.
+Import PeanoNat.
 
 Set Implicit Arguments.
 
@@ -441,7 +442,7 @@ Module SDIR.
   Qed.
 
   Definition is_valid_sname s : bool :=
-    andb (is_nozero s) (if (le_dec (String.length s) namelen) then true else false).
+    andb (is_nozero s) (if (Compare_dec.le_dec (String.length s) namelen) then true else false).
 
   Theorem is_valid_sname_valid : forall s,
     is_valid_sname s = true <-> sname_valid s.
@@ -452,12 +453,12 @@ Module SDIR.
     split; intros.
     destruct H.
     constructor.
-    destruct (le_dec (length s) namelen); simpl; try congruence.
+    destruct (Compare_dec.le_dec (length s) namelen); simpl; try congruence.
     apply is_nozero_nozero; auto.
 
     inversion H; split.
     apply is_nozero_nozero; auto.
-    destruct (le_dec (length s) namelen); simpl; try congruence.
+    destruct (Compare_dec.le_dec (length s) namelen); simpl; try congruence.
   Qed.
 
   Fixpoint is_zerostring (s : string) : bool :=

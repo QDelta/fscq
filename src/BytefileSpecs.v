@@ -3136,7 +3136,6 @@ Proof.
     length_rewrite_l.
     rewrite <- le_plus_minus; try lia.
     replace (valubytes - valubytes) with 0 by lia.
-    apply Nat.min_0_r.
     
     safestep.
     2: eauto.
@@ -3157,8 +3156,6 @@ Proof.
     rewrite H9; cancel.
     
     all: length_rewrite_l.
-    apply le_trans with (m:= valubytes); length_rewrite_l.
-    apply le_plus_r.
     
     apply Nat.nle_gt in H18.
     apply Nat.lt_sub_lt_add_l in H18.
@@ -3196,9 +3193,19 @@ Proof.
     rewrite mm_dist'; try lia.
     rewrite Nat.add_comm; apply roundup_div_minus_S; auto; lia.
     
-    + eapply dsupd_iter_dsupd_dwrite_first; eauto.
+    + replace (@skipn byte valubytes) with (@skipn byte (length head_data + (valubytes - length head_data))) by (f_equal; lia).
+      eapply dsupd_iter_dsupd_dwrite_first; eauto.
+      replace (length head_data + length (firstn (valubytes - length head_data) data)) with valubytes.
+      assumption.
+      rewrite firstn_length_l by lia.
+      lia.
     
-    + eapply tsupd_iter_tsupd_dwrite_first; eauto.
+    + replace (@skipn byte valubytes) with (@skipn byte (length head_data + (valubytes - length head_data))) by (f_equal; lia).
+      eapply tsupd_iter_tsupd_dwrite_first; eauto.
+      replace (length head_data + length (firstn (valubytes - length head_data) data)) with valubytes.
+      assumption.
+      rewrite firstn_length_l by lia.
+      lia.
     
     + repeat xcrash_rewrite.
     xform_norm; xform_normr; cancel.
@@ -3229,7 +3236,6 @@ Proof.
     rewrite skipn_length in H27.
     rewrite mm_dist' in H27; try lia.
     rewrite roundup_div_minus in H27; auto; try lia.
-    rewrite firstn_length_l.
     rewrite skipn_length.
     rewrite mm_dist'; try lia.
     rewrite dsupd_iter_dsupd_head.
@@ -3246,7 +3252,7 @@ Proof.
     rewrite <- Nat.add_assoc.
     rewrite list_split_chunk_cons'.
     repeat rewrite mm_dist'; try lia.
-    rewrite <- le_plus_minus; try lia.
+    (* rewrite <- le_plus_minus; try lia. *)
     replace (skipn valubytes (valu2list (fst  (selN (DFData f) block_off valuset0))))
         with (nil: list byte).
     rewrite app_nil_r.
@@ -3330,8 +3336,8 @@ Proof.
     rewrite pm_1_3_cancel; rewrite app_assoc_reverse; eauto.
     lia.
     length_rewrite_l. 
-    rewrite <- le_plus_minus; try lia.
-    apply Nat.le_add_r.
+    (* rewrite <- le_plus_minus; try lia.
+    apply Nat.le_add_r. *)
     rewrite skipn_oob; auto.
     length_rewrite_l.
     length_rewrite_l.
@@ -3356,12 +3362,12 @@ Proof.
     2: pred_apply; cancel.
     lia.
     lia.
-    length_rewrite_l.
+    (* length_rewrite_l. *)
     
     rewrite skipn_length in H27.
     rewrite mm_dist' in H27; try lia.
     rewrite roundup_div_minus in H27; auto; try lia.
-    rewrite firstn_length_l.
+    (* rewrite firstn_length_l. *)
     rewrite skipn_length.
     rewrite mm_dist'; try lia.
     replace (block_off + 1) with (S block_off) by lia.
@@ -3381,7 +3387,7 @@ Proof.
     rewrite <- Nat.add_assoc.
     rewrite list_split_chunk_cons'.
     repeat rewrite mm_dist'; try lia.
-    rewrite <- le_plus_minus; try lia.
+    (* rewrite <- le_plus_minus; try lia. *)
     replace (skipn valubytes (valu2list (fst  (selN (DFData f) block_off valuset0))))
         with (nil: list byte).
     rewrite app_nil_r.
@@ -3465,8 +3471,8 @@ Proof.
     rewrite pm_1_3_cancel; rewrite app_assoc_reverse; eauto.
     lia.
     length_rewrite_l. 
-    rewrite <- le_plus_minus; try lia.
-    apply Nat.le_add_r.
+    (* rewrite <- le_plus_minus; try lia.
+    apply Nat.le_add_r. *)
     rewrite skipn_oob; auto.
     length_rewrite_l.
     length_rewrite_l.
@@ -3491,7 +3497,7 @@ Proof.
     2: pred_apply; cancel.
     lia.
     lia.
-    length_rewrite_l.
+    (* length_rewrite_l. *)
     
     auto.
     rewrite H12; auto.

@@ -398,8 +398,8 @@ apply list2nmem_inbound in H1.
 rewrite map_length in H1.
 apply H1.
 Unshelve.
-apply nil.
 apply valuset0.
+apply nil.
 Qed. 
 
 Lemma bytefile_bfile_eq: forall f pfy ufy fy,
@@ -569,8 +569,8 @@ lia.
 apply byteset0.
 
 Unshelve.
-apply valuset0.
 apply nil.
+apply valuset0.
 Qed.
 
 

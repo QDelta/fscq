@@ -1,5 +1,5 @@
 Require Import Ascii String Lia OrderedTypeEx.
-
+Import PeanoNat.
 
 (**** String_as_OT borrowed from Fiat *)
 
@@ -7,8 +7,8 @@ Lemma nat_compare_eq_refl : forall x, Nat.compare x x = Eq.
   intros; apply Nat.compare_eq_iff; trivial.
 Qed.
 
-Hint Rewrite <- nat_compare_lt : nat_comp_hints.
-Hint Rewrite <- nat_compare_gt : nat_comp_hints.
+Hint Rewrite <- Compare_dec.nat_compare_lt : nat_comp_hints.
+Hint Rewrite <- Compare_dec.nat_compare_gt : nat_comp_hints.
 Hint Rewrite    Nat.compare_eq_iff : nat_comp_hints.
 Hint Rewrite <- Nat.compare_eq_iff : nat_comp_hints.
 Hint Rewrite    nat_compare_eq_refl : nat_comp_hints.
@@ -23,7 +23,7 @@ Lemma nat_compare_consistent :
     + { Nat.compare n0 n1 = Gt /\ Nat.compare n1 n0 = Lt }.
 Proof.
   intros n0 n1;
-  destruct (lt_eq_lt_dec n0 n1) as [ [_lt | _eq] | _lt ];
+  destruct (Compare_dec.lt_eq_lt_dec n0 n1) as [ [_lt | _eq] | _lt ];
   [ constructor 1; constructor 1  | constructor 1; constructor 2 | constructor 2 ];
   split;
   autorewrite_nat_compare;

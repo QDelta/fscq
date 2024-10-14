@@ -25,6 +25,7 @@ Require Import AsyncDisk.
 Require Import Errno.
 Require Import DestructVarname.
 Import ListNotations.
+Import PeanoNat.
 Require HexString.
 
 Set Implicit Arguments.
@@ -167,7 +168,7 @@ Module DIR.
   Definition link lxp bxp ixp dnum name inum isdir ix0 ms :=
     let de := mk_dent name inum isdir in
     let^ (ms, len) <- BFILE.getlen lxp ixp dnum ms;
-    If (lt_dec ix0 (len * Dent.RA.items_per_val)) {
+    If (Compare_dec.lt_dec ix0 (len * Dent.RA.items_per_val)) {
       let^ (ms, res) <- Dent.get lxp ixp dnum ix0 ms;
       match (is_valid res) with
       | true =>

@@ -1669,9 +1669,10 @@ rewrite <- concat_app.
 rewrite <- firstn_sum_split.
 
 replace (length (ByFData fy) - block_off * valubytes - valubytes)
-with (length (ByFData fy) - length (concat (firstn (block_off + 1) (PByFData pfy)))); [| length_rewrite_l; [rewrite Nat.mul_add_distr_r; simpl; lia | eapply proto_len_firstn; eauto] ].
+with (length (ByFData fy) - length (concat (firstn (block_off + 1) (PByFData pfy))));
+[| length_rewrite_l; eapply proto_len_firstn; eauto ].
 
-rewrite <- firstn_app_le; [| length_rewrite_l; [| eapply proto_len_firstn; eauto] ].
+rewrite <- firstn_app_le; [| length_rewrite_l; eapply proto_len_firstn; eauto ].
 
 rewrite <- concat_app.
 
@@ -1683,8 +1684,6 @@ rewrite <- H1.
 
 replace (length head_data + (length old_data + length tail_data))
   with valubytes in Hx; [auto | lia].
-  
-rewrite Nat.mul_add_distr_r; simpl; lia.
 
 rewrite firstn_1_selN with (def:= nil).
 rewrite skipn_selN; rewrite <- plus_n_O.
@@ -2183,7 +2182,6 @@ Qed.
     rewrite firstn_firstn; rewrite min_l; try lia.
     rewrite skipn_firstn_comm.
     rewrite IHa; auto.
-    apply le_plus_l.
   Qed.
 
   Lemma treeseq_pred_tree_rep_latest: forall Ftree srcpath tmppath srcinum file tinum dstbase dstname

@@ -1045,7 +1045,7 @@ rewrite H2 in H1.
 rewrite Nat.mod_1_r in H1; inversion H1.
 simpl in H1.
 destruct b.
-reflexivity.
+contradiction H1.
 simpl in *.
 destruct (snd (Nat.divmod a (S b) 0 b)); lia.
 Qed.
@@ -1180,13 +1180,6 @@ Proof.
   destruct (length l / m) eqn:D.
   destruct m eqn:D1; simpl; try lia.
   apply Nat.div_small_iff in D; try lia.
-  rewrite H0 in D.
-  destruct n.
-  simpl in D. rewrite <- plus_n_O in D; lia.
-  simpl in D. apply lt_S_n in D.
-  assert (forall a b, a + (S b) < a -> False).
-  intros; lia.
-  apply H1 in D; inversion D.
   rewrite IHn; try lia.
   rewrite skipn_length.
   rewrite H0.
@@ -1196,9 +1189,6 @@ Proof.
   inversion D.
   reflexivity.
   all: try lia.
-  simpl.
-  rewrite pm_1_3_cancel.
-  reflexivity.
   rewrite skipn_length.
   rewrite H0.
   simpl.
@@ -1323,7 +1313,6 @@ Proof.
   rewrite <- H1 in H2.
   apply length_zero_iff_nil in H2.
   rewrite firstn_length_l in H2; try lia.
-  rewrite H0; apply le_plus_trans. apply le_n.
   eapply IHa; eauto.
   rewrite skipn_length.
   rewrite H0; apply pm_1_3_cancel.
@@ -1846,7 +1835,6 @@ Proof.
 	rewrite Nat.div_mod with (x:= a)(y:= b).
 	apply Nat.add_nonneg_pos.
 	all: try lia.
-	apply le_0_n.
 Qed.
 
 Lemma minus_le_0_eq: forall a b,

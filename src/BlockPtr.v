@@ -3234,9 +3234,11 @@ Module BlockPtr (BPtr : BlockPtrSig).
           auto.
           auto.
           cancel.
-    Unshelve. all : info_eauto.
-        all: try solve [exact nil | exact $0 | exact F_].
-        admit. exact Fs.
+    Unshelve.
+        all: try exact a6.
+        all: eauto.
+        exact $0.
+        exact nil.
   Qed.
 
   Local Hint Extern 0 ({{_}} Bind (indput _ _ _ _ _ _ _) _) => apply indput_ok : prog.

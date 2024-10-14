@@ -2377,7 +2377,7 @@ Module BFILE.
       erewrite INODE.rep_bxp_switch in Hx by eassumption.
       rewrite INODE.inode_rep_bn_valid_piff in Hx; destruct_lift Hx.
       denote Forall as Hv; specialize (Hv inum); subst.
-      rewrite <- Forall_map.
+      rewrite Forall_map.
       apply forall_skipn; apply Hv; eauto. lia.
       erewrite <- listmatch_ptsto_listpred.
       rewrite listmatch_extract with (i := inum) (a := flist) by lia.
@@ -3220,7 +3220,7 @@ Module BFILE.
 
     rewrite INODE.rep_bxp_switch in *|- by eassumption.
     step.
-    rewrite <- Forall_map.
+    rewrite Forall_map.
     match goal with H: context [INODE.rep] |- context [pick_balloc ?a ?b] =>
       rewrite INODE.inode_rep_bn_valid_piff with (bxp := pick_balloc a b) in H; destruct_lift H
     end.
