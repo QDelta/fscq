@@ -32,7 +32,7 @@ Module addr_as_OT <: UsualOrderedType.
   Definition eq_trans := @eq_trans t.
   Definition lt := @wlt WIDTH.
 
-  Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
+  Lemma Nat.lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
   Proof.
     unfold lt; intros.
     apply wlt_lt in H; apply wlt_lt in H0.

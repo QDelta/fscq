@@ -139,7 +139,7 @@ Proof.
       erewrite wordToNat_natToWord_bound in n; eauto.
       repeat erewrite selN_oob with (def := None); try rewrite map_length; auto.
       rewrite app_length; simpl; intuition.
-      rewrite Nat.add_1_r; apply lt_le_S.
+      rewrite Nat.add_1_r; apply Nat.le_succ_l.
       apply le_lt_or_eq in n; intuition.
       contradict n0; rewrite H0.
       apply wordToNat_inj.
@@ -249,7 +249,7 @@ Theorem list2mem_off_eq : forall A (l : list A), list2mem l = list2mem_off 0 l.
 Proof.
   unfold list2mem, list2mem_off, sel; intros.
   apply functional_extensionality; intros.
-  rewrite <- minus_n_O.
+  rewrite Nat.sub_0_r.
   reflexivity.
 Qed.
 

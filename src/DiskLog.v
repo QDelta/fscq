@@ -882,7 +882,7 @@ Module PaddedLog.
   Proof.
     unfold loglen_valid, DescSig.xparams_ok, DataSig.xparams_ok; intuition.
     eapply goodSize_trans.
-    eapply le_trans. eauto.
+    eapply Nat.le_trans. eauto.
     apply le_plus_r. eauto.
   Qed.
 
@@ -892,7 +892,7 @@ Module PaddedLog.
   Proof.
     unfold loglen_valid, DescSig.xparams_ok, DataSig.xparams_ok; intuition.
     eapply goodSize_trans.
-    eapply le_trans. eauto.
+    eapply Nat.le_trans. eauto.
     apply le_plus_r. eauto.
   Qed.
 
@@ -1115,7 +1115,7 @@ Module PaddedLog.
     nonzero_addrs (map fst l) <= (divup (length l) n) * n.
   Proof.
     intros.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply nonzero_addrs_bound.
     rewrite map_length.
     apply roundup_ge; auto.
@@ -1133,7 +1133,7 @@ Module PaddedLog.
     setoid_rewrite <- Nat.mul_comm at 2.
     apply divup_add_gt; auto.
 
-    eapply lt_le_trans; eauto.
+    eapply Nat.lt_le_trans; eauto.
     apply Nat.add_le_mono.
     apply nonzero_addrs_roundup; auto.
     erewrite <- map_length.
@@ -1390,10 +1390,10 @@ Module PaddedLog.
     unfold ndata_log, ndesc_log; split; auto; split.
 
     rewrite H4, Nat.mul_comm.
-    eapply le_trans; [ | eauto ].
+    eapply Nat.le_trans; [ | eauto ].
     rewrite app_length, nonzero_addrs_entry_valid with (l := new) by auto.
-    apply plus_le_compat_r.
-    eapply le_trans.
+    apply Nat.add_le_mono_r.
+    eapply Nat.le_trans.
     apply nonzero_addrs_bound.
     rewrite padded_log_length, map_length.
     apply roundup_ge; auto.
@@ -1404,7 +1404,7 @@ Module PaddedLog.
     apply roundup_le in H16.
     rewrite roundup_roundup_add in H16 by auto.
     rewrite Nat.mul_add_distr_r.
-    eapply le_trans; eauto.
+    eapply Nat.le_trans; eauto.
   Qed.
 
   Theorem rep_extended_facts : forall xp old new hm,

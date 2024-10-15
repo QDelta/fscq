@@ -464,14 +464,14 @@ Module Rec.
     l * lenft = idx * lenft + (lenft + (l * lenft - lenft - idx * lenft)).
   Proof.
     intros.
-    rewrite plus_assoc.
+    rewrite Nat.add_assoc.
     rewrite Nat.add_sub_assoc.
-    rewrite <- plus_assoc.
-    rewrite plus_comm.
+    rewrite <- Nat.add_assoc.
+    rewrite Nat.add_comm.
     rewrite <- Nat.add_sub_assoc by lia.
     rewrite Nat.sub_diag; rewrite <- plus_n_O.
     rewrite Nat.add_sub_assoc.
-    rewrite plus_comm.
+    rewrite Nat.add_comm.
     rewrite <- Nat.add_sub_assoc by lia.
     rewrite Nat.sub_diag; rewrite <- plus_n_O.
     reflexivity.
@@ -535,7 +535,7 @@ Module Rec.
 
       assert (n + n0 = n + (n1 + n2)) as e0' by lia.
       replace ((eq_rect (n + n0) (fun n => word n) w (n + n1 + n2) e0))
-        with (match plus_assoc _ _ _ in _ = N return word N with
+        with (match Nat.add_assoc _ _ _ in _ = N return word N with
               | refl_equal => (eq_rect (n+n0) (fun n => word n) w (n+(n1+n2)) e0')
               end).
 
@@ -558,7 +558,7 @@ Module Rec.
   Proof.
     intros.
 
-    rewrite Nat.add_sub_assoc. rewrite plus_comm. rewrite <- Nat.add_sub_assoc by lia.
+    rewrite Nat.add_sub_assoc. rewrite Nat.add_comm. rewrite <- Nat.add_sub_assoc by lia.
     rewrite Nat.sub_diag. lia.
 
     rewrite <- Nat.mul_sub_distr_r. replace (lenft) with (1 * lenft) at 1 by lia.
@@ -570,7 +570,7 @@ Module Rec.
   Proof.
     intros.
 
-    rewrite Nat.add_sub_assoc. rewrite plus_comm. rewrite <- Nat.add_sub_assoc by lia.
+    rewrite Nat.add_sub_assoc. rewrite Nat.add_comm. rewrite <- Nat.add_sub_assoc by lia.
     rewrite Nat.sub_diag. lia.
 
     apply Nat.mul_le_mono_r; lia.
@@ -587,7 +587,7 @@ Module Rec.
 
     replace (l * len ft - idx * len ft) with (len ft + (l * len ft - idx * len ft - len ft))
       in * by (apply word_updN_helper1; assumption).
-    rewrite plus_assoc in *.
+    rewrite Nat.add_assoc in *.
 
     remember (split2 (idx * len ft + len ft) (l * len ft - idx * len ft - len ft) w) as hi; clear Heqhi.
     refine (combine v hi).
@@ -789,7 +789,7 @@ Module Rec.
   Proof. intros. lia. Qed.
 
   Fact word_shift_helper2 : forall n l, l > 0 -> n + (l - 1) * n = l * n.
-  Proof. intros. destruct l; simpl; try rewrite <- minus_n_O; lia. Qed.
+  Proof. intros. destruct l; simpl; try rewrite Nat.sub_0_r; lia. Qed.
 
   Fact word_shift_helper3 : forall a b c, a * c + (c + b * c) = (a + 1 + b) * c.
   Proof. intros. lia. Qed.
@@ -965,7 +965,7 @@ Module Rec.
     eq_rect_simpl.
     f_equal.
     f_equal.
-    apply mult_comm.
+    apply Nat.mul_comm.
   Qed.
 
   Theorem word_mask_l_gt_0 : forall l n idx (H : l > 0),
@@ -979,7 +979,7 @@ Module Rec.
     generalize_proof.
     intros HH; rewrite HH; auto.
     Unshelve.
-    simpl; rewrite <- minus_n_O.
+    simpl; rewrite Nat.sub_0_r.
     reflexivity.
   Qed.
 

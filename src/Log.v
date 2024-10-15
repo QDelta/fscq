@@ -1511,7 +1511,7 @@ Module LOG.
     safestep.
     reflexivity.
     subst; denote (Map.elements (MSTxn a1)) as Hx; rewrite <- Hx. eauto.
-    eapply lt_le_trans; eauto.
+    eapply Nat.lt_le_trans; eauto.
     subst; denote (Map.elements (MSTxn a1)) as Hx; rewrite <- Hx.
     pred_apply; cancel.
 
@@ -1688,7 +1688,7 @@ Module LOG.
     safestep.
 
     eauto. eauto.
-    eapply lt_le_trans; eauto. eauto.
+    eapply Nat.lt_le_trans; eauto. eauto.
 
     step; step.
     apply not_true_is_false; auto.

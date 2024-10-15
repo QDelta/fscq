@@ -23,7 +23,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     destruct n.
     destruct a; cbv; auto.
     destruct a; try lia.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply div_le; auto.
     rewrite Nat.mul_comm.
     destruct (mult_O_le (S n) b); auto; lia.
@@ -59,10 +59,9 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     b > 0 -> a < c / b -> b + a * b <= c.
   Proof.
     intros.
-    apply lt_le_S in H0.
-    apply mult_le_compat_r with ( p := b ) in H0; auto.
+    apply Nat.mul_le_mono_r with ( p := b ) in H0; auto.
     rewrite Nat.add_comm, <- Nat.mul_succ_l.
-    eapply le_trans; eauto.
+    eapply Nat.le_trans; eauto.
     rewrite Nat.mul_comm.
     apply Nat.mul_div_le; lia.
   Qed.
@@ -78,9 +77,8 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     b > 0 -> a / b < c -> a < c * b.
   Proof.
     intros.
-    apply lt_le_S in H0.
-    apply mult_le_compat_r with ( p := b ) in H0; auto.
-    eapply lt_le_trans; [ | eauto ].
+    apply Nat.mul_le_mono_r with ( p := b ) in H0; auto.
+    eapply Nat.lt_le_trans; [ | eauto ].
     rewrite Nat.mul_comm.
     apply Nat.mul_succ_div_gt; lia.
   Qed.
@@ -88,7 +86,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
   Lemma sub_round_eq_mod : forall a b, b <> 0 -> a - a / b * b = a mod b.
   Proof.
     intros.
-    rewrite Nat.mod_eq, mult_comm; auto.
+    rewrite Nat.mod_eq, Nat.mul_comm; auto.
   Qed.
 
   Lemma mult_neq_0 : forall m n, m <> 0 -> n <> 0 -> m * n <> 0.
@@ -100,14 +98,14 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     0 < m -> n <= n * m.
   Proof.
     intros.
-    rewrite mult_comm.
+    rewrite Nat.mul_comm.
     destruct (mult_O_le n m); solve [ lia | auto].
   Qed.
 
   Lemma mul_ge_r : forall m n,
     0 < m -> n <= m * n.
   Proof.
-    intros. rewrite mult_comm. apply mul_ge_l; auto.
+    intros. rewrite Nat.mul_comm. apply mul_ge_l; auto.
   Qed.
 
   Lemma div_mul_le : forall a b : addr, a / b * b <= a.
@@ -115,7 +113,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     intros.
     destruct (Nat.eq_dec b 0) as [H|H]; subst; try lia.
     pose proof Nat.div_mod a b H.
-    rewrite mult_comm; lia.
+    rewrite Nat.mul_comm; lia.
   Qed.
 
   Lemma sub_sub_assoc : forall a b,
@@ -139,8 +137,8 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     unfold roundup, divup; intros.
     rewrite (Nat.div_mod x sz) at 1 by lia.
     rewrite <- Nat.add_sub_assoc by lia.
-    rewrite <- plus_assoc.
-    rewrite (mult_comm sz).
+    rewrite <- Nat.add_assoc.
+    rewrite (Nat.mul_comm sz).
     rewrite Nat.div_add_l by lia.
 
     case_eq (x mod sz); intros.
@@ -162,8 +160,8 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     unfold roundup; intros.
     case_eq sz; intros; subst; auto.
     unfold ge.
-    rewrite <- mult_1_l at 1.
-    apply mult_le_compat; auto.
+    rewrite <- Nat.mul_1_l at 1.
+    apply Nat.mul_le_mono; auto.
     unfold divup.
     apply Nat.div_str_pos; lia.
   Qed.
@@ -236,21 +234,21 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     rewrite Nat.div_mod with (y := S n) by lia.
     rewrite <- H.
     rewrite <- H0.
-    apply le_trans with (sz * x / sz).
+    apply Nat.le_trans with (sz * x / sz).
     apply Nat.div_le_mono.
     lia.
     replace (sz) with (1 + (sz - 1)) at 2 by lia.
     rewrite Nat.mul_add_distr_r.
     rewrite Nat.mul_1_l.
     replace (x + sz - 1) with (x + (sz - 1)).
-    apply plus_le_compat_l.
+    apply Nat.add_le_mono_l.
     replace x with (n0 + 1) by lia.
     rewrite Nat.mul_add_distr_l.
-    rewrite plus_comm.
+    rewrite Nat.add_comm.
     rewrite Nat.mul_1_r.
-    apply le_plus_l.
+    apply Nat.le_add_r.
     lia.
-    rewrite mult_comm.
+    rewrite Nat.mul_comm.
     rewrite Nat.div_mul by lia.
     apply Nat.eq_le_incl.
     apply Nat.div_mod.
@@ -262,7 +260,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     c >= divup a b -> c * b >= a.
   Proof.
     intros.
-    apply le_trans with (m := divup a b * b).
+    apply Nat.le_trans with (m := divup a b * b).
     apply roundup_ge; auto.
     apply Nat.mul_le_mono_pos_r; auto.
   Qed.
@@ -310,7 +308,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     assert (Hxm := Nat.div_mod x m H).
     symmetry.
     apply Nat.div_unique with (r := x mod m - 1).
-    apply lt_trans with (x mod m).
+    apply Nat.lt_trans with (x mod m).
     lia.
     apply Nat.mod_upper_bound; assumption.
     replace (x + m - 1) with (x + (m - 1)) by lia.
@@ -387,12 +385,12 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     case_eq (n mod sz); intros.
     rewrite Nat.mul_lt_mono_pos_l with (p := sz) by lia.
     replace (sz * (n / sz)) with n.
-    eapply le_lt_trans.
+    eapply Nat.le_lt_trans.
     apply Nat.mul_div_le.
     lia.
     assumption.
     apply Nat.div_exact; assumption.
-    apply le_lt_trans with (n / sz).
+    apply Nat.le_lt_trans with (n / sz).
     apply Nat.div_le_mono; lia.
     lia.
   Qed.
@@ -441,8 +439,8 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     replace (4096) with (pow2 12) by reflexivity.
     rewrite <- pow2_add_mul.
     replace (pow2 (12 + n)) with (pow2 (11 + n) + pow2 (11 + n)).
-    apply plus_lt_compat.
-    eapply lt_trans.
+    apply Nat.add_lt_mono.
+    eapply Nat.lt_trans.
     apply natToWord_goodSize.
     apply pow2_inc; lia.
     apply pow2_inc; lia.
@@ -500,7 +498,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     a <= b * c -> divup a b <= c.
   Proof.
     intros.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply divup_mono; eauto.
     rewrite divup_mul_r; auto.
   Qed.
@@ -534,7 +532,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     b <> 0 -> a >= b * c -> divup a b >= c.
   Proof.
     intros.
-    eapply le_trans.
+    eapply Nat.le_trans.
     2: apply divup_mono; eauto.
     rewrite Nat.mul_comm.
     rewrite divup_mul; auto.
@@ -605,16 +603,16 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     destruct (addr_eq_dec a 0); subst; try lia.
     eapply (Nat.div_mod a) in H as HH.
     rewrite HH.
-    rewrite plus_comm.
+    rewrite Nat.add_comm.
     rewrite divup_add by lia.
     rewrite Nat.mul_add_distr_r.
     destruct (addr_eq_dec (a mod n) 0) as [H'|H'].
     rewrite H'.
     rewrite mul_div; lia.
     rewrite divup_small.
-    simpl. rewrite plus_0_r.
+    simpl. rewrite Nat.add_0_r.
     pose proof Nat.mod_upper_bound a n H.
-    rewrite mult_comm; lia.
+    rewrite Nat.mul_comm; lia.
     split. lia.
     apply Nat.lt_le_incl. apply Nat.mod_upper_bound.
     lia.
@@ -661,29 +659,29 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     destruct (addr_eq_dec x 0) as [|Hx]; subst; try lia.
     destruct (addr_eq_dec n 0) as [|Hn]; subst.
     repeat rewrite roundup_0; auto.
-    destruct (addr_eq_dec a 0) as [|Ha]; subst; [> rewrite mult_comm; auto |].
+    destruct (addr_eq_dec a 0) as [|Ha]; subst; [> rewrite Nat.mul_comm; auto |].
     unfold roundup.
-    rewrite mult_assoc.
-    apply mult_le_compat_r.
+    rewrite Nat.mul_assoc.
+    apply Nat.mul_le_mono_r.
     unfold divup.
     replace (n + a - 1) with ((1 * a) + (n - 1)) by lia.
     replace (n + x * a - 1) with (1 * (x * a) + (n - 1)) by lia.
     repeat rewrite Nat.div_add_l by auto.
-    replace (x * a) with (a * x) by (apply mult_comm).
+    replace (x * a) with (a * x) by (apply Nat.mul_comm).
     rewrite <- Nat.div_div by auto.
     remember ((n - 1) / a) as r.
     apply Nat.div_mod with (x := r) in Hx as Hr.
-    rewrite plus_comm in Hr.
+    rewrite Nat.add_comm in Hr.
     rewrite Hr at 1.
-    rewrite plus_assoc, mult_comm.
-    apply plus_le_compat_r.
-    eapply lt_le_trans; [> apply Nat.mod_upper_bound | ]; auto.
+    rewrite Nat.add_assoc, Nat.mul_comm.
+    apply Nat.add_le_mono_r.
+    eapply Nat.lt_le_trans; [> apply Nat.mod_upper_bound | ]; auto.
   Qed.
 
   Lemma min_roundup : forall a b z, roundup (min a b) z = min (roundup a z) (roundup b z).
   Proof.
     intros.
-    edestruct Min.min_spec as [ [HH Hmin]|[HH Hmin] ]; rewrite Hmin in *;
+    edestruct Nat.min_spec as [ [HH Hmin]|[HH Hmin] ]; rewrite Hmin in *;
     symmetry; (apply min_l || apply min_r);
     apply roundup_mono; lia.
   Qed.
@@ -692,7 +690,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
   Proof.
     unfold roundup; intros.
     destruct (Nat.eq_dec a 0); subst; simpl; auto.
-    replace (a * b) with (b * a) by apply mult_comm.
+    replace (a * b) with (b * a) by apply Nat.mul_comm.
     destruct (Nat.eq_dec b 0); subst; simpl.
     rewrite divup_0; auto.
     rewrite divup_mul; auto.
@@ -808,7 +806,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     lia.
 
     rewrite Nat.add_1_r in H1.
-    apply lt_n_Sm_le in H1.
+    apply -> Nat.lt_succ_r in H1.
     eapply Nat.mul_le_mono_pos_r in H1; eauto.
     replace (a / sz * sz) with (a - a mod sz) in H1.
     rewrite H0 in H1.
@@ -865,7 +863,7 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
   Proof.
     intros.
     apply (roundup_mono _ _ sz) in H0.
-    eapply le_trans; eauto.
+    eapply Nat.le_trans; eauto.
     unfold roundup.
     apply Nat.mul_le_mono_pos_r; auto.
     apply divup_mul_l.
@@ -902,9 +900,9 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     intros.
     unfold roundup.
     rewrite divup_eq_div_plus_1 by auto.
-    rewrite Nat.mul_add_distr_r. rewrite mult_1_l.
+    rewrite Nat.mul_add_distr_r. rewrite Nat.mul_1_l.
     rewrite Nat.div_mod with (x := a) (y := b) at 1 by auto.
-    rewrite mult_comm.
+    rewrite Nat.mul_comm.
     assert (a mod b < b) by (apply Nat.mod_upper_bound; auto). lia.
   Qed.
 
@@ -916,7 +914,8 @@ Definition roundup (n unitsz:nat) : nat := (divup n unitsz) * unitsz.
     destruct (a mod n) as [|n'] eqn:HH; intuition.
     replace (S n') with (a mod n) by lia.
     rewrite Nat.div_mod with (x := a) (y := n) at 2 by auto.
-    rewrite <- plus_assoc.
-    rewrite <- le_plus_minus by (apply Nat.lt_le_incl, Nat.mod_upper_bound; auto).
-    rewrite Nat.mul_add_distr_r. rewrite mult_comm. lia.
+    rewrite <- Nat.add_assoc.
+    rewrite Nat.mul_add_distr_r. rewrite Nat.mul_comm.
+    f_equal. rewrite Nat.add_sub_assoc. lia.
+    apply Nat.lt_le_incl, Nat.mod_upper_bound; auto.
   Qed.

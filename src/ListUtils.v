@@ -1174,13 +1174,18 @@ Proof.
   eauto with arith.
 Qed.
 
+Lemma not_le_minus_0 : forall n m : nat, ~ m <= n -> n - m = 0.
+Proof.
+  lia.
+Qed.
+
 Lemma skipn_app_split: forall T (a b : list T) n,
   skipn n (a ++ b) = skipn n a ++ skipn (n - length a) b.
 Proof.
   intros.
   destruct (Compare_dec.lt_dec n (length a)).
   rewrite skipn_app_l by lia.
-  rewrite Minus.not_le_minus_0 by lia.
+  rewrite not_le_minus_0 by lia.
   auto.
   replace n with (length a + (n - length a)) at 1 by lia.
   rewrite skipn_app_r.
@@ -1527,7 +1532,7 @@ Fact div_ge_subt : forall a b, b <> 0 -> (a - b) / b = a / b - 1.
 Proof.
   intros.
   destruct (Compare_dec.le_lt_dec b a).
-  apply Minus.plus_minus.
+  apply Arith_base.plus_minus_stt.
   rewrite Nat.add_comm.
   eapply Nat.div_add in H.
   rewrite Nat.mul_1_l in *.
@@ -2959,7 +2964,7 @@ Proof.
     repeat rewrite <- app_assoc.
     rewrite updN_app2. rewrite updN_app1.
     all : rewrite firstn_length_l by lia.
-    rewrite Plus.plus_Snm_nSm.
+    rewrite Nat.add_succ_comm.
     rewrite Nat.sub_diag. simpl. auto.
     all : simpl; lia.
   Unshelve.
@@ -2980,6 +2985,16 @@ Proof.
     erewrite IHl; eauto; try lia.
     erewrite IHl; eauto; try lia.
     erewrite IHl; eauto; try lia.
+Qed.
+
+Lemma le_plus_minus : forall n m : nat, n <= m -> m = n + (m - n).
+Proof.
+  lia.
+Qed.
+
+Lemma le_plus_minus_r : forall n m : nat, n <= m -> n + (m - n) = m.
+Proof.
+  lia.
 Qed.
 
 Lemma upd_range_concat_hom_small : forall T l start len (v : T) k d,
@@ -3004,7 +3019,7 @@ Proof.
   repeat rewrite <- app_assoc. repeat f_equal.
   erewrite concat_hom_subselect_skipn; eauto.
   rewrite <- skipn_firstn_comm.
-  rewrite Minus.le_plus_minus_r by auto.
+  rewrite le_plus_minus_r by auto.
   erewrite <- concat_hom_skipn; eauto.
   rewrite <- skipn_firstn_comm.
   rewrite skipn_skipn. rewrite Nat.add_shuffle0.
@@ -3103,7 +3118,7 @@ Proof.
   induction len1; intros; simpl.
   rewrite Nat.add_0_r. auto.
   rewrite upd_range_updN_oob by lia.
-  rewrite <- Plus.plus_Snm_nSm. rewrite IHlen1. auto.
+  rewrite <- Nat.add_succ_comm. rewrite IHlen1. auto.
 Qed.
 
 Lemma upd_range_hd : forall T l start len x (v : T),
@@ -3201,7 +3216,7 @@ Proof.
   induction len; intros; simpl.
   - rewrite Nat.add_0_r. rewrite removeN_updN. auto.
   - repeat rewrite removeN_updN_lt by lia. f_equal.
-    rewrite <- Plus.plus_Snm_nSm. apply IHlen.
+    rewrite <- Nat.add_succ_comm. apply IHlen.
 Qed.
 
 Lemma upd_range_eq_app_firstn_repeat : forall T (l : list T) start len v,
@@ -3267,7 +3282,7 @@ Proof.
     repeat (
       rewrite firstn_app_le; rewrite firstn_length;
       (let H := fresh in let H' := fresh in
-        edestruct Min.min_spec as [ [H H']|[H H'] ];
+        edestruct Nat.min_spec as [ [H H']|[H H'] ];
         rewrite H' in *; clear H'); try lia;
       rewrite firstn_app_l by (rewrite repeat_length; lia)).
     repeat rewrite <- app_assoc. f_equal.
@@ -3276,18 +3291,23 @@ Proof.
     repeat rewrite firstn_length_l by lia.
     repeat rewrite firstn_repeat by lia.
     match goal with [|- context [skipn ?a (repeat _ ?b ++ _)] ] =>
-      rewrite Minus.le_plus_minus with (m := b) (n := a) at 1 by lia;
+      rewrite le_plus_minus with (m := b) (n := a) at 1 by lia;
       rewrite <- repeat_app, <- app_assoc;
       rewrite skipn_app_l, skipn_oob by (rewrite repeat_length; lia)
     end. symmetry.
     match goal with [|- context [skipn ?a (repeat _ ?b ++ _)] ] =>
-      rewrite Minus.le_plus_minus with (m := b) (n := a) at 1 by lia;
+      rewrite le_plus_minus with (m := b) (n := a) at 1 by lia;
       rewrite <- repeat_app, <- app_assoc;
       rewrite skipn_app_l, skipn_oob by (rewrite repeat_length; lia)
     end.
     repeat rewrite app_nil_l. repeat rewrite app_assoc.
     repeat rewrite repeat_app. do 2 f_equal.
     lia.
+Qed.
+
+Lemma minus_plus : forall n m : nat, n + m - n = m.
+Proof.
+  lia.
 Qed.
 
 Lemma concat_hom_upd_range : forall T l start len (v : T) k,
@@ -3309,10 +3329,10 @@ Proof.
     simpl. rewrite repeat_length. rewrite Nat.sub_0_r, Nat.sub_diag. auto.
     rewrite upd_range_length. lia.
   - rewrite upd_range_app_r. f_equal.
-    rewrite Minus.minus_plus.
+    rewrite minus_plus.
     rewrite <- IHl with (len := S len) by auto.
     auto.
-    apply Plus.le_plus_l.
+    apply Nat.le_add_r.
 Qed.
 
 Lemma upd_range_start_0 : forall T l len (v : T),
@@ -3651,7 +3671,7 @@ Proof.
   rewrite skipn_length, H.
   rewrite <- Nat.mul_sub_distr_r, Nat.mul_comm.
   rewrite <- Nat.mul_1_r at 1.
-  apply Mult.mult_le_compat_l. lia.
+  apply Nat.mul_le_mono_l. lia.
 Qed.
 
 Lemma concat_hom_part : forall T (l : list T) k, Nat.divide k (length l) -> k <> 0 ->
@@ -3724,7 +3744,7 @@ Section ifind_list.
     induction vs; simpl; intros; try congruence.
     destruct cond.
     inversion H; simpl; auto.
-    apply Le.le_Sn_le.
+    apply Nat.lt_le_incl.
     apply IHvs; auto.
   Qed.
 
@@ -3785,7 +3805,7 @@ Section ifind_list.
     destruct ix.
     rewrite Nat.add_0_r.
     destruct cond; congruence.
-    rewrite <- Plus.plus_Snm_nSm.
+    rewrite <- Nat.add_succ_comm.
     apply IHl; try lia.
     destruct (cond a); congruence.
   Qed.
@@ -3885,7 +3905,7 @@ Proof.
     replace (off + (length l - off)) with (length l) by lia.
     rewrite skipn_oob by lia.
     constructor.
-  - rewrite Minus.not_le_minus_0 by auto. rewrite upd_range_0.
+  - rewrite not_le_minus_0 by auto. rewrite upd_range_0.
     rewrite skipn_oob by lia. constructor.
 Qed.
 

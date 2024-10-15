@@ -128,7 +128,7 @@ Module String_as_OT <: UsualOrderedType.
   Definition lt x y :=
     string_compare x y = Lt.
 
-  Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
+  Lemma Nat.lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
   Proof.
     intros x y z;
     generalize x z;

@@ -1,7 +1,7 @@
 
 (** Fixed precision machine words *)
 
-Require Import Arith Div2 NArith Bool Lia.
+Require Import Arith NArith Bool Lia.
 Require Import Nomega.
 Require Import Wf_nat.
 Require Import Eqdep_dec.
@@ -39,7 +39,7 @@ Definition wordToNat' sz (w : word sz) : nat :=
 Theorem wordToNat_wordToNat' : forall sz (w : word sz),
   wordToNat w = wordToNat' w.
 Proof.
-  induction w. auto. unfold wordToNat. simpl. rewrite mult_comm. reflexivity.
+  induction w. auto. unfold wordToNat. simpl. rewrite Nat.mul_comm. reflexivity.
 Qed.
 
 Fixpoint mod2 (n : nat) : bool :=
@@ -52,7 +52,7 @@ Fixpoint mod2 (n : nat) : bool :=
 Fixpoint natToWord (sz n : nat) : word sz :=
   match sz with
     | O => WO
-    | S sz' => WS (mod2 n) (natToWord sz' (div2 n))
+    | S sz' => WS (mod2 n) (natToWord sz' (Nat.div2 n))
   end.
 
 Definition liftWord (sz : nat) (f : nat -> nat) (w: word sz) :=
@@ -122,12 +122,12 @@ Qed.
 
 Local Hint Resolve mod2_S_double mod2_double.
 
-Theorem div2_double : forall n, div2 (2 * n) = n.
+Theorem div2_double : forall n, Nat.div2 (2 * n) = n.
 Proof.
   induction n; simpl; intuition; rewrite <- plus_n_Sm; f_equal; rethink.
 Qed.
 
-Theorem div2_S_double : forall n, div2 (S (2 * n)) = n.
+Theorem div2_S_double : forall n, Nat.div2 (S (2 * n)) = n.
 Proof.
   induction n; simpl; intuition; f_equal; rethink.
 Qed.
@@ -182,7 +182,7 @@ Proof.
   induction c; intros.
   rewrite Nat.mul_1_r; auto.
   rewrite Nat.mul_succ_r.
-  apply lt_plus_trans.
+  apply Nat.lt_lt_add_r.
   apply IHc; auto.
 Qed.
 
@@ -279,7 +279,7 @@ Section strong.
   Lemma strong' : forall n m, m <= n -> P m.
   Proof.
     induction n; simpl; intuition; apply PH; intuition.
-    elimtype False; lia.
+    lia.
   Qed.
 
   Theorem strong : forall n, P n.
@@ -290,26 +290,26 @@ End strong.
 
 Theorem div2_odd : forall n,
   mod2 n = true
-  -> n = S (2 * div2 n).
+  -> n = S (2 * Nat.div2 n).
 Proof.
   induction n using strong; simpl; intuition.
 
   destruct n; simpl in *; intuition.
   destruct n; simpl in *; intuition.
   do 2 f_equal.
-  replace (div2 n + S (div2 n + 0)) with (S (div2 n + (div2 n + 0))); auto.
+  replace (Nat.div2 n + S (Nat.div2 n + 0)) with (S (Nat.div2 n + (Nat.div2 n + 0))); auto.
 Qed.
 
 Theorem div2_even : forall n,
   mod2 n = false
-  -> n = 2 * div2 n.
+  -> n = 2 * Nat.div2 n.
 Proof.
   induction n using strong; simpl; intuition.
 
   destruct n; simpl in *; intuition.
   destruct n; simpl in *; intuition.
   f_equal.
-  replace (div2 n + S (div2 n + 0)) with (S (div2 n + (div2 n + 0))); auto.
+  replace (Nat.div2 n + S (Nat.div2 n + 0)) with (S (Nat.div2 n + (Nat.div2 n + 0))); auto.
 Qed.
 
 Lemma wordToNat_natToWord' : forall sz w, exists k, wordToNat (natToWord sz w) + k * pow2 sz = w.
@@ -320,27 +320,27 @@ Proof.
 
   case_eq (mod2 w); intro Hmw.
 
-  specialize (IHsz (div2 w)); firstorder.
+  specialize (IHsz (Nat.div2 w)); firstorder.
   simpl wordToNat.
   rewrite wordToNat_wordToNat' in *.
   exists x; intuition.
-  rewrite mult_assoc.
-  rewrite (mult_comm x 2).
-  rewrite mult_comm. simpl mult at 1.
-  rewrite (plus_Sn_m (2 * wordToNat' (natToWord sz (div2 w)))).
-  rewrite <- mult_assoc.
-  rewrite <- mult_plus_distr_l.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm x 2).
+  rewrite Nat.mul_comm. simpl mult at 1.
+  rewrite (plus_Sn_m (2 * wordToNat' (natToWord sz (Nat.div2 w)))).
+  rewrite <- Nat.mul_assoc.
+  rewrite <- Nat.mul_add_distr_l.
   rewrite H; clear H.
   symmetry; apply div2_odd; auto.
 
-  specialize (IHsz (div2 w)); firstorder.
+  specialize (IHsz (Nat.div2 w)); firstorder.
   simpl wordToNat.
   exists x; intuition.
-  rewrite mult_assoc.
-  rewrite (mult_comm x 2).
-  rewrite <- mult_assoc.
-  rewrite mult_comm.
-  rewrite <- mult_plus_distr_l.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm x 2).
+  rewrite <- Nat.mul_assoc.
+  rewrite Nat.mul_comm.
+  rewrite <- Nat.mul_add_distr_l.
   rewrite H; clear H.
   symmetry; apply div2_even; auto.
 Qed.
@@ -635,12 +635,12 @@ Proof.
 
   rewrite (UIP_dec eq_nat_dec Heq (refl_equal _)); reflexivity.
 
-  rewrite (IHw1 _ _ _ _ (plus_assoc _ _ _)); clear IHw1.
+  rewrite (IHw1 _ _ _ _ (Nat.add_assoc _ _ _)); clear IHw1.
   repeat match goal with
            | [ |- context[match ?pf with refl_equal => _ end] ] => generalize pf
          end.  
   generalize dependent (combine w1 (combine w2 w3)).
-  rewrite plus_assoc; intros.
+  rewrite Nat.add_assoc; intros.
   rewrite (UIP_dec eq_nat_dec e (refl_equal _)).
   rewrite (UIP_dec eq_nat_dec Heq0 (refl_equal _)).
   reflexivity.
@@ -672,7 +672,7 @@ Proof.
 
   rewrite (UIP_dec eq_nat_dec Heq (refl_equal _)); reflexivity.
 
-  rewrite (IHn1 _ _ (plus_assoc _ _ _)).
+  rewrite (IHn1 _ _ (Nat.add_assoc _ _ _)).
   f_equal.
   apply wtl_match.
 Qed.
@@ -844,18 +844,23 @@ Proof.
 
   rewrite (shatter_word w) in *.
   simpl.
-  eapply trans_eq; [ | apply IHn1 with (Heq := plus_assoc _ _ _) ]; clear IHn1.
+  eapply trans_eq; [ | apply IHn1 with (Heq := Nat.add_assoc _ _ _) ]; clear IHn1.
   repeat f_equal.
   repeat match goal with
            | [ |- context[match ?pf with refl_equal => _ end] ] => generalize pf
          end.
   simpl.
   generalize dependent w.
-  rewrite plus_assoc.
+  rewrite Nat.add_assoc.
   intros.
   rewrite (UIP_dec eq_nat_dec e (refl_equal _)).
   rewrite (UIP_dec eq_nat_dec Heq0 (refl_equal _)).
   reflexivity.
+Qed.
+
+Lemma plus_reg_l : forall n m p : nat, p + n = p + m -> n = m.
+Proof.
+  lia.
 Qed.
 
 Theorem eq_rect_combine : forall n1 n2 n2' (w1 : word n1) (w2 : word n2') Heq,
@@ -1173,7 +1178,7 @@ Theorem mod2_S : forall n k,
 Proof.
   induction n using strong; intros.
   destruct n; simpl in *.
-  elimtype False; lia.
+  lia.
   destruct n; simpl in *; auto.
   destruct k; simpl in *.
   discriminate.
@@ -1299,7 +1304,7 @@ Qed.
 
 Theorem div2_minus_2 : forall n k,
   2 * k <= n
-  -> div2 (n - 2 * k) = div2 n - k.
+  -> Nat.div2 (n - 2 * k) = Nat.div2 n - k.
 Proof.
   induction n using strong; intros.
 
@@ -1313,7 +1318,7 @@ Qed.
 
 Theorem div2_bound : forall k n,
   2 * k <= n
-  -> k <= div2 n.
+  -> k <= Nat.div2 n.
 Proof.
   intros; case_eq (mod2 n); intro Heq.
 
@@ -1330,30 +1335,30 @@ Theorem drop_sub : forall sz n k,
 Proof.
   induction sz; simpl; intuition; repeat rewrite untimes2 in *; f_equal.
 
-  rewrite mult_assoc.
-  rewrite (mult_comm k).
-  rewrite <- mult_assoc.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm k).
+  rewrite <- Nat.mul_assoc.
   apply drop_mod2.
-  rewrite mult_assoc.
-  rewrite (mult_comm 2).
-  rewrite <- mult_assoc.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm 2).
+  rewrite <- Nat.mul_assoc.
   auto.
 
-  rewrite <- (IHsz (div2 n) k).
-  rewrite mult_assoc.
-  rewrite (mult_comm k).
-  rewrite <- mult_assoc.
+  rewrite <- (IHsz (Nat.div2 n) k).
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm k).
+  rewrite <- Nat.mul_assoc.
   rewrite div2_minus_2.
   reflexivity.  
-  rewrite mult_assoc.
-  rewrite (mult_comm 2).
-  rewrite <- mult_assoc.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm 2).
+  rewrite <- Nat.mul_assoc.
   auto.
   
   apply div2_bound.
-  rewrite mult_assoc.
-  rewrite (mult_comm 2).
-  rewrite <- mult_assoc.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm 2).
+  rewrite <- Nat.mul_assoc.
   auto.
 Qed.
 
@@ -1397,7 +1402,7 @@ Proof.
 Qed.
 
 Theorem div2_plus_2 : forall n k,
-  div2 (n + 2 * k) = div2 n + k.
+  Nat.div2 (n + 2 * k) = Nat.div2 n + k.
 Proof.
   induction n; intros.
   simpl.
@@ -1405,34 +1410,34 @@ Proof.
   replace (k + k) with (2 * k) by lia.
   apply div2_double.
   replace (S n + 2 * k) with (S (n + 2 * k)) by lia.
-  destruct (Even.even_or_odd n).
-  - rewrite <- even_div2.
-    rewrite <- even_div2 by auto.
+  destruct (Nat.Even_or_Odd n).
+  - rewrite <- Nat.Even_div2.
+    rewrite <- Nat.Even_div2 by auto.
     apply IHn.
-    apply Even.even_even_plus; auto.
-    apply Even.even_mult_l; repeat constructor.
+    apply Nat.Even_Even_add; auto.
+    apply Nat.Even_mul_l; exists 1; auto.
 
-  - rewrite <- odd_div2.
-    rewrite <- odd_div2 by auto.
+  - rewrite <- Nat.Odd_div2.
+    rewrite <- Nat.Odd_div2 by auto.
     rewrite IHn.
     lia.
-    apply Even.odd_plus_l; auto.
-    apply Even.even_mult_l; repeat constructor.
+    apply Nat.Odd_add_l; auto.
+    apply Nat.Even_mul_l; exists 1; auto.
 Qed.
 
 Theorem drop_add : forall sz n k,
   natToWord sz (n + k * pow2 sz) = natToWord sz n.
 Proof.
   induction sz; simpl; intuition; repeat rewrite untimes2 in *; f_equal.
-  - rewrite mult_assoc.
-    rewrite (mult_comm k).
-    rewrite <- mult_assoc.
+  - rewrite Nat.mul_assoc.
+    rewrite (Nat.mul_comm k).
+    rewrite <- Nat.mul_assoc.
     apply drop_mod2_add.
 
-  - rewrite <- (IHsz (div2 n) k).
-    rewrite mult_assoc.
-    rewrite (mult_comm k).
-    rewrite <- mult_assoc.
+  - rewrite <- (IHsz (Nat.div2 n) k).
+    rewrite Nat.mul_assoc.
+    rewrite (Nat.mul_comm k).
+    rewrite <- Nat.mul_assoc.
     rewrite div2_plus_2.
     reflexivity.
 Qed.
@@ -1473,7 +1478,7 @@ Proof.
   rewrite <- (mod2_double (wordToNat x)); f_equal; lia.
 Qed.
 
-Theorem div2_WS : forall sz (x : word sz) b, div2 (wordToNat (WS b x)) = wordToNat x.
+Theorem div2_WS : forall sz (x : word sz) b, Nat.div2 (wordToNat (WS b x)) = wordToNat x.
 Proof.
   destruct b; rewrite wordToNat_wordToNat'; unfold wordToNat'; fold wordToNat'.
   apply div2_S_double.
@@ -1486,7 +1491,7 @@ Proof.
   destruct sz; simpl.
   rewrite (shatter_word x); reflexivity.
   rewrite roundTrip_0; simpl.
-  rewrite plus_0_r.
+  rewrite Nat.add_0_r.
   rewrite (shatter_word x).
   f_equal.
 
@@ -1518,21 +1523,21 @@ Proof.
                destruct (wordToNat_natToWord sz w) as [? [Heq ?]]; rewrite Heq
          end.
 
-  rewrite mult_minus_distr_l.
-  rewrite mult_minus_distr_r.
-  rewrite (mult_assoc (wordToNat x) x0).
-  rewrite <- (mult_assoc x1).
-  rewrite (mult_comm (pow2 sz)).
-  rewrite (mult_assoc x1).
+  rewrite Nat.mul_sub_distr_l.
+  rewrite Nat.mul_sub_distr_r.
+  rewrite (Nat.mul_assoc (wordToNat x) x0).
+  rewrite <- (Nat.mul_assoc x1).
+  rewrite (Nat.mul_comm (pow2 sz)).
+  rewrite (Nat.mul_assoc x1).
   repeat rewrite drop_sub; auto with arith.
-  rewrite (mult_comm x1).
-  rewrite <- (mult_assoc (wordToNat x)).
-  rewrite (mult_comm (wordToNat y)).
-  rewrite mult_assoc.
-  rewrite (mult_comm (wordToNat x)).
-  repeat rewrite <- mult_assoc.
+  rewrite (Nat.mul_comm x1).
+  rewrite <- (Nat.mul_assoc (wordToNat x)).
+  rewrite (Nat.mul_comm (wordToNat y)).
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm (wordToNat x)).
+  repeat rewrite <- Nat.mul_assoc.
   auto with arith.
-  repeat rewrite <- mult_assoc.
+  repeat rewrite <- Nat.mul_assoc.
   auto with arith.
 Qed.
 
@@ -1546,18 +1551,18 @@ Proof.
                destruct (wordToNat_natToWord sz w) as [? [Heq ?]]; rewrite Heq
          end.
 
-  rewrite mult_minus_distr_r.
-  rewrite <- (mult_assoc x0).
-  rewrite (mult_comm (pow2 sz)).
-  rewrite (mult_assoc x0).
+  rewrite Nat.mul_sub_distr_r.
+  rewrite <- (Nat.mul_assoc x0).
+  rewrite (Nat.mul_comm (pow2 sz)).
+  rewrite (Nat.mul_assoc x0).
 
   replace (wordToNat x * wordToNat z - x1 * pow2 sz +
     (wordToNat y * wordToNat z - x2 * pow2 sz))
     with (wordToNat x * wordToNat z + wordToNat y * wordToNat z - x1 * pow2 sz - x2 * pow2 sz).
   repeat rewrite drop_sub; auto with arith.
-  rewrite (mult_comm x0).
-  rewrite (mult_comm (wordToNat x + wordToNat y)).
-  rewrite <- (mult_assoc (wordToNat z)).
+  rewrite (Nat.mul_comm x0).
+  rewrite (Nat.mul_comm (wordToNat x + wordToNat y)).
+  rewrite <- (Nat.mul_assoc (wordToNat z)).
   auto with arith.
   generalize dependent (wordToNat x * wordToNat z).
   generalize dependent (wordToNat y * wordToNat z).
@@ -1610,7 +1615,7 @@ Theorem goodSize_trans: forall sz n1 n2,
 Proof.
   intros.
   unfold goodSize in *.
-  apply le_lt_trans with n2; lia.
+  apply Nat.le_lt_trans with n2; lia.
 Qed.
 
 Theorem goodSize_word_bound: forall n1 sz (bound: word sz),
@@ -1619,7 +1624,7 @@ Theorem goodSize_word_bound: forall n1 sz (bound: word sz),
 Proof.
   intros.
   unfold goodSize.
-  eapply le_lt_trans.
+  eapply Nat.le_lt_trans.
   eassumption.
   apply wordToNat_bound.
 Qed.
@@ -2183,7 +2188,7 @@ Proof.
   rewrite e. rewrite wplus_assoc. rewrite wminus_inv. rewrite wplus_unit. auto.
   unfold wminus in H.
   generalize (unique_inverse a (wneg a) (^~ b)).
-  intros. elimtype False. apply n. symmetry; apply H0.
+  intros. exfalso. apply n. symmetry; apply H0.
   apply wminus_inv.
   auto.
 Qed.
@@ -2192,7 +2197,7 @@ Lemma le_neq_lt : forall sz (a b : word sz),
   b <= a -> a <> b -> b < a.
 Proof.
   intros; destruct (wlt_dec b a); auto.
-  elimtype False. apply H0. unfold wlt, N.lt in *.
+  exfalso. apply H0. unfold wlt, N.lt in *.
   eapply wordToN_inj. eapply Ncompare_eq_correct.
   case_eq ((wordToN a ?= wordToN b)%N); auto; try congruence.
   intros. rewrite <- Ncompare_antisym in n. rewrite H1 in n. simpl in *. congruence.
@@ -2217,7 +2222,7 @@ Lemma rewrite_weq : forall sz (a b : word sz)
   (pf : a = b),  
   weq a b = left _ pf.
 Proof.
-  intros; destruct (weq a b); try solve [ elimtype False; auto ].
+  intros; destruct (weq a b); try solve [ exfalso; auto ].
   f_equal. 
   eapply UIP_dec. eapply weq.
 Qed.
@@ -2305,15 +2310,15 @@ Proof.
   replace ((n - x * pow2 (S sz)) * (m - x0 * pow2 (S sz)))
     with ((n - x * pow2 (S sz)) * m - (n - x * pow2 (S sz)) * (x0 * pow2 (S sz)))
     by (rewrite Nat.mul_sub_distr_l; auto).
-  rewrite mult_assoc; rewrite drop_sub.
-  repeat rewrite mult_comm with (m:=m).
+  rewrite Nat.mul_assoc; rewrite drop_sub.
+  repeat rewrite Nat.mul_comm with (m:=m).
   replace (m * (n - x * pow2 (S sz)))
     with (m * n - m * (x * pow2 (S sz)))
     by (rewrite Nat.mul_sub_distr_l; auto).
-  rewrite mult_assoc; rewrite drop_sub.
+  rewrite Nat.mul_assoc; rewrite drop_sub.
   auto.
-  rewrite <- mult_assoc; apply Nat.mul_le_mono_l; auto.
-  rewrite <- mult_assoc; apply Nat.mul_le_mono_l; auto.
+  rewrite <- Nat.mul_assoc; apply Nat.mul_le_mono_l; auto.
+  rewrite <- Nat.mul_assoc; apply Nat.mul_le_mono_l; auto.
 Qed.
 
 Lemma wlt_lt: forall sz (a b : word sz), a < b ->
@@ -2355,7 +2360,7 @@ Proof.
   apply wlt_lt in H.
   destruct (wordToNat_natToWord' sz m).
   rewrite <- H0.
-  apply lt_plus_trans with (p := x * pow2 sz).
+  apply Nat.lt_lt_add_r with (p := x * pow2 sz).
   assumption.
 Qed.
 
@@ -2366,9 +2371,7 @@ Proof.
   intros.
   apply wle_le in H.
   destruct (wordToNat_natToWord' sz m).
-  rewrite <- H0.
-  apply le_plus_trans with (p := x * pow2 sz).
-  assumption.
+  rewrite <- H0. lia.
 Qed.
 
 (* Chain [lt_word_lt_nat] and [Nat.lt_le_incl]
@@ -2416,7 +2419,7 @@ Lemma wordToNat_natToWord_bound : forall sz n (bound : word sz),
 Proof.
   intros.
   apply wordToNat_natToWord_idempotent'.
-  eapply le_lt_trans; eauto.
+  eapply Nat.le_lt_trans; eauto.
   apply wordToNat_bound.
 Qed.
 
@@ -2426,7 +2429,7 @@ Proof.
   intros.
   case_eq (lt_dec n (pow2 sz)); intros.
   rewrite wordToNat_natToWord_idempotent'; auto.
-  eapply le_trans.
+  eapply Nat.le_trans.
   apply Nat.lt_le_incl.
   apply wordToNat_bound.
   lia.
@@ -2436,7 +2439,7 @@ Lemma wordToNat_natToWord_lt : forall sz n b,
   (n < b -> wordToNat (natToWord sz n) < b)%nat.
 Proof.
   intros.
-  eapply le_lt_trans.
+  eapply Nat.le_lt_trans.
   apply wordToNat_natToWord_le.
   auto.
 Qed.
@@ -2520,7 +2523,7 @@ Proof.
   destruct (weq y (natToWord sz 0)); subst.
 
   rewrite roundTrip_0.
-  repeat rewrite <- minus_n_O.
+  repeat rewrite Nat.sub_0_r.
   rewrite <- drop_sub with (k:=1) (n:=pow2 sz); try lia.
   replace (pow2 sz - 1 * pow2 sz) with (0) by lia.
   rewrite roundTrip_0.
@@ -2540,7 +2543,7 @@ Proof.
 
   simpl. rewrite <- plus_n_O.
   rewrite Nat.add_sub_assoc; [| remember (wordToNat_bound y); lia ].
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   rewrite <- Nat.add_sub_assoc.
   lia.
 
@@ -2751,13 +2754,13 @@ Qed.
 
 Definition wlshift (sz : nat) (w : word sz) (n : nat) : word sz.
   refine (split1 sz n _).
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   exact (combine (wzero n) w).
 Defined.
 
 Definition wrshift (sz : nat) (w : word sz) (n : nat) : word sz.
   refine (split2 n sz _).
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   exact (combine w (wzero n)).
 Defined.
 

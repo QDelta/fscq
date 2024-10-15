@@ -1056,7 +1056,7 @@ Module MLog.
     | [H : @length ?T ?l = 0 |- context [?l] ] => replace l with (@nil T) by eauto
     | [H : equal_unless_in _ _ _ |- _ ] => apply equal_unless_in_length_eq in H
     | [H : possible_crash_list _ _ |- _ ] => apply possible_crash_list_length in H
-    | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try lia ]
+    | [ |- _ < _ ] => try solve [eapply Nat.lt_le_trans; eauto; try lia ]
     end.
 
   Ltac simplen :=  auto; repeat (try subst; simpl;

@@ -604,7 +604,7 @@ Proof.
   intros.
   eapply IHl; auto.
   intros.
-  rewrite plus_Snm_nSm in *.
+  rewrite Nat.add_succ_comm in *.
   apply H; auto.
   lia.
 Qed.

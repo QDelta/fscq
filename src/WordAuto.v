@@ -59,9 +59,9 @@ Qed.
 Theorem plus_ovf_r : forall sz x y, $ (x + wordToNat (natToWord sz y)) = natToWord sz (x + y).
 Proof.
   intros.
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   rewrite plus_ovf_l.
-  rewrite plus_comm.
+  rewrite Nat.add_comm.
   auto.
 Qed.
 
@@ -96,15 +96,15 @@ Proof.
   replace (x0 * pow2 sz * y) with (x0 * y * pow2 sz) by ring.
   apply drop_sub.
   replace (x0 * y * pow2 sz) with (x0 * pow2 sz * y) by ring.
-  apply mult_le_compat_r; auto.
+  apply Nat.mul_le_mono_r; auto.
 Qed.
 
 Theorem mul_ovf_r : forall sz x y, $ (x * wordToNat (natToWord sz y)) = natToWord sz (x * y).
 Proof.
   intros.
-  rewrite mult_comm.
+  rewrite Nat.mul_comm.
   rewrite mul_ovf_l.
-  rewrite mult_comm.
+  rewrite Nat.mul_comm.
   auto.
 Qed.
 
@@ -137,6 +137,11 @@ Theorem Wneq_out : forall sz (n m:word sz),
   n <> m -> wordToNat n <> wordToNat m.
 Proof.
   intuition. apply wordToNat_inj in H0; tauto.
+Qed.
+
+Lemma mult_O_le : forall n m : nat, m = 0 \/ n <= m * n.
+Proof.
+  intros; destruct m; lia.
 Qed.
 
 Lemma divmod_Ndiv_eucl :
@@ -265,7 +270,7 @@ Proof.
   repeat rewrite wordToNat_N. trivial.
   apply Nlt_in.
   autorewrite with W2Nat.
-  apply le_lt_trans with (m := wordToNat a).
+  apply Nat.le_lt_trans with (m := wordToNat a).
   apply div_le; assumption.
   apply wordToNat_bound.
 Qed.
@@ -341,7 +346,7 @@ Ltac word2nat_solve := unfold goodSize in *; subst;
     ); solve [auto]
    ) ||
    (apply Nat.div_lt_upper_bound; solve [word2nat_auto]) ||
-   (eapply le_lt_trans; [(apply div_le || apply Nat.mod_le) |]; solve [word2nat_auto])
+   (eapply Nat.le_lt_trans; [(apply div_le || apply Nat.mod_le) |]; solve [word2nat_auto])
   )
 
 (* XXX does this actually rewrite from the inside out? *)

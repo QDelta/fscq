@@ -296,7 +296,7 @@ Proof.
   reflexivity.
   rewrite concat_hom_length with (k:= valubytes).
   rewrite map_length.
-  eapply le_trans.
+  eapply Nat.le_trans.
   apply roundup_ge with (sz := valubytes); auto.
   rewrite H; apply le_n.
   apply Forall_map_vs2bs.
@@ -305,7 +305,7 @@ Proof.
   reflexivity.
   rewrite concat_hom_length with (k:= valubytes).
   rewrite map_length.
-  eapply le_trans.
+  eapply Nat.le_trans.
   apply roundup_ge with (sz := valubytes); auto.
   rewrite H; apply le_n.
   apply Forall_map_vs2bs.
@@ -314,7 +314,7 @@ Proof.
   auto.
   rewrite concat_hom_length with (k:= valubytes).
   rewrite map_length.
-  eapply le_trans.
+  eapply Nat.le_trans.
   apply roundup_ge with (sz := valubytes); auto.
   rewrite H; apply le_n.
   apply Forall_map_vs2bs.
@@ -1138,7 +1138,7 @@ Qed.
        rewrite H3; rewrite valubytes_is; lia.
        
        
-       apply lt_le_S.
+       apply Nat.le_succ_l.
        eapply inlen_bfile with (j:= 0); eauto.
        apply valubytes_ge_O.
        2: {
@@ -1306,7 +1306,7 @@ Qed.
        rewrite H3; rewrite valubytes_is; lia.
        
        
-       apply lt_le_S.
+       apply Nat.le_succ_l.
        eapply inlen_bfile with (j:= 0); eauto.
        apply valubytes_ge_O.
        2: {
@@ -1636,7 +1636,7 @@ rewrite min_r in H9; try lia.
 assert (A2: block_off + 1 <= length (PByFData pfy)).
 apply le_mult_weaken with (p:= valubytes); eauto.
 erewrite <- unified_byte_protobyte_len; eauto.
-eapply le_trans.
+eapply Nat.le_trans.
 2: eapply bytefile_unified_byte_len; eauto.
 rewrite Nat.mul_add_distr_r; simpl; lia.
 
@@ -1747,7 +1747,7 @@ erewrite bfile_bytefile_selN_firstn_skipn with (b:= 0); eauto;
 
 apply lt_mult_weaken with (p:= valubytes); eauto.
 erewrite <- unified_byte_protobyte_len; eauto.
-eapply lt_le_trans.
+eapply Nat.lt_le_trans.
 2: eapply bytefile_unified_byte_len; eauto.
 lia.
 
@@ -2057,12 +2057,12 @@ tsupd_iter ts pathname block_off
       rewrite skipn_length.
       lia.
       simpl in *.
-      eapply le_trans.
+      eapply Nat.le_trans.
       2: eauto.
-      apply le_plus_l.
-      eapply le_trans.
+      apply Nat.le_add_r.
+      eapply Nat.le_trans.
       2: eauto.
-      apply le_plus_l.
+      apply Nat.le_add_r.
     Qed.
     
     Lemma mod_lt_nonzero: forall a b,

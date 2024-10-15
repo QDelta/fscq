@@ -106,7 +106,7 @@ Module AsyncRecArray (RA : RASig).
     rewrite app_length.
     eapply le_add_helper. apply H.
     rewrite le_plus_minus_r.
-    apply mult_le_compat_r.
+    apply Nat.mul_le_mono_r.
     apply divup_le; lia.
     apply roundup_ge.
     apply items_per_val_gt_0.
@@ -224,7 +224,7 @@ Module AsyncRecArray (RA : RASig).
     | [H : ?l = _ , H2 : context [ ?l ] |- _ ] => rewrite H in H2
     | [H : @length ?T ?l = 0 |- context [?l] ] => replace l with (@nil T) by eauto
     | [H : @eqlen _ ?T ?l nil |- context [?l] ] => replace l with (@nil T) by eauto
-    | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try lia ]
+    | [ |- _ < _ ] => try solve [eapply Nat.lt_le_trans; eauto; try lia ]
     end.
 
   Ltac simplen := unfold eqlen; eauto; repeat (try subst; simpl;
@@ -276,7 +276,7 @@ Module AsyncRecArray (RA : RASig).
     unfold possible_crash_list in *; subst; intuition.
     instantiate (l := fold_left iunpack l' []).
     unfold synced_array.
-    cancel.
+    cancel. eauto. unfold nils.
     unfold rep_common; intuition.
     unfold items_valid; intuition.
     rewrite fold_left_iunpack_length.
@@ -351,7 +351,7 @@ Module AsyncRecArray (RA : RASig).
     cancel.
     rewrite Nat.add_assoc.
     rewrite arrayN_split by auto.
-    cancel.
+    apply pimpl_refl.
     intuition.
     rewrite firstn_length.
     rewrite Nat.min_l; lia.

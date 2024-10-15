@@ -136,7 +136,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
     repeat rewrite Nat2N.inj_add.
     simpl. repeat rewrite Nat2N.inj_mul. simpl.
     rewrite NIndirect_is.
-    eapply N.le_lt_trans.
+    eapply N.Nat.le_lt_trans.
     repeat rewrite <- N.add_assoc.
     apply N.add_le_mono_r.
     unfold N.le.
@@ -238,7 +238,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
   Fact sub_sub_comm : forall a b c, a - b - c = a - c - b.
   Proof.
     intros.
-    rewrite <- Nat.sub_add_distr. rewrite plus_comm.
+    rewrite <- Nat.sub_add_distr. rewrite Nat.add_comm.
     rewrite Nat.sub_add_distr. auto.
   Qed.
 
@@ -259,7 +259,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
 
   Ltac min_cases :=
     let H := fresh in let H' := fresh in
-    edestruct Min.min_spec as [ [H H']|[H H'] ];
+    edestruct Nat.min_spec as [ [H H']|[H H'] ];
     rewrite H' in *; clear H'.
 
   Ltac mult_nonzero := 
@@ -761,7 +761,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
     intros.
     unfold indrep_n_helper, IndRec.rep. destruct addr_eq_dec; try lia.
     unfold IndRec.items_valid, IndSig.xparams_ok, IndSig.RAStart, IndSig.RALen.
-    rewrite mult_1_l. unfold Rec.well_formed. simpl.
+    rewrite Nat.mul_1_l. unfold Rec.well_formed. simpl.
     split; cancel;
     rewrite IndRec.Defs.ipack_one by (unfold IndRec.Defs.item in *; auto).
     all : cancel.
@@ -841,7 +841,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
     intros.
     apply Nat.div_lt_upper_bound; mult_nonzero.
     erewrite indrep_n_tree_length in * by eauto.
-    rewrite mult_comm; simpl in *. auto.
+    rewrite Nat.mul_comm; simpl in *. auto.
   Qed.
 
   Lemma indrep_index_bound_helper' : forall Fm Fm' off indlvl bxp Fs bn iblocks l_part fsl m,
@@ -911,13 +911,13 @@ Module BlockPtr (BPtr : BlockPtrSig).
     - rewrite le_plus_minus_r. auto.
       apply roundup_ge; lia.
     - erewrite concat_hom_length by eauto.
-      rewrite Nat.add_sub_assoc by auto. rewrite plus_comm.
+      rewrite Nat.add_sub_assoc by auto. rewrite Nat.add_comm.
       rewrite <- Nat.add_sub_assoc by (apply Nat.mod_le; mult_nonzero).
       rewrite sub_mod_eq_round by mult_nonzero.
-      rewrite <- mult_1_l with (n := _ * _) at 1. rewrite <- Nat.mul_add_distr_r.
-      apply mult_le_compat_r. simpl.
+      rewrite <- Nat.mul_1_l with (n := _ * _) at 1. rewrite <- Nat.mul_add_distr_r.
+      apply Nat.mul_le_mono_r. simpl.
       apply Nat.div_lt_upper_bound; mult_nonzero.
-      rewrite mult_comm. edestruct le_lt_eq_dec; eauto.
+      rewrite Nat.mul_comm. edestruct le_lt_eq_dec; eauto.
       subst. rewrite Nat.mod_mul in * by mult_nonzero. intuition.
     - rewrite le_plus_minus_r; auto.
     - apply Nat.lt_add_lt_sub_r. apply Nat.mod_upper_bound. auto.
@@ -932,20 +932,20 @@ Module BlockPtr (BPtr : BlockPtrSig).
   Proof.
     intros.
     rewrite Nat.add_sub_assoc by auto.
-    rewrite plus_comm with (n := a).
+    rewrite Nat.add_comm with (n := a).
     rewrite <- Nat.add_sub_assoc by (apply Nat.mod_le; auto).
     rewrite sub_mod_eq_round by auto.
-    rewrite <- mult_1_l with (n := N) at 1.
+    rewrite <- Nat.mul_1_l with (n := N) at 1.
     repeat rewrite <- Nat.mul_add_distr_r.
     rewrite Nat.div_mul by auto.
-    simpl. apply lt_le_S. eapply le_lt_trans.
+    simpl. apply Nat.le_succ_l. eapply Nat.le_lt_trans.
     apply div_add_distr_le.
-    eapply le_lt_trans. apply Nat.div_le_mono. auto.
+    eapply Nat.le_lt_trans. apply Nat.div_le_mono. auto.
     instantiate (1 := a + b - 1).
     assert (a mod N < N) by (apply Nat.mod_upper_bound; auto).
     lia.
     apply Nat.div_lt_upper_bound; auto.
-    rewrite mult_comm. lia.
+    rewrite Nat.mul_comm. lia.
   Qed.
 
 
@@ -989,8 +989,8 @@ Module BlockPtr (BPtr : BlockPtrSig).
     | [ |- context [length (combine ?a ?b)] ] => rewrite combine_length_eq by congruence
     | [ |- _ ] => progress autorewrite with core lists
     | [ |- ?a * ?b = ?c * ?b ] => rewrite Nat.mul_cancel_r by mult_nonzero
-    | [ |- ?a * ?b = ?b * ?c ] => rewrite mult_comm with (n := b) (m := c)
-    | [ |- ?b * ?a = ?b * ?c ] => rewrite mult_comm with (n := b) (m := a)
+    | [ |- ?a * ?b = ?b * ?c ] => rewrite Nat.mul_comm with (n := b) (m := c)
+    | [ |- ?b * ?a = ?b * ?c ] => rewrite Nat.mul_comm with (n := b) (m := a)
     | [ H : ?a < ?b * ?c |- ?a < ?d * ?c] => replace d with b; [ eauto | ]
     | [ H : ?a < ?x |- ?a < ?y ] => replace y with x; [ auto | ]
     | [ H : ?a <= ?x |- ?a <= ?y ] => replace y with x; [ auto | ]
@@ -999,10 +999,10 @@ Module BlockPtr (BPtr : BlockPtrSig).
     | [ H : context [indrep_n_helper _ _ _ ?l] |- context [length ?l] ] =>
       replace (length l) with NIndirect by (erewrite indrep_n_helper_length; auto; pred_apply' H; cancel)
     | [ |- ?off / ?N < ?N' ] => apply Nat.div_lt_upper_bound; [ mult_nonzero |]
-    | [ |- ?off < ?N * NIndirect] => rewrite mult_comm
+    | [ |- ?off < ?N * NIndirect] => rewrite Nat.mul_comm
     | [ |- context [Nat.min ?a ?b] ] => rewrite Nat.min_r by auto
     | [ |- context [Nat.min ?a ?b] ] => rewrite Nat.min_l by auto
-    | [ H : ?a + ?b <= ?c |- ?a < ?d ] => eapply lt_le_trans with (m := a + b); [lia |]
+    | [ H : ?a + ?b <= ?c |- ?a < ?d ] => eapply Nat.lt_le_trans with (m := a + b); [lia |]
     (* try to get an argument to indrep_n_tree or indrep_n_helper *)
     | [ H : context [listmatch ?P (combine ?A ?B) ?C] |- context [length ?C] ] =>
       replace (length C) with (length A) in * by (
@@ -1027,7 +1027,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
     | [ |- context [Nat.min _ _] ] => rewrite min_l by lia
     | [ H: context [Nat.min _ _] |- _ ] => rewrite min_l in H by lia
     | [ |- _ ] => lia
-    | [ |- ?a < ?b * ?c ] => rewrite mult_comm; lia
+    | [ |- ?a < ?b * ?c ] => rewrite Nat.mul_comm; lia
     | [ H : context [length (concat ?l)] |- _ ] => erewrite concat_hom_length in H by eauto
     end.
 
@@ -1446,7 +1446,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       indrep_n_extract. cancel.
       indrep_n_tree_bound.
       indrep_n_tree_bound.
-      eapply lt_le_trans; [eapply Nat.mod_upper_bound|]; auto.
+      eapply Nat.lt_le_trans; [eapply Nat.mod_upper_bound|]; auto.
       indrep_n_extract.
       erewrite indrep_n_length_pimpl in *.
       destruct_lifts.
@@ -1635,24 +1635,24 @@ Module BlockPtr (BPtr : BlockPtrSig).
         match goal with |- context [(?a + ?b) / ?b] =>
           replace ((a + b) / b) with ((a + 1 * b) / b) by (do 2 f_equal; lia)
         end.
-        rewrite Nat.div_add, plus_comm; auto.
+        rewrite Nat.div_add, Nat.add_comm; auto.
       + rewrite <- roundup_eq by auto.
         unfold roundup.
         rewrite Nat.div_mul by auto.
         rewrite divup_eq_div_plus_1 by auto.
-        rewrite plus_comm; auto.
+        rewrite Nat.add_comm; auto.
       + autorewrite with core.
         match goal with H: context [selN] |- _ => rewrite H end.
         lia.
     - apply Nat.div_lt_upper_bound; auto.
-      eapply le_lt_trans.
-      apply plus_le_compat_l, div_mul_le.
+      eapply Nat.le_lt_trans.
+      apply Nat.add_le_mono_l, div_mul_le.
       rewrite plus_assoc_reverse.
       rewrite le_plus_minus_r by lia.
       indrep_n_tree_bound.
     - apply Nat.div_lt_upper_bound; auto.
-      eapply le_lt_trans.
-      apply plus_le_compat_l, div_mul_le.
+      eapply Nat.le_lt_trans.
+      apply Nat.add_le_mono_l, div_mul_le.
       rewrite plus_assoc_reverse.
       rewrite le_plus_minus_r by lia.
       indrep_n_tree_bound.
@@ -2261,7 +2261,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       pred_apply; cancel.
       {
         rewrite Nat.div_mul, Nat.div_0_l by auto. simpl in *.
-        apply Nat.div_le_upper_bound; mult_nonzero. rewrite mult_comm.
+        apply Nat.div_le_upper_bound; mult_nonzero. rewrite Nat.mul_comm.
         apply Nat.lt_le_incl. congruence.
       }
       indrep_n_tree_bound.
@@ -2277,7 +2277,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       safestep.
       { rewrite Nat.div_0_l, Nat.div_mul by auto. cancel. }
       {
-        rewrite mult_comm, <- Nat.div_mod by auto.
+        rewrite Nat.mul_comm, <- Nat.div_mod by auto.
         erewrite concat_hom_length by eauto.
         autorewrite with lists.
         apply Nat.lt_le_incl. congruence.
@@ -2289,7 +2289,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       cbn [fst snd] in *.
       intuition auto.
       unfold IndRec.items_valid, IndSig.xparams_ok, IndSig.RAStart, IndSig.RALen.
-      rewrite mult_1_l. intuition.
+      rewrite Nat.mul_1_l. intuition.
       rewrite upd_range_length in *.
       match goal with |- length ?x = _ => substl (length x) end.
       indrep_n_tree_bound.
@@ -2312,7 +2312,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
           denote (selN _ _ _ = _) as Hs. rewrite Hs.
           rewrite concat_hom_upd_range by eauto. cbn -[Nat.div Nat.modulo].
           autorewrite with lists. simpl.
-          rewrite mult_comm, <- Nat.div_mod; auto.
+          rewrite Nat.mul_comm, <- Nat.div_mod; auto.
           erewrite concat_hom_length; eauto.
           all: lia.
         * autorewrite with lists; auto.
@@ -2330,7 +2330,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
           rewrite concat_hom_upd_range; eauto.
           rewrite upd_range_upd_range; eauto.
           repeat f_equal; eauto.
-          rewrite mult_comm with (n := len / _), <- Nat.div_mod; auto.
+          rewrite Nat.mul_comm with (n := len / _), <- Nat.div_mod; auto.
           erewrite concat_hom_length by eauto. lia.
           all: lia.
         * autorewrite with lists; auto.
@@ -2413,7 +2413,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       prestep. norml.
       assert (start / NIndirect < length l_part).
         erewrite concat_hom_length in *; eauto.
-        apply Nat.div_lt_upper_bound; auto. rewrite mult_comm.
+        apply Nat.div_lt_upper_bound; auto. rewrite Nat.mul_comm.
         edestruct le_lt_eq_dec; [> | eauto |]; eauto.
         subst. rewrite Nat.mod_mul in * by auto. intuition.
       cancel.
@@ -2507,7 +2507,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       rewrite listmatch_length_pimpl in *. destruct_lifts.
       assert (start / (NIndirect ^ S (S indlvl)) < length l_part); simpl in *.
         erewrite concat_hom_length in *; eauto.
-        apply Nat.div_lt_upper_bound; auto. rewrite mult_comm.
+        apply Nat.div_lt_upper_bound; auto. rewrite Nat.mul_comm.
         edestruct le_lt_eq_dec; [> | eauto |]; eauto.
         subst. rewrite Nat.mod_mul in * by auto. intuition.
       cancel. prestep. norm. cancel.
@@ -2558,7 +2558,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       denote (selN fsl) as Hs. rewrite Hs. cancel.
       {
         erewrite concat_hom_length by eauto.
-        eapply le_trans; [> | apply mult_le_compat_r].
+        eapply Nat.le_trans; [> | apply Nat.mul_le_mono_r].
         apply Nat.lt_le_incl.
         apply Nat.mod_upper_bound.
         assert (NIndirect <> 0) by auto.
@@ -2576,13 +2576,13 @@ Module BlockPtr (BPtr : BlockPtrSig).
         erewrite concat_hom_length in * by eauto.
         rewrite Nat.mul_cancel_r in *; mult_nonzero.
         rewrite combine_length_eq in * by lia. lia.
-        apply divup_le. rewrite mult_comm. eauto.
+        apply divup_le. rewrite Nat.mul_comm. eauto.
       }
       prestep. norm. cancel. intuition idtac.
       auto.
       {
         unfold IndRec.items_valid, IndSig.xparams_ok, IndSig.RAStart, IndSig.RALen.
-        rewrite mult_1_l.
+        rewrite Nat.mul_1_l.
         match goal with [H : context [listmatch _ (combine ?l _)] |- context [length (upd_range ?l _ _ _)] ] =>
           rewrite listmatch_length_pimpl with (a := (combine l _)) in H; destruct_lift H end.
         denote (concat _ = upd_range _ _ _ _) as Hc.
@@ -2685,26 +2685,26 @@ Module BlockPtr (BPtr : BlockPtrSig).
     step.
     step.
     { repeat rewrite Nat.div_mul by mult_nonzero.
-      eapply le_trans. apply div_add_distr_le.
+      eapply Nat.le_trans. apply div_add_distr_le.
       denote (concat _ = _) as Hc.
       apply f_equal with (f := @length _) in Hc.
       rewrite upd_range_length in *.
       repeat erewrite concat_hom_length in * by eauto.
       rewrite Nat.mul_cancel_r in * by mult_nonzero.
-      apply Nat.div_le_upper_bound; auto. rewrite mult_comm with (m := length _).
+      apply Nat.div_le_upper_bound; auto. rewrite Nat.mul_comm with (m := length _).
       destruct (addr_eq_dec (start mod (NIndirect * NIndirect ^ indlvl)) 0).
       - unfold roundup. rewrite divup_eq_div by auto. rewrite mul_div by mult_nonzero.
         autorewrite with core. congruence.
       - rewrite roundup_eq by auto. rewrite minus_plus.
-        rewrite <- plus_assoc. autorewrite with core; solve [congruence | lia].
+        rewrite <- Nat.add_assoc. autorewrite with core; solve [congruence | lia].
     }
     { autorewrite with core; auto. }
     prestep. norm. cancel.
     intuition auto.
     + pred_apply. repeat rewrite Nat.div_mul by auto. cancel.
     + erewrite concat_hom_length by auto. autorewrite with lists.
-      rewrite mult_comm with (m := _ * _ ^ _).
-      rewrite <- plus_assoc, <- Nat.div_mod by auto.
+      rewrite Nat.mul_comm with (m := _ * _ ^ _).
+      rewrite <- Nat.add_assoc, <- Nat.div_mod by auto.
       denote (concat _ = _) as Hc.
       apply f_equal with (f := @length _) in Hc.
       rewrite upd_range_length in *.
@@ -2714,7 +2714,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       - unfold roundup. rewrite divup_eq_div by auto. rewrite mul_div by mult_nonzero.
         autorewrite with core. congruence.
       - rewrite roundup_eq by auto. rewrite minus_plus.
-        rewrite <- plus_assoc. autorewrite with core; solve [congruence | lia].
+        rewrite <- Nat.add_assoc. autorewrite with core; solve [congruence | lia].
     + autorewrite with core. auto.
     + autorewrite with lists in *. lia.
     + pred_apply; cancel.
@@ -2725,7 +2725,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       rewrite roundup_round in *.
       match goal with H: concat _ = _, H' : concat _ = _ |- _ => rewrite H, H' end.
       autorewrite with lists.
-      rewrite mult_comm with (m := N), <- Nat.div_mod by mult_nonzero.
+      rewrite Nat.mul_comm with (m := N), <- Nat.div_mod by mult_nonzero.
       erewrite <- le_plus_minus_r with (m := roundup start N) at 2.
       rewrite upd_range_upd_range. f_equal.
       destruct (addr_eq_dec (start mod N) 0).
@@ -3216,7 +3216,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
           replace (length dummy1) with NIndirect by indrep_n_tree_bound.
           indrep_n_tree_bound.
           erewrite <- updN_concat.
-          rewrite plus_comm, mult_comm, <- Nat.div_mod; auto.
+          rewrite Nat.add_comm, Nat.mul_comm, <- Nat.div_mod; auto.
           auto.
           auto.
           or_r. cancel.
@@ -3230,7 +3230,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
           replace (length dummy1) with NIndirect by indrep_n_tree_bound.
           indrep_n_tree_bound.
           erewrite <- updN_concat.
-          rewrite plus_comm, mult_comm, <- Nat.div_mod; auto.
+          rewrite Nat.add_comm, Nat.mul_comm, <- Nat.div_mod; auto.
           auto.
           auto.
           cancel.
@@ -3327,7 +3327,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
     split; [> | cancel].
     intros m' H'. pred_apply. cancel.
     destruct_lift H'.
-    repeat rewrite <- plus_assoc. rewrite minus_plus.
+    repeat rewrite <- Nat.add_assoc. rewrite minus_plus.
     indrep_n_tree_extract_lengths.
     erewrite <- firstn_skipn with (l := l). rewrite app_length. f_equal; eauto.
     erewrite <- firstn_skipn with (l := skipn _ _). rewrite app_length.
@@ -3355,7 +3355,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
     unfold indrep. intros.
     repeat match goal with [H : _ = 0 |- _] => rewrite H end.
     repeat rewrite indrep_n_tree_0. simpl.
-    repeat rewrite <- plus_assoc. rewrite minus_plus.
+    repeat rewrite <- Nat.add_assoc. rewrite minus_plus.
     rewrite mult_1_r in *.
     setoid_rewrite indrep_n_tree_0.
     split; norm; psubst; try cancel;
@@ -3606,7 +3606,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
     step; indrep_n_tree_extract_lengths; hoare.
     match goal with H : length l = _ |- _ => setoid_rewrite <- H end.
     let H := fresh in
-    edestruct Min.min_spec as [ [? H]|[? H] ]; rewrite H; clear H.
+    edestruct Nat.min_spec as [ [? H]|[? H] ]; rewrite H; clear H.
     reflexivity.
     rewrite firstn_oob.
     rewrite firstn_oob; auto.
@@ -3968,7 +3968,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
       - apply le_nblocks_goodSize. simpl. rewrite mult_1_r. lia.
       - eauto.
       - substl l at 1.
-        rewrite plus_comm.
+        rewrite Nat.add_comm.
         repeat match goal with [|- context [firstn ?a (?b ++ ?c)] ] =>
           rewrite firstn_app_split with (l1 := b); rewrite firstn_oob with (l := b) by lia
         end. rewrite <- app_assoc. f_equal.
@@ -3996,7 +3996,7 @@ Module BlockPtr (BPtr : BlockPtrSig).
        -- split; cancel.
        -- substl l at 1. cbn.
           match goal with [H : updN _ _ _ = _ |- _] => rewrite <- H end.
-          rewrite plus_comm. erewrite firstn_S_selN.
+          rewrite Nat.add_comm. erewrite firstn_S_selN.
           repeat rewrite firstn_app_le by lia.
           rewrite firstn_updN_oob by lia. rewrite selN_app2 by lia.
           erewrite eq_trans with (x := _ - _); [> | reflexivity |].

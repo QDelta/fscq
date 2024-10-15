@@ -293,7 +293,7 @@ Module BUFCACHE.
   Proof.
     unfold size_valid in *; intuition simpl.
     rewrite map_remove_cardinal by eauto; congruence.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply map_cardinal_remove_le; auto.
     auto.
   Qed.
@@ -306,7 +306,7 @@ Module BUFCACHE.
     unfold size_valid in *; intuition simpl.
     rewrite Map.cardinal_1 in *.
     rewrite map_remove_not_in_elements_eq by auto. auto.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply map_cardinal_remove_le; auto.
     auto.
   Qed.

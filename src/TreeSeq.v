@@ -2069,7 +2069,7 @@ Lemma seq_upd_safe_upd_bwd_ne: forall pathname pathname' inum n ts off v f mscs,
       2: eapply dirtree_update_block.
       erewrite dirtree_update_inode_update_subtree.
       rewrite app_length; simpl.
-      rewrite plus_comm; simpl.
+      rewrite Nat.add_comm; simpl.
 
       rewrite synced_file_alt_helper2_selN_oob by lia.
       replace (selN (vssync_vecs m al) x ($0, nil)) with

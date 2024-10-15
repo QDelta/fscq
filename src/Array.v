@@ -388,7 +388,7 @@ Proof.
   rewrite IHl.
   split; cancel.
   intros.
-  rewrite <- Plus.plus_Snm_nSm.
+  rewrite <- Nat.add_succ_comm.
   rewrite H; (eauto; lia).
 Qed.
 
@@ -663,7 +663,7 @@ Proof.
   rewrite selN_app2.
   rewrite skipn_selN.
   rewrite combine_length_eq.
-  rewrite Minus.le_plus_minus_r; auto.
+  rewrite le_plus_minus_r; auto.
   rewrite repeat_length; auto.
   rewrite combine_length_eq; auto.
   rewrite repeat_length; auto.

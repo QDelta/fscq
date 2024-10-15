@@ -1,4 +1,4 @@
-FROM coqorg/coq:8.16
+FROM coqorg/coq:8.19
 
 SHELL ["/bin/bash", "-c"]
 
@@ -23,7 +23,7 @@ RUN cabal update && \
     cabal install --lib rdtsc digest
 
 RUN opam update -y -u && \
-    opam install -y -v ocaml-lsp-server ocamlformat && \
+    opam install -y -v ocaml-lsp-server ocamlformat coq-lsp && \
     opam clean -a -c -s --logs
 
 CMD ["/bin/bash"]

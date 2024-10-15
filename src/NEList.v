@@ -460,7 +460,7 @@ Section NonEmptyList.
         replace (t, [t0]) with (pushd t0 (t, nil)) by reflexivity.
         eapply NESubsetHead.
       + replace (selN (a :: t1 :: l) (length (a :: t1 :: l) - 1) t) with (selN (t1 :: l) (length (t1 :: l) - 1) t) in H.
-        2: simpl; rewrite <- minus_n_O; eauto.
+        2: simpl; rewrite Nat.sub_0_r; eauto.
         rewrite cuttail_cons in H by ( simpl; lia ).
         inversion H; subst.
         * replace (t, t0 :: t1 :: l) with (pushd t0 (t, t1 :: l)) by reflexivity.
@@ -529,7 +529,7 @@ Section NonEmptyList.
             inversion H3; subst.
             apply SubsetIn. eauto.
          -- apply SubsetNotIn. eauto.
-      + unfold cuttail. simpl. rewrite <- minus_n_O.
+      + unfold cuttail. simpl. rewrite Nat.sub_0_r.
         induction l0 using rev_ind; simpl; auto.
         rewrite app_length; simpl.
         replace (length l0 + 1) with (S (length l0)) by lia.

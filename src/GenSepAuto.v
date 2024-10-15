@@ -76,7 +76,7 @@ Ltac simplen_rewrite := repeat match goal with
   | [H : ?l = _ , H2 : context [ ?l ] |- _ ] => first [ rewrite_ignore H2 | rewrite H in H2 ]
   | [H : @length ?T ?l = 0 |- context [?l] ] => replace l with (@nil T) by eauto
   | [H : @eqlen _ ?T ?l nil |- context [?l] ] => replace l with (@nil T) by eauto
-  | [ |- _ < _ ] => try solve [eapply lt_le_trans; eauto; try lia ]
+  | [ |- _ < _ ] => try solve [eapply Nat.lt_le_trans; eauto; try lia ]
   end.
 
 Ltac genseplen_rewrite := repeat match goal with

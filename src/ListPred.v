@@ -415,7 +415,7 @@ Section LISTMATCH.
   Variable V : Type.
   Variable prd : A -> B -> @pred AT AEQ V.
 
-  Definition pprd := prod_curry prd.
+  Definition pprd := uncurry prd.
 
   Definition listmatch (a : list A) (b : list B) :=
     ([[ length a = length b ]] *
@@ -733,7 +733,7 @@ Proof.
   destruct H' as [? [? Hs] ].
   destruct_lifts.
   rewrite listpred_pick in H.
-  unfold pprd, prod_curry in *.
+  unfold pprd, uncurry in *.
   2: eapply in_selN.
   erewrite selN_combine in H by auto.
   2: rewrite combine_length_eq; eauto.
@@ -917,7 +917,7 @@ Lemma crash_xform_pprd : forall A B (prd : A -> B -> rawpred),
   (fun p => crash_xform (pprd prd p)) =
   (pprd (fun x y => crash_xform (prd x y))).
 Proof.
-  unfold pprd, prod_curry, crash_xform; intros.
+  unfold pprd, uncurry, crash_xform; intros.
   apply functional_extensionality; intros; destruct x; auto.
 Qed.
 

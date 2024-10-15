@@ -1332,7 +1332,7 @@ Module PaddedLog.
   Proof.
     unfold loglen_valid, DescSig.xparams_ok, DataSig.xparams_ok; intuition.
     eapply goodSize_trans.
-    eapply le_trans. eauto.
+    eapply Nat.le_trans. eauto.
     apply le_plus_r. eauto.
   Qed.
 
@@ -1342,7 +1342,7 @@ Module PaddedLog.
   Proof.
     unfold loglen_valid, DescSig.xparams_ok, DataSig.xparams_ok; intuition.
     eapply goodSize_trans.
-    eapply le_trans. eauto.
+    eapply Nat.le_trans. eauto.
     apply le_plus_r. eauto.
   Qed.
 
@@ -1561,7 +1561,7 @@ Module PaddedLog.
     nonzero_addrs (map fst l) <= (divup (length l) n) * n.
   Proof.
     intros.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply nonzero_addrs_bound.
     rewrite map_length.
     apply roundup_ge; auto.
@@ -1579,7 +1579,7 @@ Module PaddedLog.
     setoid_rewrite <- Nat.mul_comm at 2.
     apply divup_add_gt; auto.
 
-    eapply lt_le_trans; eauto.
+    eapply Nat.lt_le_trans; eauto.
     apply Nat.add_le_mono.
     apply nonzero_addrs_roundup; auto.
     erewrite <- map_length.
@@ -1990,7 +1990,7 @@ Module PaddedLog.
     all: unfold DescSig.RALen, DataSig.RALen, xparams_ok in *;
           try lia; auto; intuition.
 
-    apply mult_le_compat_r; lia.
+    apply Nat.mul_le_mono_r; lia.
 
     replace DataSig.items_per_val with 1 in * by (cbv; auto); try lia.
   Qed.

@@ -2,7 +2,8 @@
     "name": "fscq",
 
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile",
+        "context": ".."
     },
 
     "customizations": {
@@ -10,7 +11,7 @@
             "settings": {
                 "coqtop.startOn": "interaction",
                 "coq.coqProjectRoot": "src",
-                "coqtop.args": ["-async-proofs", "off", "-w", "-omega-is-deprecated,-implicit-core-hint-db,-deprecated-hint-without-locality,-deprecated-grab-existentials,-undeclared-scope"],
+                "coqtop.args": ["-async-proofs", "off"],
                 "files.associations": {
                     "*.mlg": "ocaml.ocamllex" // workaround for syntax highlighting
                 }

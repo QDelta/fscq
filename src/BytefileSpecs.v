@@ -101,7 +101,7 @@ Hint Resolve valubytes_ge_O.
     repeat match goal with | [H: ?a = _ |- context[?a] ] =>  rewrite H end;
     try apply Nat.le_add_le_sub_l;
     try rewrite <- Nat.mul_succ_l;
-    try apply mult_le_compat_r;
+    try apply Nat.mul_le_mono_r;
     lia.
     
 Ltac solve_dsupd_iter:=
@@ -2850,27 +2850,27 @@ Proof.
      safecancel.
    
      + instantiate (1:= length x4).
-       eapply le_trans.
+       eapply Nat.le_trans.
        apply H21.
        apply Nat.div_le_mono; auto.
        apply roundup_ge; auto.
         
     + rewrite firstn_firstn; rewrite min_l.
       rewrite firstn_app_l; auto.
-      eapply le_trans.
+      eapply Nat.le_trans.
       2: eapply Nat.mul_div_le with (b:= valubytes); auto.
-      rewrite Nat.mul_comm; apply mult_le_compat_l; auto.
-      apply mult_le_compat_r; auto.
+      rewrite Nat.mul_comm; apply Nat.mul_le_mono_l; auto.
+      apply Nat.mul_le_mono_r; auto.
    
    + eauto.
    + rewrite firstn_app_l.
        rewrite firstn_firstn; rewrite min_l; auto.
        repeat (rewrite firstn_firstn in H18; rewrite min_l in H18); eauto.
-       apply mult_le_compat_r; auto.
-       apply mult_le_compat_r; auto.
-       eapply le_trans.
+       apply Nat.mul_le_mono_r; auto.
+       apply Nat.mul_le_mono_r; auto.
+       eapply Nat.le_trans.
        2: eapply Nat.mul_div_le with (b:= valubytes); auto.
-       rewrite Nat.mul_comm; apply mult_le_compat_l; auto.
+       rewrite Nat.mul_comm; apply Nat.mul_le_mono_l; auto.
   + eauto.
   + eauto.
   
@@ -3226,7 +3226,7 @@ Proof.
     apply Nat.div_str_pos; auto.
     split; auto.
     apply valubytes_ge_O.
-    apply le_trans with (m:= length data + length head_data).
+    apply Nat.le_trans with (m:= length data + length head_data).
     lia.
     apply roundup_ge; auto.
     apply le_sub_le_add_r' in H27.
@@ -3317,8 +3317,8 @@ Proof.
     apply le_sub_le_add_r' in H27; try lia.
     replace (valubytes + S n * valubytes) with
     ((S n + 1) * valubytes) by (rewrite Nat.mul_add_distr_r; simpl; lia).
-    apply mult_le_compat_r with (p:= valubytes) in H27; auto.
-    eapply le_trans.
+    apply Nat.mul_le_mono_r with (p:= valubytes) in H27; auto.
+    eapply Nat.le_trans.
     apply H27.
     rewrite Nat.add_comm; rewrite Nat.mul_comm; apply Nat.mul_div_le; auto.
     
@@ -3452,8 +3452,8 @@ Proof.
     apply le_sub_le_add_r' in H27; try lia.
     replace (valubytes + S n * valubytes) with
     ((S n + 1) * valubytes) by (rewrite Nat.mul_add_distr_r; simpl; lia).
-    apply mult_le_compat_r with (p:= valubytes) in H27; auto.
-    eapply le_trans.
+    apply Nat.mul_le_mono_r with (p:= valubytes) in H27; auto.
+    eapply Nat.le_trans.
     apply H27.
     rewrite Nat.add_comm; rewrite Nat.mul_comm; apply Nat.mul_div_le; auto.
     
@@ -3528,7 +3528,7 @@ Proof.
 
     instantiate (1:= 1).
     length_rewrite_l.
-    eapply le_trans.
+    eapply Nat.le_trans.
     instantiate (1:= (length head_data + length data) / valubytes).
     apply Nat.div_str_pos; auto.
     split; auto.
@@ -3787,7 +3787,7 @@ Proof.
   unfold hpad_length in *; auto.
   rewrite Nat.div_0_l in *; auto.
   rewrite Nat.mod_0_l in *; auto.
-  repeat rewrite <- minus_n_O in *; auto.
+  repeat rewrite Nat.sub_0_r in *; auto.
   simpl in *.
   instantiate (1:= nil).
   instantiate (2:= nil).

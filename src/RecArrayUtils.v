@@ -321,7 +321,7 @@ Module RADefs (RA : RASig).
     lia.
     destruct i; cbn; auto.
     rewrite IHnr by lia.
-    rewrite plus_comm.
+    rewrite Nat.add_comm.
     rewrite skipn_skipn.
     reflexivity.
   Qed.
@@ -471,7 +471,7 @@ Module RADefs (RA : RASig).
     rewrite firstn_app_l.
     rewrite firstn_firstn; rewrite Nat.min_l; auto.
     rewrite firstn_length.
-    apply Min.min_glb; auto.
+    apply Nat.min_glb; auto.
   Qed.
 
   Lemma list_chunk'_app : forall A na sz a b (def : A),
@@ -719,7 +719,7 @@ Module RADefs (RA : RASig).
 
     rewrite H0 in *.
     rewrite divup_mul in l by auto.
-    apply lt_le_S in l; eapply mult_le_compat_r in l; eauto.
+    apply Nat.le_succ_l in l; eapply Nat.mul_le_mono_r in l; eauto.
 
     repeat rewrite firstn_oob; try lia.
     eapply iunpack_ipack; eauto.
@@ -727,7 +727,7 @@ Module RADefs (RA : RASig).
     rewrite H0 in *.
     rewrite divup_mul in n0 by auto.
     apply Nat.nlt_ge in n0.
-    apply mult_le_compat; lia.
+    apply Nat.mul_le_mono; lia.
   Qed.
 
   Lemma ipack_iunpack_one : forall (a : valu),
@@ -978,7 +978,7 @@ Module RADefs (RA : RASig).
     rewrite list_chunk_spec, setlen_length in *.
 
     rewrite H2.
-    eapply lt_le_trans; eauto.
+    eapply Nat.lt_le_trans; eauto.
     setoid_rewrite <- Nat.mul_1_l at 5.
     rewrite <- Nat.mul_add_distr_r.
     apply Nat.mul_le_mono_r; lia.
@@ -1006,7 +1006,7 @@ Module RADefs (RA : RASig).
     apply Nat.min_glb_lt; try lia.
     setoid_rewrite H2.
     apply lt_add_lt_sub in Hb; auto.
-    eapply lt_le_trans; eauto.
+    eapply Nat.lt_le_trans; eauto.
     rewrite <- Nat.mul_sub_distr_r, <- Nat.mul_1_l at 1.
     apply Nat.mul_le_mono_r; lia.
   Qed.
@@ -1027,7 +1027,7 @@ Module RADefs (RA : RASig).
 
     assert (ix < length items).
     setoid_rewrite H4.
-    eapply lt_le_trans; eauto.
+    eapply Nat.lt_le_trans; eauto.
     setoid_rewrite Nat.mul_comm.
     rewrite Nat.add_comm, mult_n_Sm.
     apply Nat.mul_le_mono_pos_l; auto.

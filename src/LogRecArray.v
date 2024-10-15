@@ -473,7 +473,7 @@ Module LogRecArray (RA : RASig).
     rewrite length_nil with (l := l2); auto.
     rewrite length_nil with (l := l1); auto.
     induction r; intros; intuition.
-    simpl in *; rewrite plus_0_r in *.
+    simpl in *; rewrite Nat.add_0_r in *.
     rewrite ipack_one in *; auto.
     rewrite ipack_one in *; auto.
     match goal with [H : _::_ = _::_ |- _] => inversion H; clear H end.
@@ -488,7 +488,7 @@ Module LogRecArray (RA : RASig).
         erewrite ipack_app with (na := 1) in H;
         [> erewrite <- firstn_skipn with (l := lx) | ];
         [> erewrite ipack_one with (l := firstn _ _) in H | ]
-    end; simpl in *; try rewrite plus_0_r in *.
+    end; simpl in *; try rewrite Nat.add_0_r in *.
     match goal with [H: _::_ = _::_ |- _ ] => inversion H end.
     unfold block2val, word2val, eq_rec_r, eq_rec in *.
     simpl in *.

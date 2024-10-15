@@ -1130,7 +1130,7 @@ Module GLog.
     constructor; auto.
     split; destruct H2.
     apply log_vaild_filter; eauto.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply filter_length. auto.
   Qed.
 

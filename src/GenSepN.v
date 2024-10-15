@@ -375,7 +375,7 @@ Theorem list2nmem_off_eq : forall A (l : list A), list2nmem l = list2nmem_off 0 
 Proof.
   unfold list2nmem, list2nmem_off; intros.
   apply functional_extensionality; intros.
-  rewrite <- Minus.minus_n_O.
+  rewrite Nat.sub_0_r.
   reflexivity.
 Qed.
 
@@ -1318,7 +1318,7 @@ Proof.
   unfold arrayN_ex; intros.
   apply sep_star_notindomain.
   apply arrayN_notindomain_after.
-  rewrite firstn_length. simpl. apply Min.le_min_l.
+  rewrite firstn_length. simpl. apply Nat.le_min_l.
   apply arrayN_notindomain_before.
   lia.
 Qed.

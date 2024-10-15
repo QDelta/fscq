@@ -177,7 +177,7 @@ Proof.
   destruct i; intros. simpl.
   inversion H.
   simpl.
-  rewrite <- minus_n_O.
+  rewrite Nat.sub_0_r.
   reflexivity.
 Qed.
 
@@ -210,10 +210,10 @@ Proof.
 Qed.
 
 (* XXX: START Arithmetic Lemmas. *)
-Lemma le_trans: forall n m k, n <= m -> m <= k -> n <= k.
+Lemma Nat.le_trans: forall n m k, n <= m -> m <= k -> n <= k.
 Proof. intros. lia. Qed.
 
-Fact lt_le_trans: forall n m p, n < m -> m <= p -> n < p.
+Fact Nat.lt_le_trans: forall n m p, n < m -> m <= p -> n < p.
 Proof. intros. lia. Qed.
 
 Lemma le_weaken_l: forall n m k, n + m <= k -> n <= k.
@@ -333,7 +333,7 @@ Proof.
   unfold ge.
   remember (n * length a + i) as x.
   replace (length a + n * length a + i) with (length a + x).
-  apply le_plus_l.
+  apply Nat.le_add_r.
   lia.
 Qed.
 
@@ -1548,16 +1548,16 @@ Qed.
 	Proof.
 		induction c; intros.
 		simpl.
-		rewrite <- minus_n_O.
+		rewrite Nat.sub_0_r.
 		reflexivity.
 		replace (a - S c * b) with ((a - b) - c * b).
 		rewrite IHc.
 		apply modulo_eq.
 		all: auto.
 		simpl in H0.
-		eapply le_trans.
+		eapply Nat.le_trans.
 		2: apply H0.
-		apply le_plus_l.
+		apply Nat.le_add_r.
 		apply Nat.le_add_le_sub_l.
 		simpl in H0; auto.
 		simpl.
@@ -1709,7 +1709,7 @@ Proof.
   simpl; rewrite <- plus_n_O.
   rewrite Nat.sub_add; try lia.
   destruct c. lia.
-  simpl;  apply le_plus_l.
+  simpl;  apply Nat.le_add_r.
 Qed.
 
 Lemma merge_bs_firstn_comm: forall l l' a,
@@ -1855,7 +1855,7 @@ Proof.
   intros.
   destruct b; simpl in *.
   inversion H0.
-  rewrite <- minus_n_O in *.
+  rewrite Nat.sub_0_r in *.
 
   pose proof (Nat.le_exists_sub (b*c) a); intuition; deex.
   rewrite Nat.mod_add by auto.

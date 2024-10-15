@@ -58,9 +58,9 @@ Inductive hashmap_subset : list (word hashlen * {sz : nat & word sz}) -> hashmap
 Ltac existT_wordsz_neq H :=
   let Hx := fresh in
   inversion H as [ Hx ];
-  try (rewrite <- plus_0_r in Hx at 1;
+  try (rewrite <- Nat.add_0_r in Hx at 1;
       apply plus_reg_l in Hx);
-  try (rewrite <- plus_0_r in Hx;
+  try (rewrite <- Nat.add_0_r in Hx;
       apply plus_reg_l in Hx);
   inversion Hx.
 

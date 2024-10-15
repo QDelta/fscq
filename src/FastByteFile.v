@@ -185,13 +185,13 @@ Module FASTBYTEFILE.
     step.
 
     eapply goodSize_word_bound.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply divup_lt_arg.
     apply Nat.lt_le_incl; eauto.
 
     erewrite array_items_num_blocks; eauto.
     apply divup_mono.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply Nat.lt_le_incl; eauto.
     apply firstn_length_l_iff; auto.
 
@@ -206,7 +206,7 @@ Module FASTBYTEFILE.
     step.
     rewrite le_plus_minus_r by lia.
     eapply goodSize_word_bound.
-    eapply le_trans.
+    eapply Nat.le_trans.
     apply divup_lt_arg.
     eauto.
 

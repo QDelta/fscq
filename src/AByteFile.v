@@ -1,4 +1,3 @@
-Require Import Min.
 Require Import Arith.
 Require Import Word.
 Require Import Prog ProgMonad.
@@ -634,9 +633,9 @@ i * valubytes < length (ByFData fy) ->
 Proof.
 intros.
 erewrite unified_byte_protobyte_len with (k:= valubytes); eauto.
-apply mult_le_compat_r.
-apply lt_le_S.
-eapply lt_le_trans with (m:= length (ByFData fy)) in H2.
+apply Nat.mul_le_mono_r.
+apply Nat.le_succ_l.
+eapply Nat.lt_le_trans with (m:= length (ByFData fy)) in H2.
 2: apply bytefile_unified_byte_len; eauto.
 erewrite unified_byte_protobyte_len with (k:= valubytes) in H2; eauto.
 apply lt_mult_weaken in H2; auto.
@@ -654,7 +653,7 @@ Fact inbound_bytefile_bfile: forall a  b f pfy ufy fy,
 Proof.
 intros.
 apply bytefile_unified_byte_len in H1.
-eapply lt_le_trans with (m:= length (ByFData fy))in H2.
+eapply Nat.lt_le_trans with (m:= length (ByFData fy))in H2.
 2:eauto.
 erewrite unified_byte_protobyte_len with (k:= valubytes) in H2.
 2:eauto.
@@ -2437,7 +2436,7 @@ Lemma unified_bytefile_minus: forall f pfy ufy fy a,
 		 length (ByFData fy) >= length (UByFData ufy) - a.
 		 Proof.
 		 	intros.
-		 	eapply le_trans.
+		 	eapply Nat.le_trans.
 		 	instantiate (1:= length (UByFData ufy) - valubytes).
 		 	lia.
 		 	rewrite H1.
@@ -2541,7 +2540,7 @@ Qed.
 
 	  eapply goodSize_trans.
 	  2: apply H2.
-	  apply plus_le_compat_l.
+	  apply Nat.add_le_mono_l.
 	  apply mod_ne_0 in H3; auto.
 	  lia.
 	  apply valubytes_ne_O.
@@ -2577,7 +2576,7 @@ Qed.
 	  apply mod_upper_bound_le'; auto.
 	  eapply goodSize_trans.
 	  2: apply H1.
-	  apply plus_le_compat_l.
+	  apply Nat.add_le_mono_l.
 	  apply mod_ne_0 in H2; auto.
 	  lia.
   Qed.
@@ -2615,7 +2614,7 @@ Qed.
   skipn (a) (list_zero_pad nil n) = list_zero_pad nil (n - a).
   Proof.
     induction a; intros; simpl.
-    rewrite <- minus_n_O.
+    rewrite Nat.sub_0_r.
     reflexivity.
     destruct n; simpl.
     reflexivity.
@@ -2820,9 +2819,9 @@ Proof.
   apply Nat.mod_le; auto.
   destruct c; try lia.
   simpl.
-  eapply le_trans.
+  eapply Nat.le_trans.
   apply mod_upper_bound_le'; eauto.
-  apply le_plus_l.
+  apply Nat.le_add_r.
 Qed.
 
 Lemma div_ge_0: forall a b,
@@ -2877,7 +2876,7 @@ Proof.
 	intros.
 	eapply goodSize_trans.
 	2: eauto.
-	apply plus_le_compat_l.
+	apply Nat.add_le_mono_l.
 	apply Nat.nlt_ge in H0; apply H0.
 Qed.
 

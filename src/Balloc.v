@@ -331,7 +331,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     intros.
     pose proof (Nat.div_mod bn Defs.itemsz) as Hbn.
     rewrite Hbn at 4 by auto.
-    rewrite plus_comm, mult_comm.
+    rewrite Nat.add_comm, Nat.mul_comm.
     rewrite updN_concat; f_equal.
     rewrite map_updN; f_equal.
     rewrite bits_set_avail.
@@ -386,7 +386,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     unfold BmpSig.RALen.
     rewrite BmpSig.blocksz_ok.
     cbn [Rec.len BmpSig.itemtype].
-    auto using mult_assoc.
+    auto using Nat.mul_assoc.
   Qed.
 
   Lemma bmap_rep_length_ok1 : forall F xp blist d a,
@@ -396,7 +396,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
   Proof.
     unfold Bmp.rep, Bmp.items_valid; intros.
     destruct_lift H0.
-    eapply lt_le_trans; eauto.
+    eapply Nat.lt_le_trans; eauto.
     rewrite to_bits_length.
     setoid_rewrite H6.
     rewrite bits_len_rewrite; auto.
@@ -411,7 +411,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     destruct_lift H.
     apply Nat.div_lt_upper_bound; auto.
     setoid_rewrite H6.
-    rewrite mult_comm.
+    rewrite Nat.mul_comm.
     rewrite bits_len_rewrite.
     auto.
   Qed.
@@ -434,7 +434,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
   Proof.
     intros.
     unfold to_bits.
-    rewrite plus_comm.
+    rewrite Nat.add_comm.
     rewrite updN_concat; auto.
     rewrite map_updN.
     erewrite selN_map by auto.
@@ -476,7 +476,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     rewrite bits_rep_bit.
     rewrite repeat_selN'; auto.
     apply Nat.div_le_lower_bound; solve [auto | lia].
-    rewrite to_bits_length, mult_comm. lia.
+    rewrite to_bits_length, Nat.mul_comm. lia.
   Qed.
 
   Lemma avail_nonzero_is_avail : forall bmap i ii b d d',
@@ -492,7 +492,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     rewrite Nat.div_add_l by auto.
     rewrite Nat.div_small by auto.
     rewrite Nat.add_0_r.
-    rewrite plus_comm.
+    rewrite Nat.add_comm.
     rewrite Nat.mod_add by auto.
     rewrite Nat.mod_small by auto.
     apply ifind_list_ok_cond in H0 as H2.
@@ -612,7 +612,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
       apply Nat.mod_upper_bound; auto.
       eapply in_seq in H.
       apply Nat.div_lt_upper_bound; auto.
-      rewrite mult_comm, bits_len_rewrite.
+      rewrite Nat.mul_comm, bits_len_rewrite.
       intuition idtac.
     - apply in_seq; intuition.
       destruct (lt_dec a (BMPLen xp * valulen)); try lia.
@@ -675,7 +675,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     repeat match goal with
     | _ => lia
     | _ => solve [auto]
-    | [H: context [_ + S _] |- _] => rewrite <- plus_Snm_nSm in H
+    | [H: context [_ + S _] |- _] => rewrite <- Nat.add_succ_comm in H
     | [H: context [if ?x then _ else _] |- _ ] => destruct x; subst
     | [H: In _ (_ :: _) |- _] => destruct H; subst
     | [H: In _ _ |- _] => apply IHl in H
@@ -687,7 +687,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     repeat match goal with
     | _ => lia
     | _ => solve [auto | cbv in *; congruence]
-    | _ => rewrite <- plus_Snm_nSm
+    | _ => rewrite <- Nat.add_succ_comm
     | [|- context [if ?x then _ else _] ] => destruct x; subst
     | [H: In _ (_ :: _) |- _] => destruct H; subst
     | [|- In _ _ ] => apply IHl
@@ -976,7 +976,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     denote (Bmp.rep _ dummy) as Hr; eapply Bmp.items_length_ok in Hr.
     rewrite to_bits_length in *.
     apply Nat.div_lt_upper_bound; auto.
-    rewrite mult_comm; auto.
+    rewrite Nat.mul_comm; auto.
 
     assert (bn / Defs.itemsz < length dummy).
     unfold freelist_bmap_equiv in *; intuition.
@@ -984,7 +984,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     denote (Bmp.rep _ dummy) as Hr; eapply Bmp.items_length_ok in Hr.
     rewrite to_bits_length in *.
     apply Nat.div_lt_upper_bound; auto.
-    rewrite mult_comm; auto.
+    rewrite Nat.mul_comm; auto.
 
     step.
     safestep.
@@ -1133,7 +1133,7 @@ Module BmpWord (Sig : AllocSig) (WBSig : WordBMapSig).
     cbn in *.
     denote (length _ = _) as Ha.
     rewrite Ha in *.
-    rewrite mult_assoc.
+    rewrite Nat.mul_assoc.
     assumption.
     Unshelve.
     all : eauto; constructor.
@@ -1838,7 +1838,7 @@ Module BALLOC.
     eapply goodSize_trans.
     eapply Nat.lt_le_incl; eauto.
     eapply goodSize_trans.
-    eapply mult_le_compat_r; eauto.
+    eapply Nat.mul_le_mono_r; eauto.
     unfold goodSize.
     replace addrlen with (16 + 16 + 16 + 16) by (compute; auto).
     rewrite <- Nat.mul_1_r at 1.
@@ -2251,7 +2251,7 @@ Module BALLOCC.
     eapply goodSize_trans.
     eapply Nat.lt_le_incl; eauto.
     eapply goodSize_trans.
-    eapply mult_le_compat_r; eauto.
+    eapply Nat.mul_le_mono_r; eauto.
     unfold goodSize.
     replace addrlen with (16 + 16 + 16 + 16) by (compute; auto).
     rewrite <- Nat.mul_1_r at 1.
@@ -2396,7 +2396,7 @@ Module IAlloc.
     eapply goodSize_trans.
     eapply Nat.lt_le_incl; eauto.
     eapply goodSize_trans.
-    eapply mult_le_compat_r; eauto.
+    eapply Nat.mul_le_mono_r; eauto.
     unfold goodSize.
     replace addrlen with (16 + 16 + 16 + 16) by (compute; auto).
     rewrite <- Nat.mul_1_r at 1.

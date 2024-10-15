@@ -41,7 +41,7 @@ HSLIB_FUSE := hscgen/Fuse.hs hslib/libopfuse.a
 HSLIB_PRE  := hslib/Word.hs hslib/Evict.hs hslib/Profile.hs
 HSLIB_POST := hslib/Disk.hs hslib/Interpreter.hs
 
-COQ_WARNING := -w -omega-is-deprecated,-implicit-core-hint-db,-deprecated-hint-without-locality,-deprecated-grab-existentials,-undeclared-scope,-deprecated-hint-rewrite-without-locality,-deprecated-instance-without-locality,-deprecated-syntactic-definition
+COQ_WARNING := -w -implicit-core-hint-db,-deprecated-hint-without-locality,-undeclared-scope,-deprecated-hint-rewrite-without-locality,-deprecated-instance-without-locality,-deprecated-syntactic-definition,-unknown-option,-intuition-auto-with-star
 COQEXEC     := coqtop -R . Fscq $(COQ_WARNING) -batch -load-vernac-source
 
 .PHONY: vos vok proof clean
