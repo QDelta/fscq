@@ -1,1 +1,1 @@
-Declare ML Module "test_plugin".
+Declare ML Module "coq_test_plugin.plugin".

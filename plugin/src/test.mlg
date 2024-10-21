@@ -1,4 +1,4 @@
-DECLARE PLUGIN "test_plugin"
+DECLARE PLUGIN "coq_test_plugin.plugin"
 
 {
 
@@ -26,7 +26,7 @@ END
 TACTIC EXTEND hello_world_tactic
 | [ "hello_world" ] ->
   { let _ = Feedback.msg_notice (str Test_main.message) in
-    Tacticals.New.tclIDTAC }
+    Tacticals.tclIDTAC }
 END
 
 (*** Printing warnings ***)
@@ -50,7 +50,7 @@ TACTIC EXTEND hello_warning_tactic
 | [ "hello_warning" ] ->
    {
      let _ = test_warn () in
-     Tacticals.New.tclIDTAC
+     Tacticals.tclIDTAC
    }
 END
 
@@ -70,5 +70,5 @@ END
 TACTIC EXTEND hello_error_tactic
 | [ "hello_error" ] ->
   { let _ = CErrors.user_err (str Test_main.message) in
-    Tacticals.New.tclIDTAC }
+    Tacticals.tclIDTAC }
 END

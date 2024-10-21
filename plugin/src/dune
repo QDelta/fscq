@@ -1,9 +1,8 @@
 (library
  (name test_plugin)
  (public_name coq_test_plugin.plugin)
- (flags :standard -rectypes -w -27)
+ (flags :standard -rectypes -w -unused-var-strict)
  (libraries
-  coq.vernac
-  coq.plugins.ltac))
+  coq-core.plugins.ltac))
 
 (coq.pp (modules test))
