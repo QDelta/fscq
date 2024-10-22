@@ -6,8 +6,11 @@ module Make (T : ST) = struct
   type 'a t = T.st -> 'a * T.st
 
   let run (r : 'a t) (init : T.st) : 'a = fst (r init)
+
   let exec (r : 'a t) (init : T.st) : T.st = snd (r init)
+
   let update (f : T.st -> T.st) : unit t = fun s -> ((), f s)
+
   let get : T.st t = fun s -> (s, s)
 
   let ( let* ) (r1 : 'a t) (f : 'a -> 'b t) : 'b t =
@@ -28,7 +31,8 @@ module Make (T : ST) = struct
 
   let rec mapM (f : 'a -> 'b t) (l : 'a list) : 'b list t =
     match l with
-    | [] -> return []
+    | [] ->
+        return []
     | x :: xs ->
         let* y = f x in
         let* ys = mapM f xs in

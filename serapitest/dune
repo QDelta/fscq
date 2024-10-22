@@ -1,0 +1,6 @@
+(env
+ (dev
+  (flags :standard -warn-error -a))
+ (release
+  (flags :standard)
+  (ocamlopt_flags :standard -O3 -unbox-closures)))
