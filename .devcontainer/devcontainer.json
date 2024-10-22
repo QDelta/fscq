@@ -14,7 +14,8 @@
                 "coqtop.args": ["-async-proofs", "off"],
                 "files.associations": {
                     "*.mlg": "ocaml.ocamllex" // workaround for syntax highlighting
-                }
+                },
+                "editor.formatOnSave": true
             },
             "extensions": [
                 "coq-community.vscoq1",
