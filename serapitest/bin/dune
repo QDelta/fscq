@@ -1,13 +1,17 @@
 (executable
-  (public_name serapitest)
-  (name main)
-  (flags (:standard -rectypes) )
-  (libraries
-    serapitest
-    sexplib
-    coq-serapi.serapi_v8_14
-    coq-serapi.sertop_v8_12
-    coq-core.lib))
+ (public_name serapitest)
+ (name main)
+ (flags
+  (:standard -rectypes))
+ (libraries
+  sexplib
+  coq-serapi.serapi_v8_14
+  coq-serapi.sertop_v8_12
+  coq-core.lib))
 
 (env
-  (dev (flags (:standard -warn-error -unused-value-declaration))))
+ (dev
+  (flags :standard -warn-error -a))
+ (release
+  (flags :standard)
+  (ocamlopt_flags :standard -O3 -unbox-closures)))
