@@ -13,14 +13,12 @@ let get_sentences file_content add_answers =
        | _ ->
            None )
 
-let ser_init input_file ml_path vo_path1 vo_path2 =
-  let _ =
-    (* make sexp print less verbose *)
-    Serlib.Serlib_init.(
-      init
-        ~options:
-          {omit_loc= true; omit_att= true; omit_env= true; exn_on_opaque= false} )
-  in
+let ser_init input_file ml_path vo_path =
+  (* make sexp print less verbose *)
+  Serlib.Serlib_init.(
+    init
+      ~options:
+        {omit_loc= true; omit_att= true; omit_env= true; exn_on_opaque= false} ) ;
   let default_ml_path, default_vo_path =
     Serapi_paths.coq_loadpath_default ~implicit:true
       ~coq_path:
@@ -30,19 +28,17 @@ let ser_init input_file ml_path vo_path1 vo_path2 =
         | None ->
             Coq_config.coqlib )
   in
-  let _ =
-    Sertop_init.(
-      coq_init
-        { fb_handler= (fun _ _ -> ())
-        ; plugin_load= None
-        ; debug= false
-        ; set_impredicative_set= false
-        ; allow_sprop= false
-        ; indices_matter= false
-        ; ml_path= default_ml_path @ ml_path
-        ; vo_path= default_vo_path @ vo_path1 @ vo_path2 }
-        Format.std_formatter )
-  in
+  Sertop_init.(
+    coq_init
+      { fb_handler= (fun _ _ -> ())
+      ; plugin_load= None
+      ; debug= false
+      ; set_impredicative_set= false
+      ; allow_sprop= false
+      ; indices_matter= false
+      ; ml_path= default_ml_path @ ml_path
+      ; vo_path= default_vo_path @ vo_path }
+      Format.std_formatter ) ;
   let injections =
     [Coqargs.RequireInjection ("Coq.Init.Prelude", None, Some Lib.Import)]
   in
@@ -51,7 +47,7 @@ let ser_init input_file ml_path vo_path1 vo_path2 =
     Stm.Interactive (Coqargs.TopPhysical input_file)
     (* Stm.Interactive (TopLogical Names.(DirPath.make [ Id.of_string "SerApiTest" ])) *)
   in
-  let _ = Stm.(new_doc {doc_type; injections; stm_options}) in
+  Stm.(new_doc {doc_type; injections; stm_options}) |> ignore ;
   let empty_state =
     Ser.State.make ~in_file:input_file
       ~ldir:(Serapi_paths.dirpath_of_file input_file)
@@ -74,27 +70,40 @@ end)
 
 let ser_exec cmd : Ser.answer_kind list SerST.t = fun st -> Ser.exec_cmd st cmd
 
-let ser_exec_print cmd : unit SerST.t =
+let get_ctx sid =
+  sid |> Stm.state_of_id ~doc:(Stm.get_doc 0) |> Extcoq.context_of_st
+
+let format_ser =
+  Ser.{pp_format= PpSer; pp_depth= 0; pp_elide= "..."; pp_margin= 0}
+
+type proof_ctx = {hyps: string; goal: string} [@@deriving yojson]
+
+type tactic_record = {ctx: proof_ctx list; tactic: string} [@@deriving yojson]
+
+let query_proof_ctx sid =
   let open SerST in
-  let* answers = ser_exec cmd in
-  List.iter
-    (fun ans ->
-      let sexp = Sertop_ser.sexp_of_answer_kind ans in
-      print_endline (Sexplib0.Sexp.to_string_hum sexp) )
-    answers ;
-  return ()
-
-let format_str =
-  Ser.{pp_format= PpStr; pp_depth= 0; pp_elide= "..."; pp_margin= 72}
-
-let format_ast =
-  Ser.{pp_format= PpSer; pp_depth= 0; pp_elide= "..."; pp_margin= 72}
-
-let query_goals_str sid =
-  Ser.(Query ({preds= []; limit= None; sid; pp= format_str; route= 0}, Goals))
+  let query =
+    Ser.(Query ({preds= []; limit= None; sid; pp= format_ser; route= 0}, Goals))
+  in
+  let* ans = ser_exec query in
+  let sigma, env = get_ctx sid in
+  match ans with
+  | Ser.[ObjList [CoqGoal g]; Completed] ->
+      return
+        (Some
+           (List.map
+              (fun g ->
+                let hyps, goal = Serpp.pp_coq_goal_str env sigma format_ser g in
+                {hyps; goal} )
+              g.Serapi_goals.goals ) )
+  | _ ->
+      return None
 
 let query_sentence_ast sid =
-  Ser.(Query ({preds= []; limit= None; sid; pp= format_ast; route= 0}, Ast))
+  let query =
+    Ser.(Query ({preds= []; limit= None; sid; pp= format_ser; route= 0}, Ast))
+  in
+  ser_exec query
 
 type sentence_kind = Proof | Qed | Other
 
@@ -124,45 +133,58 @@ let filter_proofs sentence_kinds =
   in
   aux [] [] sentence_kinds
 
-let get_goal_tactic_pairs proof =
+let get_tactic_record proof =
   let open SerST in
   let rec aux result = function
     | s1 :: s2 :: rest -> (
-        let* goals = ser_exec (query_goals_str s1.id) in
-        match goals with
-        | Ser.[ObjList [CoqString goal]; Completed] ->
-            aux ((goal, s2.text) :: result) (s2 :: rest)
-        | _ ->
+        let* ctx = query_proof_ctx s1.id in
+        match ctx with
+        | Some ctx ->
+            aux ({ctx; tactic= s2.text} :: result) (s2 :: rest)
+        | None ->
             aux result (s2 :: rest) )
     | _ ->
         return (List.rev result)
   in
   aux [] proof
 
-let main input_file ml_path vo_path1 vo_path2 =
-  let sentences, init_state = ser_init input_file ml_path vo_path1 vo_path2 in
+let print_exn i = function
+  | Ser.CoqExn info ->
+      ( match info.loc with
+      | Some loc ->
+          Format.printf "line %i " loc.line_nb
+      | None ->
+          () ) ;
+      Format.printf "(sentence %i) " i ;
+      Format.print_flush () ;
+      print_endline info.str
+  | _ ->
+      ()
+
+let main input_file output_file ml_path vo_path1 vo_path2 =
+  let sentences, init_state =
+    ser_init input_file ml_path (vo_path1 @ vo_path2)
+  in
   let test =
     let open SerST in
-    let* _ = mapM (fun s -> ser_exec (Ser.Exec s.id)) sentences in
+    let* exec_answers = mapM (fun s -> ser_exec (Ser.Exec s.id)) sentences in
+    List.iteri (fun i ans -> List.iter (print_exn i) ans) exec_answers ;
     let* sentence_kinds =
       mapM
         (fun s ->
-          let* ans = ser_exec (query_sentence_ast s.id) in
+          let* ans = query_sentence_ast s.id in
           return (s, get_sentence_kind ans) )
         sentences
     in
     let proofs = filter_proofs sentence_kinds in
-    let* goal_tactic_pairs = List.flatten $ mapM get_goal_tactic_pairs proofs in
-    let _ =
-      List.iter
-        (fun (goal, tac) ->
-          print_endline "######## GOAL ########" ;
-          print_endline goal ;
-          print_endline "####### TACTIC #######" ;
-          print_endline tac ;
-          print_endline "" )
-        goal_tactic_pairs
-    in
+    let* tactic_records = List.flatten $ mapM get_tactic_record proofs in
+    let output_chan = open_out output_file in
+    List.iter
+      (fun tr ->
+        Yojson.Safe.to_channel ~suf:"\n" output_chan
+          (tactic_record_to_yojson tr) )
+      tactic_records ;
+    close_out output_chan ;
     return ()
   in
   SerST.run test init_state
@@ -172,10 +194,16 @@ let main_cmd =
   let open Cmdliner in
   let input_file =
     let doc = "Input file" in
-    Arg.(required & pos 0 (some string) None & info [] ~docv:"FILE" ~doc)
+    Arg.(required & pos 0 (some string) None & info [] ~docv:"INPUT_FILE" ~doc)
+  in
+  let output_file =
+    let doc = "Output file" in
+    Arg.(required & pos 1 (some string) None & info [] ~docv:"OUTPUT_FILE" ~doc)
   in
   let term =
-    Term.(const main $ input_file $ ml_include_path $ load_path $ rload_path)
+    Term.(
+      const main $ input_file $ output_file $ ml_include_path $ load_path
+      $ rload_path )
   in
   let info = Cmd.info "serapitest" in
   Cmd.v info term

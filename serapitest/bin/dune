@@ -5,7 +5,10 @@
   (:standard -rectypes))
  (libraries
   serapitest
-  sexplib
+  yojson
+  ppx_deriving_yojson.runtime
   coq-serapi.serapi_v8_14
   coq-serapi.sertop_v8_12
-  coq-core.lib))
+  coq-core.lib)
+ (preprocess
+  (pps ppx_deriving_yojson)))

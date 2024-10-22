@@ -1,2 +1,5 @@
 (library
- (name serapitest))
+ (name serapitest)
+ (flags
+  (:standard -rectypes))
+ (libraries coq-serapi.serapi_v8_14 coq-core.lib))
