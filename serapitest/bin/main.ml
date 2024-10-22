@@ -14,7 +14,6 @@ let get_sentences file_content add_answers =
                text = String.sub file_content loc.bp (loc.ep - loc.bp);
              }
        | _ -> None)
-  |> Array.of_list
 
 let ser_init input_file ml_path vo_path1 vo_path2 =
   let _ =
@@ -109,25 +108,63 @@ let query_sentence_ast sid =
   Ser.(
     Query ({ preds = []; limit = None; sid; pp = format_ast; route = 0 }, Ast))
 
-let is_proof_start = function
-  | Ser.ObjList [ Ser.CoqAst vernac ] -> (
-      match vernac.v.expr with Vernacexpr.VernacProof _ -> true | _ -> false)
-  | _ -> false
+type sentence_kind = Proof | Qed | Other
 
-let is_qed = function
-  | Ser.ObjList [ Ser.CoqAst vernac ] -> (
+let get_sentence_kind = function
+  | Ser.[ ObjList [ CoqAst vernac ]; Completed ] -> (
       match vernac.v.expr with
-      | Vernacexpr.(VernacEndProof (Proved _)) -> true
-      | _ -> false)
-  | _ -> false
+      | Vernacexpr.VernacProof _ -> Proof
+      | Vernacexpr.(VernacEndProof (Proved _)) -> Qed
+      | _ -> Other)
+  | _ -> Other
+
+(* sentences between `Proof.` and `Qed.`, include `Proof.` *)
+let filter_proofs sentence_kinds =
+  let rec aux proofs cur_proof = function
+    | (s, Proof) :: rest -> aux proofs [ s ] rest
+    | (s, Other) :: rest -> aux proofs (s :: cur_proof) rest
+    | (_, Qed) :: rest -> aux (List.rev cur_proof :: proofs) [] rest
+    | [] -> List.rev proofs
+  in
+  aux [] [] sentence_kinds
+
+let get_goal_tactic_pairs proof =
+  let open SerST in
+  let rec aux result = function
+    | s1 :: s2 :: rest -> (
+        let* goals = ser_exec (query_goals_str s1.id) in
+        match goals with
+        | Ser.[ ObjList [ CoqString goal ]; Completed ] ->
+            aux ((goal, s2.text) :: result) (s2 :: rest)
+        | _ -> aux result (s2 :: rest))
+    | _ -> return (List.rev result)
+  in
+  aux [] proof
 
 let main input_file ml_path vo_path1 vo_path2 =
   let sentences, init_state = ser_init input_file ml_path vo_path1 vo_path2 in
   let test =
     let open SerST in
-    let _ = Array.iter (fun s -> print_endline s.text) sentences in
-    let* _ = ser_exec_print (query_goals_str sentences.(1).id) in
-    let* _ = ser_exec_print (query_sentence_ast sentences.(2).id) in
+    let* _ = mapM (fun s -> ser_exec (Ser.Exec s.id)) sentences in
+    let* sentence_kinds =
+      mapM
+        (fun s ->
+          let* ans = ser_exec (query_sentence_ast s.id) in
+          return (s, get_sentence_kind ans))
+        sentences
+    in
+    let proofs = filter_proofs sentence_kinds in
+    let* goal_tactic_pairs = List.flatten $ mapM get_goal_tactic_pairs proofs in
+    let _ =
+      List.iter
+        (fun (goal, tac) ->
+          print_endline "######## GOAL ########";
+          print_endline goal;
+          print_endline "####### TACTIC #######";
+          print_endline tac;
+          print_endline "")
+        goal_tactic_pairs
+    in
     return ()
   in
   SerST.run test init_state
